@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#172338">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<title>Moje Finanse</title>
+</head>
+<body>
+<div class="app">
+<header><div><h1>Moje Finanse</h1><p>Dashboard • 2026</p></div><button class="icon" onclick="openSettings()">⚙</button></header>
+
+<section class="hero">
+<div><small>DOCHÓD PO KOSZTACH I OBCIĄŻENIACH</small><h2 id="net">0 zł</h2><div class="positive" id="monthly">0 zł / mies.</div><button class="pill" onclick="scrollToId('forecast')">↗ Zobacz prognozę</button></div>
+<div class="ring"><div id="ringLabel">0%</div></div>
+</section>
+
+<section class="metrics">
+<div><span>💼</span><small>PRZYCHÓD</small><b id="revenue">0 zł</b></div>
+<div><span>🧾</span><small>PODATKI + ZUS</small><b id="tax">0 zł</b></div>
+<div><span>🏦</span><small>KREDYTY</small><b id="loanCost">0 zł</b></div>
+<div><span>💜</span><small>VAT</small><b id="vat">0 zł</b></div>
+</section>
+
+<section class="card">
+<div class="title"><b>DOCHODY</b><button onclick="incomeDialog.showModal()">Edytuj ›</button></div>
+<div class="incomeRow"><span>💼</span><div><b>Etat</b><strong id="salary">0 zł</strong></div><em id="salaryPct">0%</em></div>
+<div class="bar"><i id="salaryBar"></i></div>
+<div class="incomeRow"><span>🏢</span><div><b>Działalność</b><strong id="business">0 zł</strong></div><em id="businessPct">0%</em></div>
+<div class="bar"><i id="businessBar"></i></div>
+<div class="incomeRow"><span>★</span><div><b>Inne</b><strong id="otherIncome">0 zł</strong></div><em id="otherPct">0%</em></div>
+<div class="bar"><i id="otherBar"></i></div>
+</section>
+
+<section class="grid">
+<section class="card" id="forecast">
+<div class="title"><b>PROGNOZA 2026</b><button onclick="openMonthly()">Miesiące ›</button></div>
+<div class="big green" id="forecastValue">0 zł</div>
+<div class="chart"><svg viewBox="0 0 500 150" preserveAspectRatio="none"><polyline id="line" points="0,140 45,125 90,130 135,105 180,112 225,90 270,95 315,70 360,76 405,50 450,58 500,20"/></svg></div>
+<p class="hint">Prognoza jest liczona na podstawie wpisanych miesięcznych dochodów, podatków, VAT i rat.</p>
+</section>
+
+<section class="card">
+<div class="title"><b>OBCIĄŻENIA</b></div>
+<div class="break"><span>Podatki + ZUS</span><b id="taxPct">0%</b></div>
+<div class="break"><span>VAT</span><b id="vatPct">0%</b></div>
+<div class="break"><span>Kredyty</span><b id="loanPct">0%</b></div>
+<div class="break"><span>Do dyspozycji</span><b class="green" id="freePct">0%</b></div>
+<hr><p class="hint">W kolejnej wersji dojdzie pełny moduł kosztów życia i majątku.</p>
+</section>
+</section>
+
+<section class="card">
+<div class="title"><b>KREDYTY</b><button onclick="loanDialog.showModal()">＋ Dodaj</button></div>
+<div id="loans"></div>
+<button class="overpay" onclick="simulate()">↗ Symuluj nadpłatę kredytów</button>
+</section>
+
+<section class="card">
+<div class="title"><b>USTAWIENIA PODATKOWE</b><button onclick="taxDialog.showModal()">Zmień ›</button></div>
+<div class="taxline"><span>Sposób opodatkowania</span><b id="taxModeLabel">Skala podatkowa</b></div>
+<div class="taxline"><span>Próg</span><b id="thresholdLabel">12% / 32%</b></div>
+</section>
+
+<nav><button class="active">⌂<small>Dashboard</small></button><button onclick="incomeDialog.showModal()">▣<small>Dochody</small></button><button class="plus" onclick="incomeDialog.showModal()">＋</button><button onclick="document.querySelector('.loans-card')?.scrollIntoView()">⌑<small>Kredyty</small></button><button onclick="openSettings()">•••<small>Więcej</small></button></nav>
+</div>
+
+<dialog id="incomeDialog"><form method="dialog" id="incomeForm"><h2>Dochody i obciążenia</h2>
+<label>Etat netto / miesiąc<input id="salaryIn" type="number" min="0"></label>
+<label>Firma — dochód po kosztach / miesiąc<input id="businessIn" type="number" min="0"></label>
+<label>Inne dochody / miesiąc<input id="otherIn" type="number" min="0"></label>
+<label>VAT do zapłaty / miesiąc<input id="vatIn" type="number" min="0"></label>
+<label>Podatki + ZUS / miesiąc<input id="taxIn" type="number" min="0"></label>
+<div class="actions"><button value="cancel">Anuluj</button><button class="primary" value="default">Zapisz</button></div></form></dialog>
+
+<dialog id="loanDialog"><form method="dialog" id="loanForm"><h2>Dodaj kredyt</h2>
+<label>Nazwa<input id="loanName" required placeholder="np. Hipoteczny"></label>
+<label>Pozostały kapitał<input id="loanBalance" type="number" min="0" required></label>
+<label>Rata<input id="loanPayment" type="number" min="0" required></label>
+<label>Oprocentowanie %<input id="loanRate" type="number" min="0" step=".01" required></label>
+<label>Pozostało rat<input id="loanMonths" type="number" min="1" required></label>
+<div class="actions"><button value="cancel">Anuluj</button><button class="primary" value="default">Dodaj</button></div></form></dialog>
+
+<dialog id="taxDialog"><form method="dialog" id="taxForm"><h2>Podatki</h2>
+<label>Sposób opodatkowania<select id="taxMode"><option>Skala podatkowa</option><option>Podatek liniowy</option><option>Ryczałt</option></select></label>
+<label>Pierwszy próg %<input id="threshold1" type="number" value="12" step=".1"></label>
+<label>Drugi próg %<input id="threshold2" type="number" value="32" step=".1"></label>
+<label>Próg dochodowy zł<input id="thresholdAmount" type="number" value="120000"></label>
+<div class="actions"><button value="cancel">Anuluj</button><button class="primary" value="default">Zapisz</button></div></form></dialog>
+
+<dialog id="simDialog"><form method="dialog"><h2>Symulator nadpłaty</h2><label>Dodatkowa kwota / miesiąc<input id="extra" type="number" value="500" min="0" step="100" oninput="calculateSimulation()"></label><div id="simResult" class="sim"></div><div class="actions"><button value="cancel">Zamknij</button></div></form></dialog>
+
+<dialog id="monthDialog"><form method="dialog"><h2>Prognoza miesięczna</h2><div id="monthList"></div><div class="actions"><button value="cancel">Zamknij</button></div></form></dialog>
+
+<script src="app.js"></script>
+</body></html>
