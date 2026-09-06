@@ -1,6 +1,6 @@
-/* Moje Finanse 2.9 — finalny strażnik wersji i porządek UI */
+/* Moje Finanse 3.0 — finalny strażnik wersji i porządek UI */
 (function(){
-const VERSION='2.9.0';
+const VERSION='3.0.0';
 function apply(){
   document.title='Moje Finanse '+VERSION;
   let h=document.querySelector('.top small');
