@@ -14,4 +14,6 @@ box.innerHTML=`<div class="card salaryHero23"><div><small>PEŁNY KOSZT TWOJEJ PR
 window.saveSalarySettings23=function(){S.finance.ppkOpening=num(G('ppkOpening23').value);S.finance.ppkReturnPct=num(G('ppkReturn23').value);S.finance.ppkStateAnnual=num(G('ppkState23').value);S.finance.ppkWelcome=num(G('ppkWelcome23').value);S.finance.employerAccidentPct=num(G('accident23').value)||1.67;save();renderSalary23()};
 function version(){let h=document.querySelector('.top small');if(h)h.innerHTML=`<span id="headerYear">${S.selectedYear}</span> • wersja 2.3`;document.title='Moje Finanse 2.3'}
 ensure23();const prev=window.render;if(typeof prev==='function')window.render=function(){prev();renderSalary23();version()};setTimeout(()=>{renderSalary23();version()},60);
+if(!document.querySelector('link[data-v24]')){let l=document.createElement('link');l.rel='stylesheet';l.href='v24.css?v=240';l.dataset.v24='1';document.head.appendChild(l)}
+if(!document.querySelector('script[data-v24]')){let s=document.createElement('script');s.src='v24raise.js?v=240';s.dataset.v24='1';document.body.appendChild(s)}
 })();
