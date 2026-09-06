@@ -1,0 +1,9 @@
+/* Moje Finanse 1.9 */
+.loanKpis{grid-template-columns:repeat(5,1fr)}
+.loanKpi.interestFuture{background:#fff7e8}
+.loanTitleActions{display:flex;gap:7px;align-items:center}.collapseBtn{background:#eef4ff;color:#3976dc}
+.loanCollapsedSummary{display:none;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.loanCollapsedSummary span{background:var(--soft);border-radius:10px;padding:9px;color:var(--muted);font-size:9px}.loanCollapsedSummary b{display:block;color:var(--ink);font-size:13px;margin-top:2px}
+.loan.loanCollapsed>.loanKpis,.loan.loanCollapsed>.loanProgress,.loan.loanCollapsed>.debtComposition,.loan.loanCollapsed>.loanChartHead,.loan.loanCollapsed>.loanScroll,.loan.loanCollapsed>.legend,.loan.loanCollapsed>.loanResultGrid,.loan.loanCollapsed>.paymentSection,.loan.loanCollapsed>.loanEdit{display:none!important}.loan.loanCollapsed>.loanCollapsedSummary{display:grid}
+.capitalEquation{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);text-align:right}.capitalEquation b{color:var(--ink)}
+@media(max-width:760px){.loanKpis{grid-template-columns:1fr 1fr}.loanCollapsedSummary{grid-template-columns:1fr 1fr}.loanTitleActions{flex-direction:column;align-items:flex-end}}
+@media(max-width:440px){.loanCollapsedSummary{grid-template-columns:1fr 1fr}.loanKpi.interestFuture{grid-column:1/-1}}
