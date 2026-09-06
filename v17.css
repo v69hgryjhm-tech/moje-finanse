@@ -1,0 +1,3 @@
+/* Kredyty 1.7 — legenda i adaptacyjny wykres */
+.loanAdaptive svg{min-height:252px}.loanLegend17{align-items:center}.loanLegend17 span{display:inline-flex;align-items:center;gap:4px}.legendBar{display:inline-block;width:16px;height:10px;border-radius:3px}.legendBar.planned{background:#cfe1fb}.legendBar.paid{background:#38b96a}.legendBar.extra{background:#f4a126}.loanAdaptive text{user-select:none}.loanAdaptive rect{transition:opacity .15s,filter .15s}.loanAdaptive rect:hover{filter:brightness(.96)}
+@media(max-width:650px){.loanAdaptive svg{min-height:246px}.loanLegend17{gap:8px}.loanLegend17 span{font-size:9px}}
