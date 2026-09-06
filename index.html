@@ -1,98 +1,49 @@
 <!doctype html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#172338">
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
-<title>Moje Finanse</title>
-</head>
-<body>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f4f7fb"><title>Moje Finanse 1.0</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#172238;--muted:#7d899d;--green:#38b96a;--green2:#dff5e7;--blue:#3976dc;--orange:#f4a126;--purple:#9550d7;--red:#e25c64;--line:#e7ebf1;--nav:rgba(255,255,255,.94)}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:var(--ink)}button,input,select{font:inherit}button{border:0;cursor:pointer}.app{max-width:1100px;margin:auto;padding:28px 20px 120px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.title{font-size:42px;font-weight:800;letter-spacing:-1.5px}.sub{font-size:19px;color:var(--muted);margin-top:2px}.gear{width:62px;height:62px;border-radius:22px;background:#fff;box-shadow:0 10px 25px #17223812;font-size:28px}.hero{background:var(--ink);color:#fff;border-radius:30px;padding:28px 30px;display:grid;grid-template-columns:1.25fr .75fr;gap:25px;box-shadow:0 18px 40px #17223820}.eyebrow{color:#c1cad8;font-size:17px;line-height:1.5}.heroValue{font-size:52px;font-weight:800;margin:10px 0 3px;letter-spacing:-2px}.heroSmall{color:#6ee18e;font-size:20px}.pill{margin-top:20px;background:#2b3850;color:white;border-radius:20px;padding:12px 17px}.donutWrap{display:flex;align-items:center;justify-content:center}.donut{width:185px;height:185px;border-radius:50%;background:conic-gradient(var(--green) 0 55%,var(--blue) 55% 75%,var(--orange) 75% 91%,var(--purple) 91% 100%);display:grid;place-items:center}.donut:after{content:"";width:115px;height:115px;background:var(--ink);border-radius:50%;}.donutText{position:absolute;text-align:center;font-weight:800;font-size:25px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:20px 0}.tile,.card{background:var(--card);border-radius:25px;padding:22px;box-shadow:0 8px 25px #17223808}.icon{font-size:28px}.label{color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:.4px;margin-top:10px}.big{font-size:28px;font-weight:750;margin-top:5px}.green{color:var(--green)}.red{color:var(--red)}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.cardTitle{font-size:22px;font-weight:750;margin-bottom:18px;display:flex;justify-content:space-between}.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.progress{height:8px;background:#edf0f4;border-radius:9px;overflow:hidden;margin-top:8px}.progress span{display:block;height:100%;background:var(--green);border-radius:9px}.loan{padding:14px 0;border-bottom:1px solid var(--line)}.loanTop{display:flex;justify-content:space-between}.muted{color:var(--muted)}.chart{height:190px;display:flex;align-items:end;gap:7px;padding:15px 5px;border-bottom:1px solid var(--line)}.bar{flex:1;background:linear-gradient(#5bc77d,#b8ebc7);border-radius:8px 8px 0 0;min-height:5px}.months{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:7px}.nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(680px,calc(100% - 24px));background:var(--nav);backdrop-filter:blur(20px);border-radius:28px;box-shadow:0 10px 35px #17223820;display:flex;align-items:center;justify-content:space-around;padding:10px 8px;z-index:20}.nav button{background:none;color:var(--muted);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:4px}.nav button.active{color:var(--green)}.plus{width:62px!important;height:62px;border-radius:50%!important;background:var(--green)!important;color:#fff!important;font-size:35px!important;box-shadow:0 8px 18px #38b96a55}.view{display:none}.view.active{display:block}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.btn{background:#fff;padding:11px 15px;border-radius:14px;color:var(--ink);box-shadow:0 5px 16px #1722380a}.btn.primary{background:var(--green);color:white}.formGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:13px;color:var(--muted)}.field input,.field select{border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff;color:var(--ink)}.modal{position:fixed;inset:0;background:#10182866;display:none;align-items:flex-end;justify-content:center;z-index:30}.modal.show{display:flex}.sheet{background:#fff;width:min(720px,100%);border-radius:28px 28px 0 0;padding:24px;max-height:90vh;overflow:auto}.sheet h2{margin-top:0}.statLine{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)}.note{background:var(--green2);padding:15px;border-radius:16px;margin-top:15px}.danger{background:#fff1f1;color:var(--red)}@media(max-width:760px){.app{padding:20px 16px 120px}.title{font-size:38px}.hero{grid-template-columns:1fr;padding:24px}.heroValue{font-size:45px}.grid4{grid-template-columns:1fr 1fr;gap:12px}.grid2{grid-template-columns:1fr}.tile,.card{padding:18px}.nav{bottom:8px}.formGrid{grid-template-columns:1fr}}@media(min-width:761px){.nav{bottom:20px}}
+</style></head><body>
 <div class="app">
-<header><div><h1>Moje Finanse</h1><p>Dashboard • 2026</p></div><button class="icon" onclick="openSettings()">⚙</button></header>
-
-<section class="hero">
-<div><small>DOCHÓD PO KOSZTACH I OBCIĄŻENIACH</small><h2 id="net">0 zł</h2><div class="positive" id="monthly">0 zł / mies.</div><button class="pill" onclick="scrollToId('forecast')">↗ Zobacz prognozę</button></div>
-<div class="ring"><div id="ringLabel">0%</div></div>
+<header class="top"><div><div class="title">Moje Finanse</div><div class="sub">Dashboard • <span id="yearLabel"></span></div></div><button class="gear" onclick="openSettings()">⚙️</button></header>
+<section id="dashboard" class="view active">
+<div class="hero"><div><div class="eyebrow">DOCHÓD PO KOSZTACH I OBCIĄŻENIACH</div><div class="heroValue" id="netYear">0 zł</div><div class="heroSmall" id="netMonth">0 zł / mies.</div><button class="pill" onclick="openForecast()">↗ Zobacz prognozę</button></div><div class="donutWrap"><div class="donut"><div class="donutText" id="donutPct">0%</div></div></div></div>
+<div class="grid4"><div class="tile"><div class="icon">💼</div><div class="label">Przychód</div><div class="big" id="incomeTile">0 zł</div></div><div class="tile"><div class="icon">🧾</div><div class="label">Podatki + ZUS</div><div class="big" id="taxTile">0 zł</div></div><div class="tile"><div class="icon">🏦</div><div class="label">Kredyty</div><div class="big" id="loanTile">0 zł</div></div><div class="tile"><div class="icon">💜</div><div class="label">VAT</div><div class="big" id="vatTile">0 zł</div></div></div>
+<div class="grid2"><div class="card"><div class="cardTitle">DOCHODY <button class="btn" onclick="showView('income')">Edytuj ›</button></div><div id="incomeRows"></div></div><div class="card"><div class="cardTitle">PROGNOZA GOTÓWKI <button class="btn" onclick="openForecast()">Szczegóły ›</button></div><div>Na koniec roku</div><div class="big green" id="forecastEnd">0 zł</div><div class="chart" id="chart"></div><div class="months"><span>Sty</span><span>Kwi</span><span>Lip</span><span>Paź</span><span>Gru</span></div><div class="note">📈 Przy obecnych założeniach prognoza jest liczona automatycznie z Twoich danych.</div></div></div>
+<div class="card" style="margin-top:18px"><div class="cardTitle">KREDYTY <button class="btn" onclick="showView('loans')">Wszystkie ›</button></div><div id="loanRows"></div></div>
 </section>
-
-<section class="metrics">
-<div><span>💼</span><small>PRZYCHÓD</small><b id="revenue">0 zł</b></div>
-<div><span>🧾</span><small>PODATKI + ZUS</small><b id="tax">0 zł</b></div>
-<div><span>🏦</span><small>KREDYTY</small><b id="loanCost">0 zł</b></div>
-<div><span>💜</span><small>VAT</small><b id="vat">0 zł</b></div>
+<section id="income" class="view"><div class="toolbar"><button class="btn primary" onclick="addIncome()">＋ Dodaj dochód</button><button class="btn" onclick="resetDemo()">Przywróć przykładowe dane</button></div><div class="card"><div class="cardTitle">Źródła dochodu</div><div id="incomeList"></div></div></section>
+<section id="loans" class="view"><div class="toolbar"><button class="btn primary" onclick="addLoan()">＋ Dodaj kredyt</button></div><div id="loansList"></div></section>
+<section id="more" class="view"><div class="grid2"><div class="card"><div class="cardTitle">Podatki i ZUS</div><div class="formGrid"><div class="field"><label>Forma opodatkowania</label><select id="taxForm" onchange="saveSettings();render()"><option value="scale">Skala podatkowa</option><option value="flat">Podatek liniowy</option><option value="lump">Ryczałt</option></select></div><div class="field"><label>Próg / stawka (%)</label><input id="taxRate" type="number" step="0.1" onchange="saveSettings();render()"></div><div class="field"><label>ZUS miesięcznie</label><input id="zus" type="number" onchange="saveSettings();render()"></div><div class="field"><label>Koszty firmowe / mies.</label><input id="costs" type="number" onchange="saveSettings();render()"></div></div><div class="note">Aplikacja pozwala testować scenariusze. Wyniki podatkowe są kalkulacją orientacyjną, a nie poradą podatkową.</div></div><div class="card"><div class="cardTitle">VAT</div><div class="formGrid"><div class="field"><label>VAT należny / mies.</label><input id="vatDue" type="number" onchange="saveSettings();render()"></div><div class="field"><label>VAT naliczony / mies.</label><input id="vatInput" type="number" onchange="saveSettings();render()"></div></div><div class="statLine"><span>VAT do zapłaty / mies.</span><b id="vatMonthly">0 zł</b></div><div class="statLine"><span>VAT do zapłaty / rok</span><b id="vatAnnual">0 zł</b></div></div></div>
+<div class="card" style="margin-top:18px"><div class="cardTitle">Scenariusz nadpłaty</div><div class="formGrid"><div class="field"><label>Dodatkowa nadpłata miesięczna</label><input id="extraPayment" type="number" value="0" onchange="saveSettings();render()"></div><div class="field"><label>Jednorazowa nadpłata</label><input id="oneOff" type="number" value="0" onchange="saveSettings();render()"></div></div><div id="scenarioResult" class="note"></div></div>
 </section>
-
-<section class="card">
-<div class="title"><b>DOCHODY</b><button onclick="incomeDialog.showModal()">Edytuj ›</button></div>
-<div class="incomeRow"><span>💼</span><div><b>Etat</b><strong id="salary">0 zł</strong></div><em id="salaryPct">0%</em></div>
-<div class="bar"><i id="salaryBar"></i></div>
-<div class="incomeRow"><span>🏢</span><div><b>Działalność</b><strong id="business">0 zł</strong></div><em id="businessPct">0%</em></div>
-<div class="bar"><i id="businessBar"></i></div>
-<div class="incomeRow"><span>★</span><div><b>Inne</b><strong id="otherIncome">0 zł</strong></div><em id="otherPct">0%</em></div>
-<div class="bar"><i id="otherBar"></i></div>
-</section>
-
-<section class="grid">
-<section class="card" id="forecast">
-<div class="title"><b>PROGNOZA 2026</b><button onclick="openMonthly()">Miesiące ›</button></div>
-<div class="big green" id="forecastValue">0 zł</div>
-<div class="chart"><svg viewBox="0 0 500 150" preserveAspectRatio="none"><polyline id="line" points="0,140 45,125 90,130 135,105 180,112 225,90 270,95 315,70 360,76 405,50 450,58 500,20"/></svg></div>
-<p class="hint">Prognoza jest liczona na podstawie wpisanych miesięcznych dochodów, podatków, VAT i rat.</p>
-</section>
-
-<section class="card">
-<div class="title"><b>OBCIĄŻENIA</b></div>
-<div class="break"><span>Podatki + ZUS</span><b id="taxPct">0%</b></div>
-<div class="break"><span>VAT</span><b id="vatPct">0%</b></div>
-<div class="break"><span>Kredyty</span><b id="loanPct">0%</b></div>
-<div class="break"><span>Do dyspozycji</span><b class="green" id="freePct">0%</b></div>
-<hr><p class="hint">W kolejnej wersji dojdzie pełny moduł kosztów życia i majątku.</p>
-</section>
-</section>
-
-<section class="card">
-<div class="title"><b>KREDYTY</b><button onclick="loanDialog.showModal()">＋ Dodaj</button></div>
-<div id="loans"></div>
-<button class="overpay" onclick="simulate()">↗ Symuluj nadpłatę kredytów</button>
-</section>
-
-<section class="card">
-<div class="title"><b>USTAWIENIA PODATKOWE</b><button onclick="taxDialog.showModal()">Zmień ›</button></div>
-<div class="taxline"><span>Sposób opodatkowania</span><b id="taxModeLabel">Skala podatkowa</b></div>
-<div class="taxline"><span>Próg</span><b id="thresholdLabel">12% / 32%</b></div>
-</section>
-
-<nav><button class="active">⌂<small>Dashboard</small></button><button onclick="incomeDialog.showModal()">▣<small>Dochody</small></button><button class="plus" onclick="incomeDialog.showModal()">＋</button><button onclick="document.querySelector('.loans-card')?.scrollIntoView()">⌑<small>Kredyty</small></button><button onclick="openSettings()">•••<small>Więcej</small></button></nav>
 </div>
-
-<dialog id="incomeDialog"><form method="dialog" id="incomeForm"><h2>Dochody i obciążenia</h2>
-<label>Etat netto / miesiąc<input id="salaryIn" type="number" min="0"></label>
-<label>Firma — dochód po kosztach / miesiąc<input id="businessIn" type="number" min="0"></label>
-<label>Inne dochody / miesiąc<input id="otherIn" type="number" min="0"></label>
-<label>VAT do zapłaty / miesiąc<input id="vatIn" type="number" min="0"></label>
-<label>Podatki + ZUS / miesiąc<input id="taxIn" type="number" min="0"></label>
-<div class="actions"><button value="cancel">Anuluj</button><button class="primary" value="default">Zapisz</button></div></form></dialog>
-
-<dialog id="loanDialog"><form method="dialog" id="loanForm"><h2>Dodaj kredyt</h2>
-<label>Nazwa<input id="loanName" required placeholder="np. Hipoteczny"></label>
-<label>Pozostały kapitał<input id="loanBalance" type="number" min="0" required></label>
-<label>Rata<input id="loanPayment" type="number" min="0" required></label>
-<label>Oprocentowanie %<input id="loanRate" type="number" min="0" step=".01" required></label>
-<label>Pozostało rat<input id="loanMonths" type="number" min="1" required></label>
-<div class="actions"><button value="cancel">Anuluj</button><button class="primary" value="default">Dodaj</button></div></form></dialog>
-
-<dialog id="taxDialog"><form method="dialog" id="taxForm"><h2>Podatki</h2>
-<label>Sposób opodatkowania<select id="taxMode"><option>Skala podatkowa</option><option>Podatek liniowy</option><option>Ryczałt</option></select></label>
-<label>Pierwszy próg %<input id="threshold1" type="number" value="12" step=".1"></label>
-<label>Drugi próg %<input id="threshold2" type="number" value="32" step=".1"></label>
-<label>Próg dochodowy zł<input id="thresholdAmount" type="number" value="120000"></label>
-<div class="actions"><button value="cancel">Anuluj</button><button class="primary" value="default">Zapisz</button></div></form></dialog>
-
-<dialog id="simDialog"><form method="dialog"><h2>Symulator nadpłaty</h2><label>Dodatkowa kwota / miesiąc<input id="extra" type="number" value="500" min="0" step="100" oninput="calculateSimulation()"></label><div id="simResult" class="sim"></div><div class="actions"><button value="cancel">Zamknij</button></div></form></dialog>
-
-<dialog id="monthDialog"><form method="dialog"><h2>Prognoza miesięczna</h2><div id="monthList"></div><div class="actions"><button value="cancel">Zamknij</button></div></form></dialog>
-
-<script src="app.js"></script>
-</body></html>
+<nav class="nav"><button class="active" data-v="dashboard" onclick="showView('dashboard')">⌂<span>Dashboard</span></button><button data-v="income" onclick="showView('income')">▣<span>Dochody</span></button><button class="plus" onclick="quickAdd()">＋</button><button data-v="loans" onclick="showView('loans')">⌑<span>Kredyty</span></button><button data-v="more" onclick="showView('more')">•••<span>Więcej</span></button></nav>
+<div id="modal" class="modal" onclick="if(event.target.id==='modal')closeModal()"><div class="sheet" id="sheet"></div></div>
+<script>
+const KEY='moje-finanse-v1';const PLN=new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',maximumFractionDigits:0});
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{year:new Date().getFullYear(),incomes:[{name:'Etat',annual:72000,type:'etat'},{name:'Działalność gospodarcza',annual:0,type:'firma'},{name:'Inne',annual:0,type:'inne'}],loans:[{name:'Kredyt hipoteczny',balance:320000,rate:7.2,payment:2150,months:214},{name:'Kredyt samochodowy',balance:42000,rate:8.1,payment:1050,months:28}],settings:{taxForm:'scale',taxRate:12,zus:0,costs:0,vatDue:0,vatInput:0,extraPayment:0,oneOff:0}};
+function money(n){return PLN.format(Math.max(0,n||0))}function save(){localStorage.setItem(KEY,JSON.stringify(state))}function taxCalc(){let gross=state.incomes.reduce((a,x)=>a+x.annual,0);let base=Math.max(0,gross-state.settings.costs*12-state.settings.zus*12);let r=state.settings.taxRate/100;return base*r+state.settings.zus*12}function totals(){let income=state.incomes.reduce((a,x)=>a+x.annual,0),tax=taxCalc(),vat=Math.max(0,(state.settings.vatDue-state.settings.vatInput)*12),loan=state.loans.reduce((a,x)=>a+x.payment*12,0),cost=state.settings.costs*12;return{income,tax,vat,loan,cost,net:income-tax-vat-loan-cost}}function render(){document.getElementById('yearLabel').textContent=state.year;const t=totals();document.getElementById('netYear').textContent=money(t.net);document.getElementById('netMonth').textContent=money(t.net/12)+' / mies.';document.getElementById('incomeTile').textContent=money(t.income);document.getElementById('taxTile').textContent=money(t.tax);document.getElementById('loanTile').textContent=money(t.loan);document.getElementById('vatTile').textContent=money(t.vat);document.getElementById('forecastEnd').textContent=money(t.net);let burden=t.income?Math.round((t.net/t.income)*100):0;document.getElementById('donutPct').textContent=burden+'%';document.getElementById('incomeRows').innerHTML=state.incomes.map(x=>`<div class="row"><div><b>${x.name}</b><div class="progress"><span style="width:${t.income?Math.min(100,x.annual/t.income*100):0}%"></span></div></div><b>${money(x.annual)}</b></div>`).join('');document.getElementById('loanRows').innerHTML=state.loans.slice(0,3).map((l,i)=>`<div class="loan"><div class="loanTop"><div><b>${l.name}</b><div class="muted">Pozostało: ${money(l.balance)} • ${l.rate.toFixed(2)}%</div></div><b>${money(l.payment)} / mies.</b></div><div class="progress"><span style="width:${Math.max(5,Math.min(100,100-l.months/240*100))}%"></span></div></div>`).join('')||'<div class="muted">Brak kredytów</div>';renderChart(t.net);renderIncomeList();renderLoansList();document.getElementById('vatMonthly').textContent=money(Math.max(0,state.settings.vatDue-state.settings.vatInput));document.getElementById('vatAnnual').textContent=money(t.vat);document.getElementById('scenarioResult').innerHTML=scenarioText();['taxForm','taxRate','zus','costs','vatDue','vatInput','extraPayment','oneOff'].forEach(id=>{let el=document.getElementById(id);if(el){let key=id==='taxForm'?id:id;let val=id==='extraPayment'?state.settings.extraPayment:id==='oneOff'?state.settings.oneOff:state.settings[id];if(val!==undefined)el.value=val}})}
+function renderChart(end){let vals=[];for(let i=1;i<=12;i++)vals.push(Math.max(0,end*i/12));let max=Math.max(...vals,1);document.getElementById('chart').innerHTML=vals.map(v=>`<div class="bar" style="height:${Math.max(5,v/max*100)}%" title="${money(v)}"></div>`).join('')}
+function renderIncomeList(){document.getElementById('incomeList').innerHTML=state.incomes.map((x,i)=>`<div class="row"><div><b>${x.name}</b><div class="muted">${x.type}</div></div><div><b>${money(x.annual)}</b> <button class="btn" onclick="editIncome(${i})">Edytuj</button> <button class="btn danger" onclick="delIncome(${i})">Usuń</button></div></div>`).join('')}
+function renderLoansList(){document.getElementById('loansList').innerHTML=state.loans.map((l,i)=>`<div class="card" style="margin-bottom:14px"><div class="cardTitle"><span>🏦 ${l.name}</span><button class="btn danger" onclick="delLoan(${i})">Usuń</button></div><div class="statLine"><span>Kapitał</span><b>${money(l.balance)}</b></div><div class="statLine"><span>Oprocentowanie</span><b>${l.rate.toFixed(2)}%</b></div><div class="statLine"><span>Rata</span><b>${money(l.payment)} / mies.</b></div><div class="statLine"><span>Pozostało</span><b>${l.months} rat</b></div><button class="btn primary" style="margin-top:12px" onclick="openLoanCalc(${i})">Symuluj nadpłatę</button></div>`).join('')||'<div class="card">Brak kredytów.</div>'}
+function showView(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(v).classList.add('active');document.querySelectorAll('.nav button[data-v]').forEach(x=>x.classList.toggle('active',x.dataset.v===v));window.scrollTo({top:0,behavior:'smooth'})}
+function openModal(html){document.getElementById('sheet').innerHTML=html;document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
+function addIncome(){openModal(`<h2>Dodaj dochód</h2><div class="formGrid"><div class="field"><label>Nazwa</label><input id="mName"></div><div class="field"><label>Rocznie netto</label><input id="mAnnual" type="number"></div></div><button class="btn primary" style="margin-top:18px" onclick="saveIncome()">Zapisz</button> <button class="btn" onclick="closeModal()">Anuluj</button>`)}
+function editIncome(i){let x=state.incomes[i];openModal(`<h2>Edytuj dochód</h2><div class="formGrid"><div class="field"><label>Nazwa</label><input id="mName" value="${x.name}"></div><div class="field"><label>Rocznie netto</label><input id="mAnnual" type="number" value="${x.annual}"></div></div><button class="btn primary" style="margin-top:18px" onclick="saveIncome(${i})">Zapisz</button>`)}
+function saveIncome(i){let x={name:document.getElementById('mName').value||'Dochód',annual:+document.getElementById('mAnnual').value||0,type:'inne'};if(i===undefined)state.incomes.push(x);else state.incomes[i]=x;save();closeModal();render()}
+function delIncome(i){if(confirm('Usunąć dochód?')){state.incomes.splice(i,1);save();render()}}
+function addLoan(){openModal(`<h2>Dodaj kredyt</h2><div class="formGrid"><div class="field"><label>Nazwa</label><input id="lName"></div><div class="field"><label>Pozostały kapitał</label><input id="lBal" type="number"></div><div class="field"><label>Oprocentowanie %</label><input id="lRate" type="number" step="0.01"></div><div class="field"><label>Rata miesięczna</label><input id="lPay" type="number"></div><div class="field"><label>Pozostałe raty</label><input id="lMonths" type="number"></div></div><button class="btn primary" style="margin-top:18px" onclick="saveLoan()">Zapisz</button>`)}
+function saveLoan(){state.loans.push({name:document.getElementById('lName').value||'Kredyt',balance:+document.getElementById('lBal').value||0,rate:+document.getElementById('lRate').value||0,payment:+document.getElementById('lPay').value||0,months:+document.getElementById('lMonths').value||0});save();closeModal();render()}
+function delLoan(i){if(confirm('Usunąć kredyt?')){state.loans.splice(i,1);save();render()}}
+function openLoanCalc(i){let l=state.loans[i];openModal(`<h2>${l.name} — nadpłata</h2><p class="muted">Aktualnie: ${money(l.balance)}, rata ${money(l.payment)}, ${l.months} rat.</p><div class="field"><label>Dodatkowa nadpłata miesięczna</label><input id="calcExtra" type="number" value="1000"></div><button class="btn primary" style="margin-top:15px" onclick="calcLoan(${i})">Policz</button><div id="calcOut" class="note"></div>`)}
+function calcLoan(i){let l=state.loans[i],extra=+document.getElementById('calcExtra').value||0,bal=l.balance,r=l.rate/100/12,pay=l.payment+extra,n=0,total=0;while(bal>0&&n<1000){let interest=bal*r;let principal=Math.max(0,pay-interest);bal-=principal;total+=interest;n++;if(principal<=0)break}let savedMonths=Math.max(0,l.months-n);document.getElementById('calcOut').innerHTML=`Przy nadpłacie <b>${money(extra)}</b> miesięcznie spłata potrwa około <b>${n} miesięcy</b> zamiast ${l.months}.<br>Szacowane skrócenie: <b>${savedMonths} miesięcy</b>.<br>Odsetki w symulacji: <b>${money(total)}</b>.`}
+function scenarioText(){let t=totals(),extra=+state.settings.extraPayment||0,one=+state.settings.oneOff||0;let loanPay=state.loans.reduce((a,l)=>a+l.payment,0)+extra;let months=0;let bal=state.loans.reduce((a,l)=>a+l.balance,0)-one;while(bal>0&&months<1000){let p=0;state.loans.forEach(l=>{let share=l.balance/(state.loans.reduce((a,z)=>a+z.balance,0)||1);p+=Math.max(0,l.payment+extra*share-l.balance*l.rate/100/12)});bal-=p;months++;if(p<=0)break}return `Przy dodatkowej nadpłacie <b>${money(extra)}</b>/mies. i jednorazowej <b>${money(one)}</b> łączna rata kredytów wyniesie ok. <b>${money(loanPay)}</b>/mies. Łączny kapitał w tej uproszczonej symulacji zostanie spłacony w ok. <b>${months}</b> mies.`}
+function saveSettings(){state.settings.taxForm=document.getElementById('taxForm').value;state.settings.taxRate=+document.getElementById('taxRate').value||0;state.settings.zus=+document.getElementById('zus').value||0;state.settings.costs=+document.getElementById('costs').value||0;state.settings.vatDue=+document.getElementById('vatDue').value||0;state.settings.vatInput=+document.getElementById('vatInput').value||0;state.settings.extraPayment=+document.getElementById('extraPayment').value||0;state.settings.oneOff=+document.getElementById('oneOff').value||0;save()}
+function openSettings(){openModal(`<h2>Ustawienia</h2><p class="muted">Dane są zapisywane lokalnie w przeglądarce tego urządzenia.</p><button class="btn danger" onclick="localStorage.removeItem(KEY);location.reload()">Usuń wszystkie dane</button> <button class="btn" onclick="closeModal()">Zamknij</button>`)}
+function openForecast(){let t=totals();openModal(`<h2>Prognoza ${state.year}</h2><div class="statLine"><span>Przychód</span><b>${money(t.income)}</b></div><div class="statLine"><span>Podatki + ZUS</span><b>${money(t.tax)}</b></div><div class="statLine"><span>VAT</span><b>${money(t.vat)}</b></div><div class="statLine"><span>Kredyty</span><b>${money(t.loan)}</b></div><div class="statLine"><span>Koszty</span><b>${money(t.cost)}</b></div><div class="statLine"><span>Do dyspozycji</span><b class="green">${money(t.net)}</b></div><div class="note">To prognoza na podstawie obecnych danych. Możemy ją później rozbudować o miesięczne wartości, sezonowość i rzeczywiste przepływy.</div>`)}
+function quickAdd(){openModal(`<h2>Dodaj</h2><button class="btn primary" onclick="closeModal();addIncome()">＋ Dochód</button> <button class="btn" onclick="closeModal();addLoan()">＋ Kredyt</button>`)}
+function resetDemo(){if(confirm('Przywrócić dane przykładowe?')){localStorage.removeItem(KEY);location.reload()}}
+render();
+</script></body></html>
