@@ -1,14 +1,14 @@
-/* Moje Finanse 3.2 — stabilizacja wersji, pulpitu i kalendarza */
+/* Moje Finanse 3.3 — stabilizacja wersji, pulpitu i kalendarza */
 (function(){
-const VERSION='3.2.0';
+const VERSION='3.3.0';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
 const FULL=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
 const key=(y,m)=>`${y}-${String(m+1).padStart(2,'0')}`;
 const parse=k=>{let [y,m]=String(k||'').split('-').map(Number);return{y:y||new Date().getFullYear(),m:(m||1)-1}};
 const esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function setVersion(){document.title='Moje Finanse '+VERSION;let h=document.querySelector('.top small');if(h)h.innerHTML=`<span id="headerYear">${window.S?.selectedYear||''}</span> • wersja ${VERSION}`;document.documentElement.dataset.appVersion=VERSION}
-function ensure(){if(!window.S)return false;S.finance||={};S.finance.expenses||=[];S.finance.calendarEvents||=[];if(!S.finance.selectedMonth)S.finance.selectedMonth=key(S.selectedYear||new Date().getFullYear(),new Date().getMonth());if(!S.finance.analysisMonth)S.finance.analysisMonth=S.finance.selectedMonth;return true}
+function setVersion(){document.title='Moje Finanse '+VERSION;let h=document.querySelector('.top small');if(h)h.innerHTML=`<span id="headerYear">${typeof S!=='undefined'?(S.selectedYear||''):''}</span> • wersja ${VERSION}`;document.documentElement.dataset.appVersion=VERSION}
+function ensure(){if(typeof S==='undefined')return false;S.finance||={};S.finance.expenses||=[];S.finance.calendarEvents||=[];if(!S.finance.selectedMonth)S.finance.selectedMonth=key(S.selectedYear||new Date().getFullYear(),new Date().getMonth());if(!S.finance.analysisMonth)S.finance.analysisMonth=S.finance.selectedMonth;return true}
 function salary(y,m){try{let old=S.selectedYear;S.selectedYear=y;Y();let r=sal().rows[m]||{};S.selectedYear=old;Y();return{net:N(r.total),gross:N(r.g),pe:N(r.pe),er:N(r.er),actual:!!r.actual}}catch(e){let r=S.years?.[String(y)]?.salary?.[m]||{},net=N(r.net)+N(r.bonus);return{net,gross:N(r.gross),pe:0,er:0,actual:net>0}}}
 function company(y,m){let r=S.years?.[String(y)]?.company?.[m]||{},rev=N(r.revenue),cost=N(r.costs),zus=N(r.zus),health=N(r.health),tax=N(r.tax),vat=(N(r.vatOut)||N(r.vatIn))?N(r.vatOut)-N(r.vatIn):N(r.vat);let actual=!!(rev||cost||zus||health||tax||vat);return{profit:rev-cost-zus-health-tax-vat,actual}}
 function expenseRows(k){return (S.finance?.expenses||[]).filter(e=>e.active!==false&&(!e.from||k>=e.from)&&(!e.to||k<=e.to))}
