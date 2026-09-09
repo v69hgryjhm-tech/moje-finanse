@@ -1,10 +1,10 @@
-/* Moje Finanse 3.2 — strażnik wersji i porządek UI */
+/* Moje Finanse 3.3 — strażnik wersji i porządek UI */
 (function(){
-const VERSION='3.2.0';
+const VERSION='3.3.0';
 function apply(){
   document.title='Moje Finanse '+VERSION;
   let h=document.querySelector('.top small');
-  if(h)h.innerHTML=`<span id="headerYear">${window.S?.selectedYear||''}</span> • wersja ${VERSION}`;
+  if(h)h.innerHTML=`<span id="headerYear">${typeof S!=='undefined'?(S.selectedYear||''):''}</span> • wersja ${VERSION}`;
   document.documentElement.dataset.appVersion=VERSION;
   ['ppkEmp','ppkEr'].forEach(id=>{let el=document.getElementById(id),label=el?.closest('label');if(label)label.style.display='none'});
   let card=document.getElementById('threshold')?.closest('.card');if(card){let t=card.querySelector('.title');if(t)t.textContent='Etat / podatki'}
