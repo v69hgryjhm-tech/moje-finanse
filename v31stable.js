@@ -1,6 +1,6 @@
-/* Moje Finanse 3.1 — stabilizacja wersji, pulpitu i kalendarza */
+/* Moje Finanse 3.2 — stabilizacja wersji, pulpitu i kalendarza */
 (function(){
-const VERSION='3.1.0';
+const VERSION='3.2.0';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
 const FULL=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
