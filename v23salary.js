@@ -1,4 +1,4 @@
-/* Moje Finanse 3.5 — szczegółowy pasek zgodny z silnikiem listy płac */
+/* Moje Finanse 4.1 — pasek wynagrodzenia i deterministyczny start modułów */
 (function(){
 const G=id=>document.getElementById(id),num=v=>+v||0,PLN=v=>F(num(v));
 const FULL=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
@@ -6,10 +6,10 @@ function split(gross,net,ppkEmp,ppkEr,row){let social=row?.social!=null?num(row.
 function pct(v,t){return t>0?Math.max(0,Math.min(100,v/t*100)):0}
 function stack(r){let parts=[['net',num(r.total)],['social',r.social],['health',r.health],['pit',r.pit],['ppk',num(r.pe)],['employer',r.employerBurden]],total=Math.max(1,r.totalCost);return `<div class="payStack23">${parts.map(([c,v])=>`<i class="${c}" style="width:${pct(v,total)}%"></i>`).join('')}</div>`}
 function renderSalary23(){let sec=G('salary');if(!sec||typeof sal!=='function')return;let box=G('salaryDeep23');if(!box){box=document.createElement('div');box.id='salaryDeep23';sec.appendChild(box)}let rows=sal().rows.map((r,i)=>({...r,...split(num(r.g),num(r.total),num(r.pe),num(r.er),r),i}));box.innerHTML=`<div class="card"><div class="title">Pasek wynagrodzenia miesiąc po miesiącu <span class="pill">rzeczywiste vs prognoza</span></div><div class="payrollScroll23"><div class="payrollGrid23">${rows.map(r=>`<div class="payMonth23 ${r.actual?'actual':'forecast'}"><div class="payMonthHead23"><b>${FULL[r.i]}</b><span>${r.actual?'rzeczywiste':'prognoza'}</span></div><strong>${PLN(r.total)}</strong><small>netto z ${PLN(r.g)} brutto</small>${stack(r)}<div class="payMini23"><span>ZUS pracownika <b>${PLN(r.social)}</b></span><span>zdrowotna <b>${PLN(r.health)}</b></span><span>PIT <b>${PLN(r.pit)}</b></span><span>PPK Ty <b>${PLN(r.pe)}</b></span><span>PPK firma <b>${PLN(r.er)}</b></span><span>koszt pracodawcy <b>${PLN(r.totalCost)}</b></span></div></div>`).join('')}</div></div><div class="payLegend23"><span><i class="net"></i>netto</span><span><i class="social"></i>ZUS</span><span><i class="health"></i>zdrowotna</span><span><i class="pit"></i>PIT</span><span><i class="ppk"></i>PPK</span><span><i class="employer"></i>koszty pracodawcy</span></div></div>`}
-function style(name){if(document.querySelector(`link[href*="${name}"]`))return;let l=document.createElement('link');l.rel='stylesheet';l.href=name+'?v=350';document.head.appendChild(l)}
-function script(name){return new Promise(res=>{if(document.querySelector(`script[src*="${name}"]`)){res();return}let s=document.createElement('script');s.src=name+'?v=351';s.onload=res;s.onerror=res;document.body.appendChild(s)})}
-async function boot35(){style('v24.css');style('v26.css');style('v27.css');await script('v24raise.js');await script('v26forecast.js');await script('v27ppk.js');await script('v30monthly.js');await script('v35business.js');await script('v36axis.js');await script('v37payroll.js');if(typeof render==='function')render();window.dispatchEvent(new Event('finance-modules-ready'))}
+function style(name){if(document.querySelector(`link[href*="${name}"]`))return;let l=document.createElement('link');l.rel='stylesheet';l.href=name+'?v=410';document.head.appendChild(l)}
+function script(name){return new Promise(res=>{if(document.querySelector(`script[src*="${name}"]`)){res();return}let s=document.createElement('script');s.src=name+'?v=410';s.onload=res;s.onerror=()=>{console.error('Nie udało się załadować '+name);res()};document.body.appendChild(s)})}
+async function boot41(){style('v24.css');style('v26.css');style('v27.css');for(const name of ['v24raise.js','v26forecast.js','v27ppk.js','v30monthly.js','v35business.js','v36axis.js','v41tax.js','v37payroll.js','v41suite.js'])await script(name);if(typeof render==='function')render();window.dispatchEvent(new Event('finance-modules-ready'))}
 window.renderSalary23=renderSalary23;
 const prev=window.render;if(typeof prev==='function')window.render=function(){prev();renderSalary23()};
-setTimeout(boot35,0);
+setTimeout(boot41,0);
 })();
