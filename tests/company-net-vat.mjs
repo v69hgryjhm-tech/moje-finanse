@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 const source=fs.readFileSync('v26forecast.js','utf8');
 const nodes=new Map();
 function element(){return {children:[],textContent:'',append(...items){this.children.push(...items)},appendChild(item){this.children.push(item)},querySelector(){return null},remove(){},insertAdjacentElement(_,item){this.hint=item}}}
-for(const id of ['home','companyTile','companyProfitHome','companyNetHome','companyRevenueHome']){
+for(const id of ['home','companyTile','companyProfitHome','companyNetHome','companyRevenueHome','homeBars']){
  const e=element();e.previousElementSibling=element();e.parentElement=element();e.closest=()=>({firstElementChild:element()});nodes.set(id,e);
 }
 const ctx={Intl,Date,console,S:{selectedYear:new Date().getFullYear()+1,loans:[]},document:{getElementById:id=>nodes.get(id),querySelector:()=>null,createElement:element,head:element()},render(){}};
@@ -26,6 +26,8 @@ for(const [lines,expected] of [
  year=makeYear(lines);
  ctx.render();
  assert.equal(nodes.get('companyTile').textContent,fmt(expected));
+ const bars=nodes.get('homeBars').innerHTML;
+ assert.ok(bars.includes('<b>'+fmt(expected)+'</b><small>FIRMA — NETTO BEZ VAT</small><span>prognoza +'+fmt(expected*11)+'</span>'), 'Słupek firmy musi pokazywać sprzedaż bez VAT, przed kosztami');
  assert.equal(nodes.get('companyNetHome').textContent,fmt(expected));
  assert.match(nodes.get('companyTile').previousElementSibling.textContent,/NETTO BEZ VAT/);
  const summary=ctx.mfCompanySummary44(year.company[0]);
@@ -37,7 +39,7 @@ for(const [lines,expected] of [
 }
 const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/FIRMA — SPRZEDAŻ NETTO BEZ VAT/);
-for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.8\.1/);
-assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='481'));
-assert.match(fs.readFileSync('manifest.json','utf8'),/v=481/);
+for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.8\.2/);
+assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='482'));
+assert.match(fs.readFileSync('manifest.json','utf8'),/v=482/);
 console.log('PASS — karta i prognoza netto bez VAT, mieszane stawki, zero, brutto, wynik po kosztach oraz wersja/cache.');
