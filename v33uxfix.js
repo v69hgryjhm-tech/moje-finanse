@@ -45,8 +45,8 @@ window.openLoanFromHome34=function(i){if(!S.loans?.[i])return;S.loans[i].uiColla
 function wireLoanHome(){let home=G('loanHome');if(!home||home.dataset.loanLinks34)return;home.dataset.loanLinks34='1';home.addEventListener('click',e=>{let row=e.target.closest('.row');if(!row)return;let rows=[...home.querySelectorAll(':scope > .row')],i=rows.indexOf(row);if(i>=0)openLoanFromHome34(i)});home.style.cursor='pointer'}
 function renderAll(){renderBudget();renderCalendar();renderScenario();renderDebt();wireLoanHome()}
 window.renderBudget34=renderBudget;window.renderCalendar34=renderCalendar;window.renderScenario34=renderScenario;window.renderDebt34=renderDebt;
-const oldShow=window.show;if(typeof oldShow==='function')window.show=function(v){oldShow(v);setVersion();if(v==='budget')setTimeout(renderBudget,0);if(v==='calendar')setTimeout(renderCalendar,0);if(v==='scenario')setTimeout(renderScenario,0);if(v==='debt')setTimeout(renderDebt,0);if(v==='home')setTimeout(wireLoanHome,0)};
-const oldRender=window.render;if(typeof oldRender==='function')window.render=function(){oldRender();setVersion();setTimeout(renderAll,0)};
+const oldShow=window.show;if(typeof oldShow==='function')window.show=function(v){oldShow(v);setVersion();if(v==='budget')renderBudget();if(v==='calendar')window.renderCalendar42?.();if(v==='scenario')renderScenario();if(v==='debt')renderDebt();if(v==='home')wireLoanHome()};
+const oldRender=window.render;if(typeof oldRender==='function')window.render=function(){oldRender();setVersion();renderAll()};
 window.renderStable34=renderAll;
 window.prepareStable34=function(){ensure();setVersion();};
 })();
