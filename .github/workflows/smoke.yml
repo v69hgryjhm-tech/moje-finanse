@@ -24,3 +24,6 @@ jobs:
 
       - name: Tax forecast summary test
         run: node tests/tax-forecast-summary.mjs
+
+      - name: Payroll PIT reconciliation test
+        run: node tests/payroll-pit-reconciliation.mjs

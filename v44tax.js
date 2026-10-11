@@ -57,6 +57,18 @@ function compact(v){
  if(v>=1000)return (v/1000).toLocaleString('pl-PL',{maximumFractionDigits:1})+' tys.';
  return Math.round(v)+' zł';
 }
+function employmentReconciliation44(rows,actual){
+ const totals=rows.filter(r=>!!r.actual===actual&&(N(r.g)||N(r.er)||N(r.base))).reduce((a,r)=>{a.gross+=N(r.g);a.social+=N(r.social);a.kup+=N(r.kup);a.ppk+=N(r.er);a.base+=N(r.base);return a},{gross:0,social:0,kup:0,ppk:0,base:0});
+ Object.keys(totals).forEach(k=>totals[k]=R2(totals[k]));
+ totals.rounding=R2(totals.base-(totals.gross-totals.social-totals.kup+totals.ppk));
+ return totals;
+}
+function employmentReconciliationHtml44(rows){
+ return '<details class="pitReconciliation44"><summary>Dlaczego brutto różni się od podstawy PIT?</summary>'+[true,false].map(actual=>{
+ const a=employmentReconciliation44(rows,actual);
+ return '<section><h3>Etat — '+(actual?'tylko wpisane':'dodatkowa prognoza')+'</h3><div class="row"><span>Brutto (szacunek)</span><b>'+PLN(a.gross)+'</b></div><div class="row"><span>− Składki społeczne pracownika</span><b>'+PLN(a.social)+'</b></div><div class="row"><span>− Koszty uzyskania przychodu</span><b>'+PLN(a.kup)+'</b></div><div class="row"><span>+ PPK pracodawcy</span><b>'+PLN(a.ppk)+'</b></div><div class="row"><span>Zaokrąglenia podstaw miesięcznych</span><b>'+(a.rounding<0?'− ':'+ ')+PLN(Math.abs(a.rounding))+'</b></div><div class="row pitReconciliationTotal44"><span>Podstawa PIT etatu</span><b>'+PLN(a.base)+'</b></div></section>';
+ }).join('')+'<p class="muted">Brutto jest szacowane z wpisanego netto. To rozbicie wyjaśnia obliczenia aplikacji; dokładne kwoty rozliczenia wynikają z listy płac.</p></details>';
+}
 function taxOverviewHtml44(final,actual,forecast,threshold){
  const remaining=threshold-final;
  return '<div class="taxForecastHero44"><small>SUMA ROCZNA Z PROGNOZĄ — PODSTAWA PIT</small><strong>'+PLN(final)+'</strong><span>Etat + dochód firmy do PIT</span></div><div class="taxForecastParts44"><div><span>Dane wpisane</span><b>'+PLN(actual)+'</b></div><div><span>Dodatkowa prognoza</span><b>'+PLN(forecast)+'</b></div><div><span>Próg PIT</span><b>'+PLN(threshold)+'</b></div><div><span>'+(remaining>=0?'Pozostaje do progu':'Powyżej progu')+'</span><b>'+PLN(Math.abs(remaining))+'</b></div></div><div class="taxOverviewLegend44"><span><i class="total44"></i>Suma do progu</span><span><i class="employment44"></i>Etat</span><span><i class="business44"></i>Firma</span><span class="taxForecastKey44">Jasne tło — miesiące z prognozą</span></div>';
@@ -96,7 +108,7 @@ function renderTax44(){
  if(homeSvg){
   let panel=G('homeTaxOverview44');
   if(!panel){panel=document.createElement('div');panel.id='homeTaxOverview44';homeSvg.insertAdjacentElement('beforebegin',panel)}
-  panel.innerHTML=taxOverviewHtml44(final,empAct+Math.max(0,bizAct),final-empAct-Math.max(0,bizAct),d.threshold);
+  panel.innerHTML=taxOverviewHtml44(final,empAct+Math.max(0,bizAct),final-empAct-Math.max(0,bizAct),d.threshold)+employmentReconciliationHtml44(employmentRows(S.selectedYear));
  }
 
  if(G('cross'))G('cross').textContent=msg+' Prognoza końca roku: '+PLN(final)+'.';
@@ -105,12 +117,12 @@ function renderTax44(){
   let box=G('taxBusiness44');
   if(!box){box=document.createElement('div');box.id='taxBusiness44';box.className='card';tax.appendChild(box)}
   box.innerHTML='<div class="title">Podstawa do skali — etat + firma</div>'+
-   '<div class="row"><span>Etat — wpisane</span><b>'+PLN(empAct)+'</b></div>'+
-   '<div class="row"><span>Etat — prognoza do końca roku</span><b class="green">+ '+PLN(empFc)+'</b></div>'+
+   '<div class="row"><span>Podstawa PIT etatu — wpisane</span><b>'+PLN(empAct)+'</b></div>'+
+   '<div class="row"><span>Podstawa PIT etatu — prognoza do końca roku</span><b class="green">+ '+PLN(empFc)+'</b></div>'+
    '<div class="row"><span>Firma — wpisane</span><b>'+PLN(Math.max(0,bizAct))+'</b></div>'+
    '<div class="row"><span>Firma — prognoza</span><b>'+(bizFc>=0?'+ ':'− ')+PLN(Math.abs(bizFc))+'</b></div>'+
    '<div class="row"><span><b>Razem do progu — z prognozą</b></span><b>'+PLN(final)+'</b></div>'+
-   '<p class="muted">Czarna linia = suma do progu, zielona = etat, fioletowa = firma. Puste punkty oznaczają prognozę. Nie używamy „całkowitego przychodu” jako progu, bo próg PIT dotyczy podstawy opodatkowania, a nie obrotu brutto. VAT nie wchodzi do dochodu PIT.</p>';
+   employmentReconciliationHtml44(employmentRows(S.selectedYear))+'<p class="muted">Wykres pokazuje podstawę PIT, nie brutto ani netto na konto. Suma obejmuje podstawę etatu i dochód firmy do PIT. Jasne tło oznacza miesiące z prognozą.</p>';
  }
  const bp=G('businessPlusBody');
  if(bp){
