@@ -34,6 +34,9 @@ function styleLoanOverview(){
  let svg=document.querySelector('#loanOverview .overviewChart svg');if(!svg)return;
  let max=(S.loans||[]).reduce((a,l)=>a+Math.max(balanceNow(l),N(l.originalBalance)),0);
  addBalanceGrid(svg,max,{left:52,right:24,top:32,bottom:147});
+ let main=[...svg.querySelectorAll(':scope > polyline')][0];if(main){main.setAttribute('stroke','#2457a6');main.setAttribute('stroke-width','4.8');main.setAttribute('filter','drop-shadow(0 2px 2px rgba(36,87,166,.16))')}
+ svg.querySelectorAll(':scope > rect').forEach(r=>{r.setAttribute('fill','#75aef4');r.setAttribute('opacity','.48')});
+ svg.querySelector('.ux47EndLabel')?.remove();if(main){let pts=(main.getAttribute('points')||'').trim().split(/\s+/),last=pts.at(-1)?.split(',');if(last?.length===2){let t=svgEl('text',{class:'ux47EndLabel',x:N(last[0])-4,y:Math.max(28,N(last[1])-8),'text-anchor':'end',fill:'#173d78','font-size':'9','font-weight':'800'},'saldo '+compact((S.loans||[]).reduce((a,l)=>a+balanceNow(l),0)));svg.appendChild(t)}}
  let chart=document.querySelector('#loanOverview .overviewChart');
  if(chart&&!chart.querySelector('.ux47AxisNote')){
   let n=document.createElement('div');n.className='ux47AxisNote';n.innerHTML='<span>↑ saldo łączne</span><span>↓ raty w danym miesiącu</span>';chart.prepend(n)
@@ -48,6 +51,7 @@ function styleLoanCards(){
  document.querySelectorAll('#loanList .loan').forEach((card,i)=>{
   let l=S.loans?.[i],svg=card.querySelector('.loanUnifiedChart svg');if(!l||!svg)return;
   addBalanceGrid(svg,Math.max(N(l.originalBalance),N(l.balance),balanceNow(l),1),{left:54,right:28,top:20,bottom:145});
+  let lines=[...svg.querySelectorAll(':scope > polyline')];if(lines[0]){lines[0].setAttribute('stroke','#9aa5b5');lines[0].setAttribute('stroke-width','2.5')}if(lines[1]){lines[1].setAttribute('stroke','#2457a6');lines[1].setAttribute('stroke-width','4.8');lines[1].setAttribute('filter','drop-shadow(0 2px 2px rgba(36,87,166,.14))')}if(lines[2]){lines[2].setAttribute('stroke','#d94f62');lines[2].setAttribute('stroke-width','4.2')}
   let chart=card.querySelector('.loanUnifiedChart');
   if(chart&&!chart.querySelector('.ux47AxisNote')){
     let n=document.createElement('div');n.className='ux47AxisNote';n.innerHTML='<span>↑ saldo kredytu</span><span>↓ rata / nadpłata</span>';chart.prepend(n)
@@ -121,11 +125,11 @@ if(typeof oldLoans==='function'&&!oldLoans.__ux47){
 }
 const oldShow=window.show;
 if(typeof oldShow==='function'&&!oldShow.__ux47){
- let fn=function(v){let out=oldShow(v);navState47(v);if(v==='loans')enhanceLoans47();if(v==='settings')renderSmoke47();improveLabels();return out};fn.__ux47=true;window.show=fn
+ let fn=function(v){let out=oldShow(v);setVersion();navState47(v);if(v==='loans')enhanceLoans47();if(v==='settings')renderSmoke47();improveLabels();return out};fn.__ux47=true;window.show=fn
 }
 const oldRender=window.render;
 if(typeof oldRender==='function'&&!oldRender.__ux47){
- let fn=function(){let out=oldRender();addFirmaShortcut();enhanceLoans47();renderSmoke47();improveLabels();return out};fn.__ux47=true;window.render=fn
+ let fn=function(){let out=oldRender();setVersion();addFirmaShortcut();enhanceLoans47();renderSmoke47();improveLabels();return out};fn.__ux47=true;window.render=fn
 }
 let st=document.createElement('style');st.textContent=`
 .nav button[data-v]{flex:1;min-width:0}.nav .plus{flex:0 0 48px}.nav{width:min(760px,calc(100% - 18px));padding:0 4px}.nav button[data-v]>span{white-space:nowrap}
