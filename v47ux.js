@@ -1,7 +1,7 @@
 /* Moje Finanse 4.7 — czytelność, edycja kredytów i dopracowanie wykresów */
 (function(){
 'use strict';
-const VERSION='4.7.2';
+const VERSION='4.8.0';
 const NS='http://www.w3.org/2000/svg';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
@@ -10,8 +10,38 @@ function svgEl(name,attrs,text){let e=document.createElementNS(NS,name);Object.e
 function setVersion(){document.title='Moje Finanse '+VERSION;let h=document.querySelector('.top small');if(h)h.innerHTML='<span id="headerYear">'+(typeof S!=='undefined'?S.selectedYear:'')+'</span> • wersja '+VERSION;document.documentElement.dataset.appVersion=VERSION}
 
 function balanceNow(l){
+ try{if(typeof window.loanCurrentPoint15==='function')return N(window.loanCurrentPoint15(l).balance)}catch{}
  try{if(typeof loanPoint==='function')return N(loanPoint(l).balance)}catch{}
  return N(l?.balance)
+}
+function loanPlan47(l,withPlan=true){try{return typeof window.loanTimeline15==='function'?window.loanTimeline15(l,withPlan):{rows:[],actual:[],forecast:[]}}catch{return{rows:[],actual:[],forecast:[]}}}
+function loanCost47(l){
+ let capital=balanceNow(l),plan=loanPlan47(l,true),base=loanPlan47(l,false);
+ let interestPlan=plan.forecast.reduce((a,r)=>a+N(r.interest),0),interestBase=base.forecast.reduce((a,r)=>a+N(r.interest),0);
+ return{capital,interestPlan,interestBase,total:capital+interestPlan,saving:Math.max(0,interestBase-interestPlan),end:plan.rows.at(-1)?.date||null,plan}
+}
+function allLoanCost47(){
+ return (S?.loans||[]).reduce((a,l)=>{let x=loanCost47(l);a.capital+=x.capital;a.interest+=x.interestPlan;a.total+=x.total;a.saving+=x.saving;return a},{capital:0,interest:0,total:0,saving:0})
+}
+function monthKey47(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function loanSeries47(){
+ let loans=S?.loans||[];if(!loans.length)return null;
+ let items=loans.map(l=>({l,c:loanCost47(l)}));
+ let starts=items.map(x=>new Date((x.l.asOfDate||TODAY)+'T12:00:00').getTime()),ends=items.map(x=>(x.c.end||new Date()).getTime());
+ let start=new Date(Math.min(...starts)),end=new Date(Math.max(...ends)),count=Math.max(1,(end.getFullYear()-start.getFullYear())*12+end.getMonth()-start.getMonth()+1),rows=[];
+ for(let i=0;i<count;i++){
+  let d=new Date(start.getFullYear(),start.getMonth()+i,1,12),capital=0,total=0;
+  items.forEach(({l,c})=>{
+   let plan=c.plan.rows||[],prev=plan.filter(r=>r.date<=d).at(-1),future=plan.filter(r=>r.date>d);
+   let bal;
+   if(d<new Date((l.asOfDate||TODAY)+'T12:00:00'))bal=N(l.balance);else if(prev)bal=N(prev.balance);else bal=balanceNow(l);
+   if(plan.length&&d>(plan.at(-1)?.date||d))bal=0;
+   let ints=future.reduce((a,r)=>a+N(r.interest),0);
+   capital+=bal;total+=bal+ints;
+  });
+  rows.push({d,capital,total})
+ }
+ return{start,end,rows}
 }
 function niceStep(max,target=4){max=Math.max(1,N(max));let raw=max/target,p=Math.pow(10,Math.floor(Math.log10(raw))),q=raw/p,m=q<=1?1:q<=2?2:q<=2.5?2.5:q<=5?5:10;return m*p}
 function addBalanceGrid(svg,max,opt={}){
@@ -27,24 +57,28 @@ function addBalanceGrid(svg,max,opt={}){
   g.appendChild(svgEl('line',{x1:left-2,x2:w-right,y1:y,y2:y,stroke:v===0?'#cfd7e2':'#dfe6ef','stroke-width':v===0?'1.2':'1','stroke-dasharray':v===0?'0':'3 5'}));
   g.appendChild(svgEl('text',{x:left-8,y:y+3,'text-anchor':'end',fill:'#6f7c91','font-size':'8.5','font-weight':'600'},compact(v)));
  }
- let first=svg.firstChild;svg.insertBefore(g,first);
+ let first=svg.firstChild;svg.insertBefore(g,first);return{axis,left,right,top,bottom,w};
 }
 function styleLoanOverview(){
  if(typeof S==='undefined')return;
- let svg=document.querySelector('#loanOverview .overviewChart svg');if(!svg)return;
- let max=(S.loans||[]).reduce((a,l)=>a+Math.max(balanceNow(l),N(l.originalBalance)),0);
- addBalanceGrid(svg,max,{left:52,right:24,top:32,bottom:147});
- let main=[...svg.querySelectorAll(':scope > polyline')][0];if(main){main.setAttribute('stroke','#2457a6');main.setAttribute('stroke-width','4.8');main.setAttribute('filter','drop-shadow(0 2px 2px rgba(36,87,166,.16))')}
- svg.querySelectorAll(':scope > rect').forEach(r=>{r.setAttribute('fill','#75aef4');r.setAttribute('opacity','.48')});
- svg.querySelector('.ux47EndLabel')?.remove();if(main){let pts=(main.getAttribute('points')||'').trim().split(/\s+/),last=pts.at(-1)?.split(',');if(last?.length===2){let t=svgEl('text',{class:'ux47EndLabel',x:N(last[0])-4,y:Math.max(28,N(last[1])-8),'text-anchor':'end',fill:'#173d78','font-size':'9','font-weight':'800'},'saldo '+compact((S.loans||[]).reduce((a,l)=>a+balanceNow(l),0)));svg.appendChild(t)}}
- let chart=document.querySelector('#loanOverview .overviewChart');
- if(chart&&!chart.querySelector('.ux47AxisNote')){
-  let n=document.createElement('div');n.className='ux47AxisNote';n.innerHTML='<span>↑ saldo łączne</span><span>↓ raty w danym miesiącu</span>';chart.prepend(n)
+ let box=G('loanOverview'),svg=box?.querySelector('.overviewChart svg');if(!box||!svg)return;
+ let costs=allLoanCost47(),series=loanSeries47(),main=[...svg.querySelectorAll(':scope > polyline')][0],points=(main?.getAttribute('points')||'').trim().split(/\s+/).filter(Boolean),xs=points.map(p=>N(p.split(',')[0]));
+ let max=Math.max(costs.total,...(series?.rows||[]).map(r=>r.total),1),grid=addBalanceGrid(svg,max,{left:52,right:24,top:32,bottom:147})||{},axis=grid.axis||max,top=grid.top||32,bottom=grid.bottom||147,y=v=>bottom-(N(v)/axis)*(bottom-top);
+ if(series&&xs.length){
+  let rows=series.rows.slice(0,xs.length),capPts=rows.map((r,i)=>xs[i]+','+y(r.capital)).join(' '),fullPts=rows.map((r,i)=>xs[i]+','+y(r.total)).join(' ');
+  if(main){main.setAttribute('points',capPts);main.setAttribute('stroke','#2457a6');main.setAttribute('stroke-width','4.4');main.setAttribute('filter','drop-shadow(0 2px 2px rgba(36,87,166,.14))')}
+  svg.querySelector('.ux47FullCost')?.remove();
+  let p=svgEl('polyline',{class:'ux47FullCost',points:fullPts,fill:'none',stroke:'#8b5cf6','stroke-width':'3.8','stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':'8 5'});svg.appendChild(p);
  }
- let head=document.querySelector('#loanOverview .loanChartHead');
- if(head){
-  let small=head.querySelector('small');if(small)small.textContent='Górny wykres: malejące saldo wszystkich kredytów. Dolne słupki: suma rat i nadpłat w miesiącu. Zielone znaczniki: planowane zakończenia.';
- }
+ svg.querySelectorAll(':scope > rect:not(.ux47Keep)').forEach(r=>{if(!r.closest('.ux47Grid')){r.setAttribute('fill','#75aef4');r.setAttribute('opacity','.42')}});
+ let k=box.querySelector('.loanOverviewKpis');
+ if(k)k.innerHTML='<div><small>KAPITAŁ DO SPŁATY</small><b>'+PLN(costs.capital)+'</b><span>bez przyszłych odsetek</span></div><div><small>ODSETKI DO KOŃCA</small><b>'+PLN(costs.interest)+'</b><span>wg obecnego planu</span></div><div class="ux47TotalPay"><small>ŁĄCZNIE DO ZAPŁATY</small><b>'+PLN(costs.total)+'</b><span>kapitał + przyszłe odsetki</span></div><div><small>RATY / MIES.</small><b>'+PLN((S.loans||[]).reduce((a,l)=>a+N(l.payment),0))+'</b></div><div><small>WPŁACONO DOTĄD</small><b>'+PLN((S.loans||[]).reduce((a,l)=>{try{return a+N(window.loanTotals15?.(l)?.paid)}catch{return a}},0))+'</b></div><div><small>OSZCZ. NADPŁAT</small><b class="green">'+PLN(costs.saving)+'</b><span>mniej przyszłych odsetek</span></div>';
+ let chart=box.querySelector('.overviewChart');
+ if(chart&&!chart.querySelector('.ux47AxisNote')){let n=document.createElement('div');n.className='ux47AxisNote';n.innerHTML='<span>↑ kapitał / pełna kwota do zapłaty</span><span>↓ raty w danym miesiącu</span>';chart.prepend(n)}
+ else if(chart?.querySelector('.ux47AxisNote'))chart.querySelector('.ux47AxisNote').innerHTML='<span>↑ kapitał / pełna kwota do zapłaty</span><span>↓ raty w danym miesiącu</span>';
+ let head=box.querySelector('.loanChartHead');
+ if(head){let title=head.querySelector('b'),small=head.querySelector('small');if(title)title.textContent='Wszystkie kredyty — kapitał i pełny koszt spłaty';if(small)small.textContent='Niebieska linia = pozostały kapitał. Fioletowa przerywana = kapitał + przyszłe odsetki. Dolne słupki = raty i nadpłaty.'}
+ let legend=chart?.nextElementSibling;if(legend?.classList.contains('legend'))legend.innerHTML='<span><i class="lineSolid"></i> kapitał</span><span><i class="ux47PurpleLine"></i> łącznie do zapłaty</span><span><i class="unpaidLegend"></i> raty miesiąca</span><span class="green">--- zakończenie kredytu</span>';
 }
 function styleLoanCards(){
  if(typeof S==='undefined')return;
@@ -65,21 +99,20 @@ function enhanceLoanEditing(){
  document.querySelectorAll('#loanList .loan').forEach((card,i)=>{
   let l=S.loans?.[i];if(!l)return;
   let actions=card.querySelector('.loanTitleActions');
-  if(actions&&!actions.querySelector('.editLoan47')){
-    let b=document.createElement('button');b.className='btn editLoan47';b.type='button';b.innerHTML='✎ Edytuj';b.onclick=()=>window.toggleLoanEdit47(i);
-    actions.insertBefore(b,actions.querySelector('.danger')||null);
-  }
-  let edit=card.querySelector('.loanEdit');
-  if(edit){
-    edit.classList.toggle('loanEditOpen47',!!l.uiEditOpen);
-    edit.classList.toggle('loanEditClosed47',!l.uiEditOpen);
-  }
-  let b=actions?.querySelector('.editLoan47');if(b)b.textContent=l.uiEditOpen?'✕ Zamknij edycję':'✎ Edytuj';
+  if(actions&&!actions.querySelector('.editLoan47')){let b=document.createElement('button');b.className='btn editLoan47';b.type='button';b.textContent='✎ Edytuj';b.onclick=()=>window.editLoanModal47(i);actions.insertBefore(b,actions.querySelector('.danger')||null)}
+  let inline=card.querySelector('.loanEdit');if(inline)inline.style.display='none';
+  let k=card.querySelector('.loanKpis');if(k&&!k.querySelector('.ux47FullKpi')){let x=loanCost47(l),d=document.createElement('div');d.className='loanKpi ux47FullKpi';d.innerHTML='<small>ŁĄCZNIE DO ZAPŁATY</small><b>'+PLN(x.total)+'</b><span>kapitał '+PLN(x.capital)+' + odsetki '+PLN(x.interestPlan)+'</span>';k.appendChild(d)}
  });
 }
-window.toggleLoanEdit47=function(i){
- let l=S?.loans?.[i];if(!l)return;l.uiEditOpen=!l.uiEditOpen;save();window.loans?.();
- if(l.uiEditOpen)setTimeout(()=>document.querySelectorAll('#loanList .loan')[i]?.querySelector('.loanEdit')?.scrollIntoView({behavior:'smooth',block:'nearest'}),0)
+window.editLoanModal47=function(i){
+ let l=S?.loans?.[i];if(!l)return;
+ open('<h2>Edytuj kredyt</h2><p class="muted">Zmiany dotyczą parametrów bazowych kredytu. Historia faktycznie zapisanych rat i nadpłat pozostaje bez zmian.</p><div class="form loanModal47"><label>Nazwa<input id="e47_name" type="text" value="'+String(l.name||'').replace(/"/g,'&quot;')+'"></label><label>Typ<select id="e47_type"><option value="interest" '+(l.loanType==='interest'?'selected':'')+'>Oprocentowany</option><option value="zero" '+(l.loanType==='zero'?'selected':'')+'>Raty 0%</option></select></label><label>Kwota początkowa<input id="e47_orig" type="number" step="0.01" value="'+N(l.originalBalance)+'"></label><label>Saldo bazowe<input id="e47_bal" type="number" step="0.01" value="'+N(l.balance)+'"></label><label>Stan na dzień<input id="e47_date" type="date" value="'+(l.asOfDate||TODAY)+'"></label><label>Rata umowna<input id="e47_pay" type="number" step="0.01" value="'+N(l.payment)+'"></label><label>Oprocentowanie %<input id="e47_rate" type="number" step="0.01" value="'+N(l.rate)+'"></label><label>Pozostało rat<input id="e47_months" type="number" step="1" value="'+(N(l.months)||'')+'"></label><label>Dzień raty<input id="e47_due" type="number" min="1" max="31" value="'+N(l.dueDay)+'"></label><label>Sposób nadpłaty<select id="e47_mode"><option value="shorten" '+(l.overpayMode==='shorten'?'selected':'')+'>Skrócenie okresu</option><option value="reduce_payment" '+(l.overpayMode==='reduce_payment'?'selected':'')+'>Zmniejszenie raty</option></select></label><label>Nadpłata / miesiąc<input id="e47_extra" type="number" step="0.01" value="'+N(l.extraMonthly)+'"></label><label>Jednorazowa nadpłata<input id="e47_one" type="number" step="0.01" value="'+N(l.oneOff)+'"></label></div><div class="notice">Po zapisaniu aplikacja od razu przeliczy harmonogram, odsetki do końca i pełną kwotę pozostałą do zapłaty.</div><div class="actions"><button class="btn" onclick="closeModal()">Anuluj</button><button class="btn primary" onclick="saveLoanEdit47('+i+')">Zapisz zmiany</button></div>');
+ let type=G('e47_type'),rate=G('e47_rate');if(type&&rate){let sync=()=>{rate.disabled=type.value==='zero';if(type.value==='zero')rate.value='0'};type.onchange=sync;sync()}
+};
+window.saveLoanEdit47=function(i){
+ let l=S?.loans?.[i];if(!l)return;
+ let bal=Math.max(0,N(G('e47_bal')?.value)),orig=Math.max(0,N(G('e47_orig')?.value));
+ l.name=(G('e47_name')?.value||l.name||'Kredyt').trim();l.loanType=G('e47_type')?.value==='zero'?'zero':'interest';l.originalBalance=Math.max(orig,bal);l.balance=bal;l.asOfDate=G('e47_date')?.value||TODAY;l.payment=Math.max(0,N(G('e47_pay')?.value));l.rate=l.loanType==='zero'?0:Math.max(0,N(G('e47_rate')?.value));l.months=Math.max(0,Math.round(N(G('e47_months')?.value)));l.dueDay=Math.max(1,Math.min(31,Math.round(N(G('e47_due')?.value)||1)));l.overpayMode=G('e47_mode')?.value==='reduce_payment'?'reduce_payment':'shorten';l.extraMonthly=Math.max(0,N(G('e47_extra')?.value));l.oneOff=Math.max(0,N(G('e47_one')?.value));l.uiEditOpen=false;save();closeModal();window.render?.();window.show?.('loans')
 };
 function enhanceLoans47(){styleLoanOverview();styleLoanCards();enhanceLoanEditing()}
 
@@ -104,6 +137,8 @@ function runSmoke47(){
  add('12 miesięcy firmy',Array.isArray(S?.years?.[String(S?.selectedYear)]?.company)&&S.years[String(S.selectedYear)].company.length===12);
  try{let p=typeof sal==='function'?sal():null;add('Silnik etatu',p?.rows?.length===12,p?.rows?.length+' / 12')}catch(e){add('Silnik etatu',false,e.message)}
  add('Kredyty',Array.isArray(S?.loans));
+ add('Edycja kredytu',typeof window.editLoanModal47==='function'&&typeof window.saveLoanEdit47==='function');
+ add('Pełny koszt kredytów',typeof window.loanTimeline15==='function');
  add('Firma+',typeof window.renderBusinessPlus44==='function');
  add('Próg PIT',typeof window.mfCombinedTax44==='function');
  add('12 kart etatu w DOM',document.querySelectorAll('#months .month').length===12,document.querySelectorAll('#months .month').length+' / 12');
@@ -137,11 +172,11 @@ if(typeof oldRender==='function'&&!oldRender.__ux47){
 }
 let st=document.createElement('style');st.textContent=`
 .nav button[data-v]{flex:1;min-width:0}.nav .plus{flex:0 0 48px}.nav{width:min(760px,calc(100% - 18px));padding:0 4px}.nav button[data-v]>span{white-space:nowrap}
-.loanTitleActions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.loanEditClosed47{display:none!important}.loanEditOpen47{display:block!important}.editLoan47{background:#eef4ff;color:#315f9f}
+.loanTitleActions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.editLoan47{background:#eef4ff;color:#315f9f}#loanList .loanEdit{display:none!important}.ux47FullKpi{background:#f4efff!important;border:1px solid #e3d8ff}.ux47TotalPay{background:#f4efff!important;border:1px solid #e3d8ff}.ux47PurpleLine{display:inline-block;width:18px;border-top:3px dashed #8b5cf6;margin-right:5px;vertical-align:middle}.loanOverviewKpis{grid-template-columns:repeat(3,minmax(0,1fr))!important}.loanModal47{grid-template-columns:repeat(2,minmax(0,1fr))}
 .ux47AxisNote{display:flex;justify-content:space-between;gap:10px;padding:5px 9px 0;font-size:9px;color:#75839a;font-weight:700;letter-spacing:.02em}
 #loanOverview .overviewChart,.loanUnifiedChart{background:linear-gradient(180deg,#fbfdff 0%,#fff 100%);box-shadow:inset 0 0 0 1px #e5ebf2}
 #loanOverview .loanChartHead b,.loanChartHead b{font-size:13px}
-@media(max-width:560px){.nav button[data-v]>span{font-size:8px}.nav{width:calc(100% - 12px)}.loanTitleActions{max-width:190px}.editLoan47{padding:7px 8px}}
+@media(max-width:760px){.loanOverviewKpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}}@media(max-width:560px){.nav button[data-v]>span{font-size:8px}.nav{width:calc(100% - 12px)}.loanTitleActions{max-width:190px}.editLoan47{padding:7px 8px}.loanModal47{grid-template-columns:1fr}.loanOverviewKpis{grid-template-columns:1fr 1fr!important}}
 `;document.head.appendChild(st);
 addFirmaShortcut();setVersion();
 })();
