@@ -106,8 +106,12 @@ function runSmoke47(){
  add('Kredyty',Array.isArray(S?.loans));
  add('Firma+',typeof window.renderBusinessPlus44==='function');
  add('Próg PIT',typeof window.mfCombinedTax44==='function');
- add('Wykres zarobków',!!G('earningsChart'));
- add('Wykres progu',!!G('taxSvg')&&!!G('homeTaxSvg'));
+ add('12 kart etatu w DOM',document.querySelectorAll('#months .month').length===12,document.querySelectorAll('#months .month').length+' / 12');
+ let ech=G('earningsChart'),ts=G('taxSvg');
+ add('Wykres zarobków',!!(ech&&ech.querySelector('svg')),ech&&ech.querySelector('svg')?'SVG OK':'brak SVG');
+ add('Wykres progu — 3 linie źródeł',!!(ts&&ts.querySelectorAll('polyline').length>=3),ts?ts.querySelectorAll('polyline').length+' linii':'brak SVG');
+ add('Karty kredytów',!(S&&S.loans&&S.loans.length)||document.querySelectorAll('#loanList .loan').length===S.loans.length,document.querySelectorAll('#loanList .loan').length+' / '+((S&&S.loans&&S.loans.length)||0));
+ add('Firma+ na pasku',!!document.querySelector('.nav [data-v="businessplus"]'));
  add('Zapis lokalny',(()=>{try{let k='mf47_smoke',v=String(Date.now());localStorage.setItem(k,v);let ok=localStorage.getItem(k)===v;localStorage.removeItem(k);return ok}catch{return false}})());
  return tests;
 }
