@@ -5,7 +5,7 @@ const ctx={console,Date,Intl,N:v=>+v||0,TODAY:'2026-10-11',S:{loans:[],finance:{
 ctx.window=ctx;vm.createContext(ctx);
 vm.runInContext(fs.readFileSync('v15loan.js','utf8'),ctx);
 const source=fs.readFileSync('v42insights.js','utf8');
-vm.runInContext(source.replace('window.renderWealth42=renderWealth42;','window.testLiabilities=liabilities;window.renderWealth42=renderWealth42;'),ctx);
+vm.runInContext(source.replace('window.renderWealth42=renderWealth42;','window.testBreakdown=debtBreakdownHtml42;window.testLiabilities=liabilities;window.renderWealth42=renderWealth42;'),ctx);
 const loan={name:'Test',loanType:'zero',balance:62105.48,payment:1000,rate:0,months:63,dueDay:1,asOfDate:'2026-09-01',history:[{month:'2026-10',paymentDate:'2026-10-01',paid:true,regularPaid:1000,isOverpayment:false,extra:0}]};
 ctx.S.loans=[loan];ctx.S.finance.informalDebts=[];
 let result=ctx.testLiabilities();
@@ -21,6 +21,13 @@ const expectedInterest=ctx.loanTimeline15(ctx.S.loans[0],true).forecast.reduce((
 assert.ok(expectedInterest>0);
 assert.equal(result.interest,expectedInterest);
 assert.equal(result.repaymentTotal,result.total+expectedInterest);
+const breakdown=ctx.testBreakdown(result);
+assert.ok(breakdown.includes('Kredyty — łącznie do zapłaty'));
+assert.ok(breakdown.includes('Pozostałe zobowiązania — bez odsetek'));
+assert.ok(breakdown.includes('class="debtParts42"'));
+assert.ok(breakdown.indexOf('Kredyty — łącznie')<breakdown.indexOf('Pozostałe zobowiązania'));
+assert.ok(breakdown.indexOf('Pozostałe zobowiązania')<breakdown.indexOf('Wszystko łącznie'));
+
 ctx.S.loans[0].extraMonthly=500;
 const overpaid=ctx.testLiabilities();
 assert.ok(overpaid.interest<expectedInterest);
