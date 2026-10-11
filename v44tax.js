@@ -58,27 +58,41 @@ function compact(v){
  return Math.round(v)+' zł';
 }
 function chartSvg(d){
- const th=d.threshold,max=Math.max(th*1.15,...d.rows.map(r=>r.combined),1),step=niceStep(max),axis=Math.ceil(max/step)*step;
- const left=48,right=570,top=24,bottom=190,x=i=>left+i*((right-left)/11),y=v=>bottom-(N(v)/axis)*(bottom-top);
- let out='';
+ const th=d.threshold,max=Math.max(th*1.18,...d.rows.map(r=>r.combined),1),step=niceStep(max),axis=Math.ceil(max/step)*step;
+ const left=52,right=565,top=38,bottom=184,x=i=>left+i*((right-left)/11),y=v=>bottom-(N(v)/axis)*(bottom-top);
+ let out='<rect x="'+left+'" y="'+(top-8)+'" width="'+(right-left)+'" height="'+(bottom-top+8)+'" rx="10" fill="#fbfcff"/>';
  for(let v=0;v<=axis+.001;v+=step){
-  const yy=y(v);out+='<line x1="'+left+'" y1="'+yy+'" x2="'+right+'" y2="'+yy+'" stroke="#e4e9f0" stroke-width="1" stroke-dasharray="'+(v?'3 5':'0')+'"/>';
-  out+='<text x="'+(left-7)+'" y="'+(yy+3)+'" text-anchor="end" fill="#7d899d" font-size="8.5">'+compact(v)+'</text>';
+  const yy=y(v);out+='<line x1="'+left+'" y1="'+yy+'" x2="'+right+'" y2="'+yy+'" stroke="#dde5ef" stroke-width="1" stroke-dasharray="'+(v?'3 5':'0')+'"/>';
+  out+='<text x="'+(left-8)+'" y="'+(yy+3)+'" text-anchor="end" fill="#69778c" font-size="8.5" font-weight="600">'+compact(v)+'</text>';
  }
- const ty=y(th),pts=d.rows.map(r=>x(r.i)+','+y(r.combined)).join(' ');
- out+='<line x1="'+left+'" y1="'+ty+'" x2="'+right+'" y2="'+ty+'" stroke="#df5963" stroke-width="2" stroke-dasharray="6 5"/>';
- out+='<polyline points="'+pts+'" fill="none" stroke="#3976dc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
- out+=SHORT.map((m,i)=>'<text x="'+x(i)+'" y="208" text-anchor="middle" fill="#7d899d" font-size="9">'+m+'</text>').join('');
+ const ty=y(th);
+ const totalPts=d.rows.map(r=>x(r.i)+','+y(r.combined)).join(' ');
+ const empPts=d.rows.map(r=>x(r.i)+','+y(r.employment)).join(' ');
+ const bizPts=d.rows.map(r=>x(r.i)+','+y(r.business)).join(' ');
+ const area=left+','+bottom+' '+totalPts+' '+right+','+bottom;
+ out+='<polygon points="'+area+'" fill="#3976dc" opacity=".055"/>';
+ out+='<line x1="'+left+'" y1="'+ty+'" x2="'+right+'" y2="'+ty+'" stroke="#df5963" stroke-width="2.2" stroke-dasharray="7 5"/>';
+ out+='<text x="'+(right-4)+'" y="'+(ty-6)+'" text-anchor="end" fill="#c8414a" font-size="9" font-weight="700">próg '+compact(th)+'</text>';
+ out+='<polyline points="'+empPts+'" fill="none" stroke="#38b96a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+ out+='<polyline points="'+bizPts+'" fill="none" stroke="#9550d7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+ out+='<polyline points="'+totalPts+'" fill="none" stroke="#172238" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>';
+ d.rows.forEach(r=>{
+  let xx=x(r.i),ey=y(r.employment),by=y(r.business),fillE=r.salaryActual?'#38b96a':'#fff',fillB=r.companyActual?'#9550d7':'#fff';
+  out+='<circle cx="'+xx+'" cy="'+ey+'" r="3" fill="'+fillE+'" stroke="#38b96a" stroke-width="1.5"/>';
+  if(r.business>0)out+='<circle cx="'+xx+'" cy="'+by+'" r="3" fill="'+fillB+'" stroke="#9550d7" stroke-width="1.5"/>';
+ });
+ out+='<g transform="translate('+left+',13)"><line x1="0" y1="0" x2="18" y2="0" stroke="#172238" stroke-width="4"/><text x="23" y="3" fill="#546176" font-size="8.5">razem</text><line x1="68" y1="0" x2="86" y2="0" stroke="#38b96a" stroke-width="3"/><text x="91" y="3" fill="#546176" font-size="8.5">etat</text><line x1="126" y1="0" x2="144" y2="0" stroke="#9550d7" stroke-width="3"/><text x="149" y="3" fill="#546176" font-size="8.5">firma</text><circle cx="196" cy="0" r="3" fill="#fff" stroke="#6f7c91" stroke-width="1.3"/><text x="203" y="3" fill="#546176" font-size="8.5">prognoza</text></g>';
+ out+=SHORT.map((m,i)=>'<text x="'+x(i)+'" y="205" text-anchor="middle" fill="#6f7c91" font-size="9">'+m+'</text>').join('');
  return out;
 }
 function renderTax44(){
  if(typeof S==='undefined')return;
  const d=combined(S.selectedYear),svg=chartSvg(d),cross=d.rows.find(r=>r.combined>=d.threshold),last=d.rows[11]||{},final=N(last.combined),empAct=N(last.employmentActual),empFc=N(last.employmentForecast),bizAct=N(last.businessActual),bizFc=N(last.businessForecast);
  ['taxSvg','homeTaxSvg'].forEach(id=>{const e=G(id);if(e)e.innerHTML=svg});
- const msg=cross?'Łączna podstawa skali (etat + firma) może przekroczyć próg około '+FULL[cross.i]+'.':'Łączna podstawa skali nie powinna przekroczyć progu.';
- if(G('pitStatus'))G('pitStatus').textContent=msg+' Prognoza etatu jest wliczona.';
+ const msg=cross?'Łączna podstawa opodatkowania (etat + firma) może przekroczyć próg około '+FULL[cross.i]+'.':'Łączna podstawa opodatkowania nie powinna przekroczyć progu.';
+ if(G('pitStatus'))G('pitStatus').textContent=msg+' Linie pokazują osobno etat, firmę i ich sumę.';
  if(G('cross'))G('cross').textContent=msg+' Prognoza końca roku: '+PLN(final)+'.';
- const tax=G('tax');
+ const legend=document.querySelector('#tax .chart .legend');if(legend)legend.innerHTML='<span><i style="display:inline-block;width:18px;border-top:4px solid #172238;margin-right:5px;vertical-align:middle"></i>razem do progu</span><span><i style="display:inline-block;width:18px;border-top:3px solid #38b96a;margin-right:5px;vertical-align:middle"></i>etat</span><span><i style="display:inline-block;width:18px;border-top:3px solid #9550d7;margin-right:5px;vertical-align:middle"></i>firma</span><span class="red">--- próg PIT</span><span>○ prognoza</span>'; const tax=G('tax');
  if(tax){
   let box=G('taxBusiness44');
   if(!box){box=document.createElement('div');box.id='taxBusiness44';box.className='card';tax.appendChild(box)}
@@ -88,7 +102,7 @@ function renderTax44(){
    '<div class="row"><span>Firma — wpisane</span><b>'+PLN(Math.max(0,bizAct))+'</b></div>'+
    '<div class="row"><span>Firma — prognoza</span><b>'+(bizFc>=0?'+ ':'− ')+PLN(Math.abs(bizFc))+'</b></div>'+
    '<div class="row"><span><b>Razem do progu — z prognozą</b></span><b>'+PLN(final)+'</b></div>'+
-   '<p class="muted">Prognoza etatu jest liczona z miesięcy oznaczonych jako PROGNOZA. Dla firmy prognozujemy przyszłe puste miesiące średnim dochodem do PIT z miesięcy już wpisanych. VAT nie wchodzi do dochodu PIT.</p>';
+   '<p class="muted">Czarna linia = suma do progu, zielona = etat, fioletowa = firma. Puste punkty oznaczają prognozę. Nie używamy „całkowitego przychodu” jako progu, bo próg PIT dotyczy podstawy opodatkowania, a nie obrotu brutto. VAT nie wchodzi do dochodu PIT.</p>';
  }
  const bp=G('businessPlusBody');
  if(bp){
