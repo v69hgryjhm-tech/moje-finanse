@@ -27,20 +27,23 @@ function companyForecast(y){
  return rows;
 }
 function combined(y){
- const year=S.years?.[String(y)]||{},company=year.company||[],emp=employmentRows(y),fc=companyForecast(y);
- const actualZus=company.filter(rowActual).map(r=>N(r.zus)),avgZus=actualZus.length?actualZus.reduce((a,b)=>a+b,0)/actualZus.length:0;
- let businessCum=0,lastActual=-1,rows=[];
+ const year=S.years?.[String(y)]||{},company=year.company||[],emp=employmentRows(y);
+ const actualBusiness=company.filter(rowActual).map(r=>N(companySummary(r).taxable));
+ const avgTaxable=actualBusiness.length?actualBusiness.reduce((a,b)=>a+b,0)/actualBusiness.length:0;
+ const now=new Date(),cy=now.getFullYear(),cm=now.getMonth();
+ let empActual=0,empForecast=0,bizActual=0,bizForecast=0,lastActual=-1,rows=[];
  for(let i=0;i<12;i++){
-  const r=company[i]||{},actual=rowActual(r);
-  let monthTaxable;
-  if(actual){monthTaxable=companySummary(r).taxable;lastActual=Math.max(lastActual,i)}
-  else monthTaxable=R2(N(fc[i]?.revenue)-N(fc[i]?.costs)-avgZus);
-  businessCum=R2(businessCum+monthTaxable);
-  const employment=N(emp[i]?.y);
-  const business=Math.max(0,businessCum);
-  rows.push({i,employment,business,combined:R2(employment+business),salaryActual:!!emp[i]?.actual,companyActual:actual,monthBusiness:monthTaxable});
+  const er=emp[i]||{},base=N(er.base);
+  if(er.actual)empActual=R2(empActual+base);else empForecast=R2(empForecast+base);
+  const r=company[i]||{},actual=rowActual(r),future=y>cy||(y===cy&&i>=cm);
+  let monthBusiness=0,companyForecasted=false;
+  if(actual){monthBusiness=N(companySummary(r).taxable);bizActual=R2(bizActual+monthBusiness);lastActual=Math.max(lastActual,i)}
+  else if(future&&actualBusiness.length){monthBusiness=avgTaxable;bizForecast=R2(bizForecast+monthBusiness);companyForecasted=true}
+  const business=Math.max(0,R2(bizActual+bizForecast));
+  const employment=R2(empActual+empForecast);
+  rows.push({i,employment,employmentActual:empActual,employmentForecast:empForecast,business,businessActual:bizActual,businessForecast:bizForecast,combined:R2(employment+business),salaryActual:!!er.actual,companyActual:actual,companyForecasted,monthBusiness});
  }
- return{rows,threshold:N(S.settings?.threshold)||120000,lastActual};
+ return{rows,threshold:N(S.settings?.threshold)||120000,lastActual,avgTaxable};
 }
 window.mfCombinedTax44=combined;
 
@@ -70,20 +73,22 @@ function chartSvg(d){
 }
 function renderTax44(){
  if(typeof S==='undefined')return;
- const d=combined(S.selectedYear),svg=chartSvg(d),cross=d.rows.find(r=>r.combined>=d.threshold),final=d.rows[11]?.combined||0,emp=d.rows[11]?.employment||0,biz=d.rows[11]?.business||0;
+ const d=combined(S.selectedYear),svg=chartSvg(d),cross=d.rows.find(r=>r.combined>=d.threshold),last=d.rows[11]||{},final=N(last.combined),empAct=N(last.employmentActual),empFc=N(last.employmentForecast),bizAct=N(last.businessActual),bizFc=N(last.businessForecast);
  ['taxSvg','homeTaxSvg'].forEach(id=>{const e=G(id);if(e)e.innerHTML=svg});
  const msg=cross?'Łączna podstawa skali (etat + firma) może przekroczyć próg około '+FULL[cross.i]+'.':'Łączna podstawa skali nie powinna przekroczyć progu.';
- if(G('pitStatus'))G('pitStatus').textContent=msg;
+ if(G('pitStatus'))G('pitStatus').textContent=msg+' Prognoza etatu jest wliczona.';
  if(G('cross'))G('cross').textContent=msg+' Prognoza końca roku: '+PLN(final)+'.';
  const tax=G('tax');
  if(tax){
   let box=G('taxBusiness44');
   if(!box){box=document.createElement('div');box.id='taxBusiness44';box.className='card';tax.appendChild(box)}
   box.innerHTML='<div class="title">Podstawa do skali — etat + firma</div>'+
-   '<div class="row"><span>Etat — podstawa opodatkowania</span><b>'+PLN(emp)+'</b></div>'+
-   '<div class="row"><span>Firma — dochód do skali</span><b>'+PLN(biz)+'</b></div>'+
-   '<div class="row"><span><b>Razem do progu</b></span><b>'+PLN(final)+'</b></div>'+
-   '<p class="muted">Faktury wpisujesz w Firma+ brutto, ale VAT nie jest dochodem do PIT. Dla działalności na skali model liczy: sprzedaż netto − koszty netto − wpisane składki społeczne. Zdrowotna nie obniża podstawy skali.</p>';
+   '<div class="row"><span>Etat — wpisane</span><b>'+PLN(empAct)+'</b></div>'+
+   '<div class="row"><span>Etat — prognoza do końca roku</span><b class="green">+ '+PLN(empFc)+'</b></div>'+
+   '<div class="row"><span>Firma — wpisane</span><b>'+PLN(Math.max(0,bizAct))+'</b></div>'+
+   '<div class="row"><span>Firma — prognoza</span><b>'+(bizFc>=0?'+ ':'− ')+PLN(Math.abs(bizFc))+'</b></div>'+
+   '<div class="row"><span><b>Razem do progu — z prognozą</b></span><b>'+PLN(final)+'</b></div>'+
+   '<p class="muted">Prognoza etatu jest liczona z miesięcy oznaczonych jako PROGNOZA. Dla firmy prognozujemy przyszłe puste miesiące średnim dochodem do PIT z miesięcy już wpisanych. VAT nie wchodzi do dochodu PIT.</p>';
  }
  const bp=G('businessPlusBody');
  if(bp){
@@ -91,7 +96,7 @@ function renderTax44(){
   if(!box){box=document.createElement('div');box.id='businessTax44';box.className='card';bp.insertBefore(box,bp.children[2]||null)}
   const remain=d.threshold-final;
   box.innerHTML='<div class="title">Próg PIT — wspólnie z etatem</div>'+
-   '<div class="grid"><div class="tile"><small>ETAT DO SKALI</small><b>'+PLN(emp)+'</b></div><div class="tile"><small>FIRMA DO SKALI</small><b>'+PLN(biz)+'</b></div><div class="tile"><small>RAZEM</small><b>'+PLN(final)+'</b></div><div class="tile"><small>'+(remain>=0?'DO PROGU':'PONAD PRÓG')+'</small><b class="'+(remain<0?'red':'')+'">'+PLN(Math.abs(remain))+'</b></div></div>';
+   '<div class="grid"><div class="tile"><small>ETAT WPISANE</small><b>'+PLN(empAct)+'</b></div><div class="tile"><small>ETAT PROGNOZA</small><b>'+PLN(empFc)+'</b></div><div class="tile"><small>FIRMA WPISANE</small><b>'+PLN(Math.max(0,bizAct))+'</b></div><div class="tile"><small>FIRMA PROGNOZA</small><b>'+PLN(bizFc)+'</b></div><div class="tile"><small>RAZEM Z PROGNOZĄ</small><b>'+PLN(final)+'</b></div><div class="tile"><small>'+(remain>=0?'DO PROGU':'PONAD PRÓG')+'</small><b class="'+(remain<0?'red':'')+'">'+PLN(Math.abs(remain))+'</b></div></div>';
  }
 }
 function renderCompanySummary44(){
