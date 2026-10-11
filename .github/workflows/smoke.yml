@@ -18,3 +18,6 @@ jobs:
         run: node tests/static-smoke.mjs
       - name: Company net VAT regression test
         run: node tests/company-net-vat.mjs
+
+      - name: Debt balance regression test
+        run: node tests/debt-balance.mjs

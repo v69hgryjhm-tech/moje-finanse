@@ -1,0 +1,30 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const ctx={console,Date,Intl,N:v=>+v||0,TODAY:'2026-10-11',S:{loans:[],finance:{}},save(){},loanPoint(){return{balance:87108.43}},document:{getElementById(){return null},createElement(){return{}},head:{appendChild(){}}},addEventListener(){}};
+ctx.window=ctx;vm.createContext(ctx);
+vm.runInContext(fs.readFileSync('v15loan.js','utf8'),ctx);
+const source=fs.readFileSync('v42insights.js','utf8');
+vm.runInContext(source.replace('window.renderWealth42=renderWealth42;','window.testLiabilities=liabilities;window.renderWealth42=renderWealth42;'),ctx);
+const loan={name:'Test',loanType:'zero',balance:62105.48,payment:1000,rate:0,months:63,dueDay:1,asOfDate:'2026-09-01',history:[{month:'2026-10',paymentDate:'2026-10-01',paid:true,regularPaid:1000,isOverpayment:false,extra:0}]};
+ctx.S.loans=[loan];ctx.S.finance.informalDebts=[];
+let result=ctx.testLiabilities();
+assert.equal(result.bank,61105.48);assert.equal(result.total,61105.48);
+ctx.S.finance.informalDebts=[{amount:27002.95,payments:[{amount:1000}]}];
+result=ctx.testLiabilities();
+assert.equal(result.informal,26002.95);assert.equal(Math.round(result.total*100)/100,87108.43);
+ctx.S.loans=[{...loan,loanType:'interest',rate:12}];
+result=ctx.testLiabilities();
+assert.equal(result.bank,ctx.loanCurrentPoint15(ctx.S.loans[0]).balance);
+assert.notEqual(result.bank,ctx.loanPoint().balance);
+ctx.S.loans[0].history[0].balanceAfter=60000;
+assert.equal(ctx.testLiabilities().bank,60000);
+ctx.S.finance.informalDebts=[{amount:100,payments:[{amount:120}]}];
+assert.equal(ctx.testLiabilities().informal,0);
+for(const file of ['v42insights.js','v41suite.js']){
+ const helper=fs.readFileSync(file,'utf8').match(/function currentBalance\(l\)[^\r\n]+/)[0];
+ vm.runInContext(helper,ctx);
+ assert.equal(ctx.currentBalance(ctx.S.loans[0]),60000);
+}
+assert.ok(source.includes('Skąd ta kwota?'));
+console.log('PASS — radar i kredyty używają tego samego salda; historia wpłat, odsetki dzienne, saldo bankowe, zobowiązania dodatkowe.');

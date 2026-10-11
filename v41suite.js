@@ -1,10 +1,10 @@
 /* Moje Finanse 4.1 — bezpieczne rozszerzenia stabilnej wersji */
 (function(){
 'use strict';
-const VERSION='4.8.4',G=id=>document.getElementById(id),N=v=>+v||0,PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v)),esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const VERSION='4.8.5',G=id=>document.getElementById(id),N=v=>+v||0,PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v)),esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function ensure(){if(typeof S==='undefined')return false;S.finance||={};let f=S.finance;f.products||=[];f.categoryLimits||={};f.assets||=[];f.goals||=[];f.informalDebts||=[];f.ppkOpening=N(f.ppkOpening);f.ppkReturnPct=N(f.ppkReturnPct)||5;return true}
 function setVersion(){document.title='Moje Finanse '+VERSION;let h=document.querySelector('.top small');if(h)h.innerHTML=`<span id="headerYear">${typeof S!=='undefined'?S.selectedYear:''}</span> • wersja ${VERSION}`;document.documentElement.dataset.appVersion=VERSION}
-function currentBalance(l){try{return N(loanPoint(l).balance)}catch{return N(l.balance)}}
+function currentBalance(l){if(typeof window.loanCurrentPoint15==='function')return N(window.loanCurrentPoint15(l).balance);try{return N(loanPoint(l).balance)}catch{return N(l?.balance)}}
 function informalRemaining(d){return Math.max(0,N(d.amount)-(d.payments||[]).reduce((a,p)=>a+N(p.amount),0))}
 function backup(force=false){if(!ensure())return;try{let k='moje-finanse-backups-v1',a=JSON.parse(localStorage.getItem(k)||'[]'),now=Date.now(),last=a[0]?.stamp?new Date(a[0].stamp).getTime():0;if(!force&&now-last<6*3600000)return;a.unshift({stamp:new Date().toISOString(),data:JSON.parse(JSON.stringify(S))});localStorage.setItem(k,JSON.stringify(a.slice(0,10)));S.finance.lastBackup=new Date().toISOString()}catch(e){console.warn('backup41',e)}}
 function wrapSave(){let old=window.save;if(typeof old!=='function'||old.__mf41)return;let fn=function(){old();backup(false)};fn.__mf41=true;window.save=fn}
