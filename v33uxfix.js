@@ -1,6 +1,6 @@
 /* Moje Finanse 3.4 — stabilne moduły i końcowy start aplikacji */
 (function(){
-const VERSION='4.2.1';
+const VERSION='4.3.0';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
 const FULL=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
@@ -47,7 +47,6 @@ function renderAll(){renderBudget();renderCalendar();renderScenario();renderDebt
 window.renderBudget34=renderBudget;window.renderCalendar34=renderCalendar;window.renderScenario34=renderScenario;window.renderDebt34=renderDebt;
 const oldShow=window.show;if(typeof oldShow==='function')window.show=function(v){oldShow(v);setVersion();if(v==='budget')setTimeout(renderBudget,0);if(v==='calendar')setTimeout(renderCalendar,0);if(v==='scenario')setTimeout(renderScenario,0);if(v==='debt')setTimeout(renderDebt,0);if(v==='home')setTimeout(wireLoanHome,0)};
 const oldRender=window.render;if(typeof oldRender==='function')window.render=function(){oldRender();setVersion();setTimeout(renderAll,0)};
-function ready(){setVersion();document.documentElement.classList.add('app-ready');document.documentElement.classList.remove('app-loading')}
-setTimeout(()=>{try{ensure();if(typeof render==='function')render();renderAll()}catch(e){console.error('Start aplikacji',e)}finally{setTimeout(ready,120)}},0);
-setTimeout(ready,1800);
+window.renderStable34=renderAll;
+window.prepareStable34=function(){ensure();setVersion();};
 })();
