@@ -37,10 +37,10 @@ function salaryAt(y,m){
 function companyAt(y,m){
  let raw=S.years?.[String(y)]?.company?.[m]||{},rev=N(raw.revenue),cost=N(raw.costs),vat=(N(raw.vatOut)||N(raw.vatIn))?N(raw.vatOut)-N(raw.vatIn):N(raw.vat),zus=N(raw.zus),health=N(raw.health),tax=N(raw.tax),actual=!!(rev||cost||vat||zus||health||tax);
  let ar=(S.years?.[String(y)]?.company||[]).filter(r=>N(r.revenue)||N(r.costs)||N(r.vat)||N(r.vatOut)||N(r.vatIn)||N(r.zus)||N(r.health)||N(r.tax)),avgCharges=ar.length?ar.reduce((a,r)=>a+N(r.zus)+N(r.health)+N(r.tax),0)/ar.length:0;
- if(actual)return{actual,rev,cost,vat,zus,health,tax,profit:rev-cost-vat-zus-health-tax};
+ if(actual){let rg=N(raw.revenueGross)||rev+Math.max(0,N(raw.vatOut)),cg=N(raw.costsGross)||cost+Math.max(0,N(raw.vatIn)),profit=rg-cg-Math.max(0,vat)-zus-health-tax;return{actual,rev,cost,vat,zus,health,tax,profit}};
  if(!companyCache.has(y)){let old=S.selectedYear,rows=[];try{S.selectedYear=y;Y();rows=typeof comp==='function'?(comp().rows||[]):[]}catch{rows=[]}finally{S.selectedYear=old;window.mfTaxSync41?.(old)}companyCache.set(y,rows)}
  let forecast=companyCache.get(y)?.[m]||{revenue:0,costs:0,vat:0};rev=N(forecast.revenue);cost=N(forecast.costs);vat=N(forecast.vat);
- return{actual:false,rev,cost,vat,zus:0,health:0,tax:0,profit:rev-cost-vat-avgCharges}
+ return{actual:false,rev,cost,vat,zus:0,health:0,tax:0,profit:rev-cost-avgCharges}
 }
 function monthData(k){
  let {y,m}=parse(k),s=salaryAt(y,m),c=companyAt(y,m),e=expenseSplit(k),lo=loanSpend(k),actualIncome=(s.actual?N(s.total):0)+(c.actual?N(c.profit):0),forecastIncome=(s.actual?0:N(s.total))+(c.actual?0:N(c.profit)),totalIncome=actualIncome+forecastIncome;
