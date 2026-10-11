@@ -38,17 +38,17 @@ function compact26(v){v=n(v);if(v>=1000)return (v/1000).toLocaleString('pl-PL',{
 function renderEarnings26(d){
  let h=document.getElementById('earningsChart');if(!h)return;
  let rows=d.p.rows.map((r,i)=>{let cm=d.companyMonths?.[i]||{},salary=Math.max(0,n(r.total)),company=Math.max(0,n(cm.revenue));return{salary,company,sa:!!r.actual,ca:!!cm.actual,cf:!!cm.forecast}});
- let max=Math.max(1,...rows.map(r=>r.salary+Math.max(0,r.company))),step=nice26(max),axis=Math.ceil(max/step)*step;
+ let totals=rows.map(r=>r.salary+Math.max(0,r.company)),actualTotals=rows.filter(r=>r.sa||r.ca).map(r=>r.salary+Math.max(0,r.company)),avgActual=actualTotals.length?actualTotals.reduce((a,b)=>a+b,0)/actualTotals.length:0,max=Math.max(1,...totals,avgActual),step=nice26(max),axis=Math.ceil(max/step)*step;
  let W=720,H=245,left=54,right=12,top=18,bottom=190,plotW=W-left-right,slot=plotW/12,barW=Math.min(32,slot*.62),y=v=>bottom-(v/axis)*(bottom-top);
  let svg='';
- for(let v=0;v<=axis+.001;v+=step){let yy=y(v);svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(W-right)+'" y2="'+yy+'" stroke="#e4e9f0" stroke-width="1" stroke-dasharray="'+(v?'3 5':'0')+'"/><text x="'+(left-7)+'" y="'+(yy+3)+'" text-anchor="end" fill="#7d899d" font-size="9">'+compact26(v)+'</text>'}
+ for(let v=0;v<=axis+.001;v+=step){let yy=y(v);svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(W-right)+'" y2="'+yy+'" stroke="#e4e9f0" stroke-width="1" stroke-dasharray="'+(v?'3 5':'0')+'"/><text x="'+(left-7)+'" y="'+(yy+3)+'" text-anchor="end" fill="#7d899d" font-size="9">'+compact26(v)+'</text>'} if(avgActual>0){let ay=y(avgActual);svg+='<line x1="'+left+'" y1="'+ay+'" x2="'+(W-right)+'" y2="'+ay+'" stroke="#6f7c91" stroke-width="1.5" stroke-dasharray="6 5"/><text x="'+(W-right-2)+'" y="'+(ay-5)+'" text-anchor="end" fill="#6f7c91" font-size="8">średnia wpisanych '+compact26(avgActual)+'</text>'}
  rows.forEach((r,i)=>{
   let x=left+slot*i+slot/2,hs=(r.salary/axis)*(bottom-top),hc=(Math.max(0,r.company)/axis)*(bottom-top),ys=bottom-hs,yc=ys-hc,sc=r.sa?'#38b96a':'#b9dfc8',cc=r.ca?'#965bd6':'#d9c6ef';
   if(hs>0)svg+='<rect x="'+(x-barW/2)+'" y="'+ys+'" width="'+barW+'" height="'+Math.max(2,hs)+'" rx="4" fill="'+sc+'" '+(r.sa?'':'stroke="#7fb995" stroke-dasharray="3 2"')+'/>';
   if(hc>0)svg+='<rect x="'+(x-barW/2)+'" y="'+yc+'" width="'+barW+'" height="'+Math.max(2,hc)+'" rx="4" fill="'+cc+'" '+(r.ca?'':'stroke="#aa8bc9" stroke-dasharray="3 2"')+'/>';
  
   svg+='<text x="'+x+'" y="211" text-anchor="middle" fill="#73819a" font-size="9">'+M[i]+'</text>';
-  if(!r.sa||r.cf)svg+='<text x="'+x+'" y="225" text-anchor="middle" fill="#8a96a8" font-size="7">prog.</text>';
+  let total=r.salary+Math.max(0,r.company);if(total>0)svg+='<text x="'+x+'" y="'+Math.max(31,y(total)-6)+'" text-anchor="middle" fill="#546176" font-size="7.5" font-weight="700">'+compact26(total)+'</text>'; if(!r.sa||r.cf)svg+='<text x="'+x+'" y="225" text-anchor="middle" fill="#8a96a8" font-size="7">prog.</text>';
  });
  h.style.display='block';h.style.height='245px';h.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="245" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:245px">'+svg+'</svg>';
  let lg=h.parentElement.querySelector('.legend');if(lg)lg.innerHTML='<span><i class="dot greenDot"></i> etat — wpisane</span><span><i style="display:inline-block;width:10px;height:10px;background:#b9dfc8;border:1px dashed #7fb995;border-radius:3px"></i> etat — prognoza</span><span><i style="display:inline-block;width:10px;height:10px;background:#965bd6;border-radius:3px"></i> firma netto bez VAT — wpisane</span><span><i style="display:inline-block;width:10px;height:10px;background:#d9c6ef;border:1px dashed #aa8bc9;border-radius:3px"></i> firma netto bez VAT — prognoza</span>'
