@@ -57,12 +57,18 @@ function compact(v){
  if(v>=1000)return (v/1000).toLocaleString('pl-PL',{maximumFractionDigits:1})+' tys.';
  return Math.round(v)+' zł';
 }
+function taxOverviewHtml44(final,actual,forecast,threshold){
+ const remaining=threshold-final;
+ return '<div class="taxForecastHero44"><small>SUMA ROCZNA Z PROGNOZĄ — PODSTAWA PIT</small><strong>'+PLN(final)+'</strong><span>Etat + dochód firmy do PIT</span></div><div class="taxForecastParts44"><div><span>Dane wpisane</span><b>'+PLN(actual)+'</b></div><div><span>Dodatkowa prognoza</span><b>'+PLN(forecast)+'</b></div><div><span>Próg PIT</span><b>'+PLN(threshold)+'</b></div><div><span>'+(remaining>=0?'Pozostaje do progu':'Powyżej progu')+'</span><b>'+PLN(Math.abs(remaining))+'</b></div></div><div class="taxOverviewLegend44"><span><i class="total44"></i>Suma do progu</span><span><i class="employment44"></i>Etat</span><span><i class="business44"></i>Firma</span><span class="taxForecastKey44">Jasne tło — miesiące z prognozą</span></div>';
+}
 function chartSvg(d){
  const th=d.threshold,max=Math.max(th*1.18,...d.rows.map(r=>r.combined),1),step=niceStep(max),axis=Math.ceil(max/step)*step;
  const left=60,right=565,top=24,bottom=184,x=i=>left+i*((right-left)/11),y=v=>bottom-(N(v)/axis)*(bottom-top);
- let out='<rect x="'+left+'" y="'+(top-8)+'" width="'+(right-left)+'" height="'+(bottom-top+8)+'" rx="10" fill="#fbfcff"/>';
+ const forecastStart=d.rows.find((r,i)=>N(r.employmentForecast)!==N(d.rows[i-1]?.employmentForecast)||N(r.businessForecast)!==N(d.rows[i-1]?.businessForecast))?.i;
+ let out=forecastStart!=null?'<rect x="'+Math.max(left,x(forecastStart)-12)+'" y="'+(top-8)+'" width="'+(right-Math.max(left,x(forecastStart)-12))+'" height="'+(bottom-top+8)+'" rx="10" fill="#eff4fb"/>':'';
+ out+='<rect x="'+left+'" y="'+(top-8)+'" width="'+(right-left)+'" height="'+(bottom-top+8)+'" rx="10" fill="transparent"/>';
  for(let v=0;v<=axis+.001;v+=step){
-  const yy=y(v);out+='<line x1="'+left+'" y1="'+yy+'" x2="'+right+'" y2="'+yy+'" stroke="#dde5ef" stroke-width="1" stroke-dasharray="'+(v?'3 5':'0')+'"/>';
+  const yy=y(v);out+='<line x1="'+left+'" y1="'+yy+'" x2="'+right+'" y2="'+yy+'" stroke="#e8edf4" stroke-width="1"/>';
   out+='<text x="'+(left-8)+'" y="'+(yy+3)+'" text-anchor="end" fill="#69778c" font-size="11" font-weight="600">'+compact(v)+'</text>';
  }
  const ty=y(th);
@@ -71,16 +77,12 @@ function chartSvg(d){
  const bizPts=d.rows.map(r=>x(r.i)+','+y(r.business)).join(' ');
  const area=left+','+bottom+' '+totalPts+' '+right+','+bottom;
  out+='<polygon points="'+area+'" fill="#3976dc" opacity=".055"/>';
- out+='<line x1="'+left+'" y1="'+ty+'" x2="'+right+'" y2="'+ty+'" stroke="#df5963" stroke-width="2.2" stroke-dasharray="7 5"/>';
+ out+='<line x1="'+left+'" y1="'+ty+'" x2="'+right+'" y2="'+ty+'" stroke="#d7838b" stroke-width="1.5"/>';
  out+='<text x="'+(right-4)+'" y="'+(ty-6)+'" text-anchor="end" fill="#c8414a" font-size="11" font-weight="700">próg '+compact(th)+'</text>';
- out+='<polyline points="'+empPts+'" fill="none" stroke="#38b96a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
- out+='<polyline points="'+bizPts+'" fill="none" stroke="#9550d7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
- out+='<polyline points="'+totalPts+'" fill="none" stroke="#172238" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>';
- d.rows.forEach(r=>{
-  let xx=x(r.i),ey=y(r.employment),by=y(r.business),fillE=r.salaryActual?'#38b96a':'#fff',fillB=r.companyActual?'#9550d7':'#fff';
-  out+='<circle cx="'+xx+'" cy="'+ey+'" r="3" fill="'+fillE+'" stroke="#38b96a" stroke-width="1.5"/>';
-  if(r.business>0)out+='<circle cx="'+xx+'" cy="'+by+'" r="3" fill="'+fillB+'" stroke="#9550d7" stroke-width="1.5"/>';
- });
+ out+='<polyline points="'+empPts+'" fill="none" stroke="#56b68a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+ out+='<polyline points="'+bizPts+'" fill="none" stroke="#a58aca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+ out+='<polyline points="'+totalPts+'" fill="none" stroke="#365f9b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
+ const last=d.rows.at(-1);if(last)out+='<circle cx="'+x(last.i)+'" cy="'+y(last.combined)+'" r="4.5" fill="#365f9b" stroke="#fff" stroke-width="2"/>';
  out+=SHORT.map((m,i)=>'<text x="'+x(i)+'" y="205" text-anchor="middle" fill="#6f7c91" font-size="9">'+m+'</text>').join('');
  return out;
 }
@@ -94,7 +96,7 @@ function renderTax44(){
  if(homeSvg){
   let panel=G('homeTaxOverview44');
   if(!panel){panel=document.createElement('div');panel.id='homeTaxOverview44';homeSvg.insertAdjacentElement('beforebegin',panel)}
-  panel.innerHTML='<div class="taxOverviewAmount44"><span>Prognoza podstawy PIT na koniec roku</span><b>'+PLN(final)+'</b></div><div class="taxOverviewLimit44"><span>Próg PIT</span><b>'+PLN(d.threshold)+'</b></div><div class="taxOverviewLegend44"><span><i class="total44"></i>Razem</span><span><i class="employment44"></i>Etat</span><span><i class="business44"></i>Firma</span><span><i class="forecast44"></i>Prognoza</span></div>';
+  panel.innerHTML=taxOverviewHtml44(final,empAct+Math.max(0,bizAct),final-empAct-Math.max(0,bizAct),d.threshold);
  }
 
  if(G('cross'))G('cross').textContent=msg+' Prognoza końca roku: '+PLN(final)+'.';

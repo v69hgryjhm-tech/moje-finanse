@@ -44,3 +44,14 @@
 #homeTaxSvg{display:block;width:100%;height:auto;aspect-ratio:600/220;max-height:none!important;margin-top:16px}
 #pitStatus{margin:12px 0 0!important;padding:12px 14px;border:1px solid #e4ebf5;border-radius:12px;background:#fff;font-size:12px;line-height:1.6;color:#697c97}
 @media(max-width:560px){#homeTaxOverview44{padding:12px}.taxOverviewAmount44 b{font-size:21px}.taxOverviewLegend44{gap:8px 14px;font-size:11px}#homeTaxSvg{margin-top:12px}}
+
+/* Suma prognozy PIT — 4.9.0 */
+#homeTaxOverview44{padding:0;border:0;background:transparent}
+.taxForecastHero44{padding:20px;border:1px solid #dfe7f3;border-radius:15px;background:linear-gradient(135deg,#edf3fd,#f7f9fd)}
+.taxForecastHero44 small{display:block;font-size:11px;line-height:1.5;font-weight:600;letter-spacing:.03em;color:#687e9e}
+.taxForecastHero44 strong{display:block;margin-top:7px;font-size:34px;line-height:1.2;font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:#2f507c}
+.taxForecastHero44>span{display:block;font-size:12px;color:#7a8ca6;margin-top:6px}
+.taxForecastParts44{padding:8px 4px 0}.taxForecastParts44>div{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;padding:10px 0;border-bottom:1px solid #e9eef5;font-size:12px;line-height:1.5}.taxForecastParts44 span{color:#7889a0}.taxForecastParts44 b{font-weight:600;color:#3f5779;font-variant-numeric:tabular-nums}
+.taxOverviewLegend44 .total44{border-color:#365f9b}.taxOverviewLegend44 .employment44{border-color:#56b68a}.taxOverviewLegend44 .business44{border-color:#a58aca}
+.taxForecastKey44{padding:3px 7px;border-radius:5px;background:#eff4fb;font-size:11px}
+@media(max-width:560px){.taxForecastHero44{padding:16px}.taxForecastHero44 strong{font-size:29px}}

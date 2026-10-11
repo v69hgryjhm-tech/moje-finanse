@@ -50,7 +50,7 @@ for(const [lines,expected] of [
 }
 const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/FIRMA — SPRZEDAŻ NETTO BEZ VAT/);
-for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.8\.9/);
-assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='489'));
-assert.match(fs.readFileSync('manifest.json','utf8'),/v=489/);
+for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.9\.0/);
+assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='490'));
+assert.match(fs.readFileSync('manifest.json','utf8'),/v=490/);
 console.log('PASS — karta i prognoza netto bez VAT, mieszane stawki, zero, brutto, wynik po kosztach oraz wersja/cache.');

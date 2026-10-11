@@ -21,3 +21,6 @@ jobs:
 
       - name: Debt balance regression test
         run: node tests/debt-balance.mjs
+
+      - name: Tax forecast summary test
+        run: node tests/tax-forecast-summary.mjs
