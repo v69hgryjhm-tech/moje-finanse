@@ -1,7 +1,7 @@
 /* Moje Finanse 4.3 — pojedynczy, stabilny start aplikacji */
 (function(){
 'use strict';
-const VERSION='4.7.1';
+const VERSION='4.7.2';
 let revealed=false, quietTimer=null, hardTimer=null, observer=null;
 
 function setVersion(){
