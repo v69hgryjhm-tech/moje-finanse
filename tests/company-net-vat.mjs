@@ -48,9 +48,18 @@ for(const [lines,expected] of [
  assert.equal(nodes.get('companyTile').hint.children[1].children[1].textContent,fmt(expected*12));
  assert.equal(nodes.get('companyTile').parentElement.children.length,0);
 }
+year=makeYear([{gross:123,vatRate:23}]);
+ctx.sal=()=>({rows:Array.from({length:12},(_,i)=>({total:i===0?1000:800,g:i===0?1500:1200,actual:i===0}))});
+ctx.render();
+const totalHtml=nodes.get('earningsChart').innerHTML;
+assert.ok(totalHtml.includes('RAZEM — TYLKO WPISANE</small><strong>'+fmt(1100)));
+assert.ok(totalHtml.includes('RAZEM — Z PROGNOZĄ ROCZNĄ</small><strong>'+fmt(11000)));
+assert.ok(totalHtml.includes('<span>Etat netto</span><b>'+fmt(1000)));
+assert.ok(totalHtml.includes('<span>Firma netto bez VAT</span><b>'+fmt(100)));
+assert.ok(totalHtml.includes('<span>Dodatkowa prognoza</span><b>'+fmt(9900)));
 const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/FIRMA — SPRZEDAŻ NETTO BEZ VAT/);
-for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.9\.0/);
-assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='490'));
-assert.match(fs.readFileSync('manifest.json','utf8'),/v=490/);
+for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.9\.1/);
+assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='491'));
+assert.match(fs.readFileSync('manifest.json','utf8'),/v=491/);
 console.log('PASS — karta i prognoza netto bez VAT, mieszane stawki, zero, brutto, wynik po kosztach oraz wersja/cache.');

@@ -19,7 +19,7 @@ function snapshot(){
  });
  let avgCash=actualRows.length?actualRows.reduce((a,r)=>a+r.cash,0)/actualRows.length:0,avgRev=actualRows.length?actualRows.reduce((a,r)=>a+r.revenue,0)/actualRows.length:0,avgGross=actualRows.length?actualRows.reduce((a,r)=>a+r.gross,0)/actualRows.length:0,avgCost=actualRows.length?actualRows.reduce((a,r)=>a+r.costs,0)/actualRows.length:0,avgVat=actualRows.length?actualRows.reduce((a,r)=>a+r.vat,0)/actualRows.length:0;
  for(let i=0;i<12;i++){
-  let sr=yr.salary[i]||{},sa=n(sr.net)+n(sr.bonus)>0;
+  let sa=!!p.rows[i]?.actual;
   if(sa){sAct+=n(p.rows[i].total);gAct+=n(p.rows[i].g)}else{sFc+=n(p.rows[i].total);gFc+=n(p.rows[i].g)}
   let m=companyMonths[i],future=year>cy||(year===cy&&i>=cm);
   if(m.actual){crAct+=m.revenue;cgrossAct+=m.gross;ccAct+=m.costs;cvAct+=m.vat;cpAct+=m.cash}
@@ -75,7 +75,9 @@ function renderEarnings26(d){
   svg+='<text x="'+x+'" y="276" text-anchor="middle" fill="#54657a" font-size="12" font-weight="500">'+M[i]+'</text></g>';
  });
  h.style.display='block';h.style.height='auto';
- h.innerHTML='<div class="earningsMeta26"><span>Wpisane kwoty i prognoza</span><span class="earningsAverage26">Średnia wpisanych <strong>'+fmt(avgActual)+'</strong></span></div><div class="earningsScroll26" tabindex="0" role="region" aria-label="Wykres miesięczny. Na małym ekranie przewiń w poziomie."><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Etat netto i sprzedaż firmy netto bez VAT, miesiąc po miesiącu">'+svg+'</svg></div>';
+ const actualTotal=d.sAct+d.crAct,forecastTotal=d.sAct+d.sFc+d.crAct+d.crFc;
+ const summary='<div class="earningsTotals26"><section class="earningsFactTotal26"><small>RAZEM — TYLKO WPISANE</small><strong>'+fmt(actualTotal)+'</strong><div><span>Etat netto</span><b>'+fmt(d.sAct)+'</b></div><div><span>Firma netto bez VAT</span><b>'+fmt(d.crAct)+'</b></div></section><section class="earningsFullTotal26"><small>RAZEM — Z PROGNOZĄ ROCZNĄ</small><strong>'+fmt(forecastTotal)+'</strong><div><span>Etat netto z prognozą</span><b>'+fmt(d.sAct+d.sFc)+'</b></div><div><span>Firma netto bez VAT z prognozą</span><b>'+fmt(d.crAct+d.crFc)+'</b></div><div class="earningsAddedForecast26"><span>Dodatkowa prognoza</span><b>'+fmt(d.sFc+d.crFc)+'</b></div></section></div><p class="earningsBasis26">Wykres i sumy: etat netto na konto + sprzedaż firmy netto bez VAT, przed kosztami. Etat brutto jest pokazany osobno.</p>';
+ h.innerHTML=summary+'<div class="earningsMeta26"><span>Wpisane kwoty i prognoza</span><span class="earningsAverage26">Średnia wpisanych <strong>'+fmt(avgActual)+'</strong></span></div><div class="earningsScroll26" tabindex="0" role="region" aria-label="Wykres miesięczny. Na małym ekranie przewiń w poziomie."><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Etat netto i sprzedaż firmy netto bez VAT, miesiąc po miesiącu">'+svg+'</svg></div>';
  let lg=h.parentElement.querySelector('.legend');if(lg){lg.classList.add('earningsLegend26');lg.innerHTML='<span><i class="earningsDot26 salary26"></i>Etat netto</span><span><i class="earningsDot26 company26"></i>Firma netto bez VAT</span><span><i class="earningsForecast26"></i>Prognoza — jasne słupki</span>'}
 }
 const oldRender=window.render;if(typeof oldRender==='function'){window.render=function(){oldRender();apply()}}

@@ -55,3 +55,15 @@
 .taxOverviewLegend44 .total44{border-color:#365f9b}.taxOverviewLegend44 .employment44{border-color:#56b68a}.taxOverviewLegend44 .business44{border-color:#a58aca}
 .taxForecastKey44{padding:3px 7px;border-radius:5px;background:#eff4fb;font-size:11px}
 @media(max-width:560px){.taxForecastHero44{padding:16px}.taxForecastHero44 strong{font-size:29px}}
+
+/* Spójne sumy wykresu i prognozy — 4.9.1 */
+.earningsTotals26{display:grid;grid-template-columns:1fr!important;gap:12px;margin-top:16px}
+.earningsTotals26>section{padding:16px;border:1px solid #e3eaf3;border-radius:14px;background:#f7fafc}
+.earningsTotals26 .earningsFullTotal26{background:#f2f5fc;border-color:#dce5f3}
+.earningsTotals26 small{display:block;font-size:11px;color:#7386a1;font-weight:600;letter-spacing:.025em}
+.earningsTotals26 strong{display:block;font-size:28px;line-height:1.3;letter-spacing:-.03em;color:#2e496e;font-variant-numeric:tabular-nums;margin:6px 0 12px}
+.earningsTotals26 section>div{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 12px;font-size:12px;line-height:1.5;margin-top:5px}
+.earningsTotals26 section>div span{color:#7789a2}.earningsTotals26 section>div b{font-weight:600;color:#526884;font-variant-numeric:tabular-nums}
+.earningsAddedForecast26{border-top:1px solid #dfe7f2;padding-top:9px;margin-top:10px!important}
+.earningsBasis26{font-size:11px;line-height:1.6;color:#7f8da2;margin:12px 0 0}
+#allIncomeTotal[hidden],#home .row[hidden]{display:none!important}
