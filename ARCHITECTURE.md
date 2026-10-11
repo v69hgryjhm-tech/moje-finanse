@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **4.7.x**.
+Aktualna gałąź produkcyjna: **4.8.1**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
