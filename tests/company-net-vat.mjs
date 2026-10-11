@@ -34,7 +34,11 @@ for(const [lines,expected] of [
  assert.ok(!chart.includes('font-size="7'));
  assert.ok(!chart.includes('>prog.</text>'));
  const bars=nodes.get('homeBars').innerHTML;
- assert.ok(bars.includes('<b>'+fmt(expected)+'</b><small>FIRMA — NETTO BEZ VAT</small><span>prognoza +'+fmt(expected*11)+'</span>'), 'Słupek firmy musi pokazywać sprzedaż bez VAT, przed kosztami');
+ assert.ok(bars.includes('<p class="yearSummaryNote26">Sprzedaż netto bez VAT</p><div class="yearSummaryAmount26">'+fmt(expected)+'</div>'), 'Podsumowanie firmy musi pokazywać sprzedaż bez VAT przed kosztami');
+ assert.ok(bars.includes('<span>Dodatkowa prognoza</span><strong>'+fmt(expected*11)+'</strong>'));
+ assert.ok(bars.includes('<span>Łącznie w roku</span><strong>'+fmt(expected*12)+'</strong>'));
+ assert.equal((bars.match(/<article /g)||[]).length,4);
+ assert.ok(!bars.includes('kpiBarStack26'));
  assert.equal(nodes.get('companyNetHome').textContent,fmt(expected));
  assert.match(nodes.get('companyTile').previousElementSibling.textContent,/NETTO BEZ VAT/);
  const summary=ctx.mfCompanySummary44(year.company[0]);
@@ -46,7 +50,7 @@ for(const [lines,expected] of [
 }
 const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/FIRMA — SPRZEDAŻ NETTO BEZ VAT/);
-for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.8\.3/);
-assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='483'));
-assert.match(fs.readFileSync('manifest.json','utf8'),/v=483/);
+for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.8\.4/);
+assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='484'));
+assert.match(fs.readFileSync('manifest.json','utf8'),/v=484/);
 console.log('PASS — karta i prognoza netto bez VAT, mieszane stawki, zero, brutto, wynik po kosztach oraz wersja/cache.');
