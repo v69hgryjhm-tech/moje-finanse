@@ -13,7 +13,7 @@ function ensure(){if(typeof S==='undefined')return false;S.finance||={};let f=S.
 function setVersion(){document.title='Moje Finanse '+VERSION;let h=document.querySelector('.top small');if(h)h.innerHTML=`<span id="headerYear">${typeof S!=='undefined'?S.selectedYear:''}</span> • wersja ${VERSION}`;document.documentElement.dataset.appVersion=VERSION}
 function inMonth(e,k){if(e?.active===false)return false;if(e?.kind==='once')return e.month===k;return(!e?.from||k>=e.from)&&(!e?.to||k<=e.to)}
 function expenseRows(k){return(S.finance.expenses||[]).filter(e=>inMonth(e,k))}
-function expenseSplit(k){let recurring=0,once=0;expenseRows(k).forEach(e=>(e.kind==='once'?once:recurring)+=N(e.amount));return{recurring,once,total:recurring+once}}
+function expenseSplit(k){let recurring=0,once=0;expenseRows(k).forEach(e=>{if(e.kind==='once')once+=N(e.amount);else recurring+=N(e.amount)});return{recurring,once,total:recurring+once}}
 function currentBalance(l){try{return N(loanPoint(l).balance)}catch{return N(l?.balance)}}
 function informalRemaining(d){return Math.max(0,N(d.amount)-(d.payments||[]).reduce((a,p)=>a+N(p.amount),0))}
 function loanSpend(k){
@@ -55,7 +55,6 @@ function renderWealth42(){
  <div class="card"><div class="title">Majątek <button class="btn primary" onclick="assetModal42()">＋ Dodaj aktywo</button></div>${assets.length?assets.map((x,i)=>`<div class="budgetRow"><div><b>${esc(x.name)}</b><small>${esc(x.type||'Inne')}</small></div><b>${PLN(x.value)}</b><button class="btn danger" onclick="removeAsset42(${i})">Usuń</button></div>`).join(''):'<p class="muted">Dodaj gotówkę, konta, inwestycje, auto lub nieruchomość.</p>'}</div>
  <div id="wealthDebt41" class="card"><div class="title">Zobowiązania poza kredytami</div><div class="row"><span>Do oddania 0%, bez terminu</span><b>${PLN(d.informal)}</b></div></div>
  <div class="card"><div class="title">PPK — stan do majątku</div><div class="row"><span>Saldo bazowe</span><b>${PLN(S.finance.ppkOpening)}</b></div><div class="row"><span>+ rzeczywiste wpłaty z aplikacji</span><b>${PLN(Math.max(0,ppk-N(S.finance.ppkOpening)))}</b></div><button class="btn" onclick="ppkBaseModal42()">Zmień saldo bazowe</button></div>`}
-}
 window.assetModal42=function(){open(`<h2>Dodaj aktywo</h2><div class="form"><label>Nazwa<input id="a42n"></label><label>Typ<select id="a42t"><option>Gotówka</option><option>Konto</option><option>Oszczędności</option><option>Inwestycje</option><option>Auto</option><option>Nieruchomość</option><option>Sprzęt</option><option>Inne</option></select></label><label>Wartość<input id="a42v" type="number" step="0.01"></label></div><div class="actions"><button class="btn" onclick="closeModal()">Anuluj</button><button class="btn primary" onclick="saveAsset42()">Zapisz</button></div>`)};
 window.saveAsset42=function(){let v=N(G('a42v')?.value);S.finance.assets.push({name:G('a42n')?.value?.trim()||'Aktywo',type:G('a42t')?.value||'Inne',value:v});save();closeModal();renderWealth42();renderRadar42()};
 window.removeAsset42=function(i){if(confirm('Usunąć aktywo?')){S.finance.assets.splice(i,1);save();renderWealth42();renderRadar42()}};
@@ -63,7 +62,7 @@ window.ppkBaseModal42=function(){open(`<h2>Saldo bazowe PPK</h2><p class="muted"
 window.savePpkBase42=function(){S.finance.ppkOpening=N(G('ppk42base')?.value);save();closeModal();renderWealth42()};
 
 function renderGoals42(){
- let h=G('goalsBody');if(!h||!ensure())return,gs=S.finance.goals||[],now=new Date();
+ let h=G('goalsBody');if(!h||!ensure())return;let gs=S.finance.goals||[],now=new Date();
  h.innerHTML=`<div class="card"><div class="title">Cele finansowe <button class="btn primary" onclick="goalModal42()">＋ Dodaj cel</button></div>${gs.length?gs.map((g,i)=>{let target=Math.max(1,N(g.target)),cur=N(g.current),remain=Math.max(0,target-cur),pct=Math.min(100,cur/target*100),months=N(g.monthly)>0?Math.ceil(remain/N(g.monthly)):null,dueMonths=null;if(g.due){let [yy,mm]=g.due.split('-').map(Number);dueMonths=Math.max(0,(yy-now.getFullYear())*12+(mm-1-now.getMonth()))}let need=dueMonths>0?remain/dueMonths:null,status=need!=null?(N(g.monthly)>=need?'tempo wystarcza':'trzeba odkładać więcej'):'';return`<div class="goalCard"><div class="goalTop"><div><b>${esc(g.name)}</b><small>${g.due?'termin '+g.due:''}</small></div><strong>${pct.toFixed(0)}%</strong></div><div class="progress"><i style="width:${pct}%"></i></div><div class="goalStats"><span>${PLN(cur)} / ${PLN(target)}</span><span>brakuje ${PLN(remain)}</span><span>${months!=null?'~ '+months+' mies. przy '+PLN(g.monthly)+'/m':''}</span></div>${need!=null?`<div class="radar42 ${N(g.monthly)>=need?'ok':'warn'}"><b>${status}</b><span>aby zdążyć: około ${PLN(need)}/mies.</span></div>`:''}<div class="actions"><button class="btn" onclick="updateGoal42(${i})">Aktualizuj</button><button class="btn danger" onclick="removeGoal42(${i})">Usuń</button></div></div>`}).join(''):'<p class="muted">Dodaj np. poduszkę, mieszkanie, auto albo sprzęt.</p>'}</div>`
 }
 window.goalModal42=function(){open(`<h2>Nowy cel</h2><div class="form"><label>Nazwa<input id="g42n"></label><label>Kwota celu<input id="g42t" type="number"></label><label>Już odłożone<input id="g42c" type="number"></label><label>Miesięczna wpłata<input id="g42m" type="number"></label><label>Termin<input id="g42d" type="month"></label></div><button class="btn primary" onclick="saveGoal42()">Zapisz</button>`)};
@@ -73,22 +72,28 @@ window.saveGoalUpdate42=function(i){let g=S.finance.goals[i];g.current=N(G('g42u
 window.removeGoal42=function(i){if(confirm('Usunąć cel?')){S.finance.goals.splice(i,1);save();renderGoals42()}};
 
 function renderEmergency42(){
- let h=G('emergencyBody');if(!h||!ensure())return,k=S.finance.analysisMonth||S.finance.selectedMonth||today().slice(0,7),d=monthData(k),monthly=Math.max(0,d.e.recurring+d.lo),saved=N(S.finance.emergencySavings),months=Math.max(1,N(S.finance.emergencyTargetMonths)||6),target=monthly*months,covered=monthly?saved/monthly:0,stressMonthly=(d.e.recurring*1.1+d.lo),stressCovered=stressMonthly?saved/stressMonthly:0,p=target?Math.min(100,saved/target*100):0;
+ let h=G('emergencyBody');if(!h||!ensure())return;let k=S.finance.analysisMonth||S.finance.selectedMonth||today().slice(0,7),d=monthData(k),monthly=Math.max(0,d.e.recurring+d.lo),saved=N(S.finance.emergencySavings),months=Math.max(1,N(S.finance.emergencyTargetMonths)||6),target=monthly*months,covered=monthly?saved/monthly:0,stressMonthly=(d.e.recurring*1.1+d.lo),stressCovered=stressMonthly?saved/stressMonthly:0,p=target?Math.min(100,saved/target*100):0;
  h.innerHTML=`<div class="wealthHero"><small>PODUSZKA FINANSOWA</small><h2>${covered.toFixed(1)} mies.</h2><span>${PLN(saved)} / cel ${PLN(target)}</span></div><div class="card"><div class="progress"><i style="width:${p}%"></i></div><div class="goalStats"><span>stałe + raty ${PLN(monthly)}/m</span><span>cel ${months} mies.</span><span>brakuje ${PLN(Math.max(0,target-saved))}</span></div><div class="radar42 ${covered>=months?'ok':covered>=3?'mid':'warn'}"><b>Stress test kosztów +10%</b><span>poduszka wystarczy na około ${stressCovered.toFixed(1)} mies.</span></div><div class="form"><label>Płynne oszczędności<input id="em42s" type="number" step="0.01" value="${saved}"></label><label>Cel — miesiące<input id="em42m" type="number" min="1" value="${months}"></label></div><button class="btn primary" onclick="saveEmergency42()">Zapisz</button></div>`
 }
 window.saveEmergency42=function(){S.finance.emergencySavings=N(G('em42s')?.value);S.finance.emergencyTargetMonths=Math.max(1,N(G('em42m')?.value)||6);save();renderEmergency42();renderRadar42()};
 
 function renderActions42(){
- let h=G('actionBody');if(!h||!ensure())return,k=S.finance.analysisMonth||S.finance.selectedMonth||today().slice(0,7),d=monthData(k),items=[];
- expenseRows(k).forEach(e=>items.push({day:Math.max(1,N(e.day)||1,text:e.name,amount:N(e.amount),done:false,kind:e.kind==='once'?'jednorazowy':'stały'}));
- (S.loans||[]).forEach(l=>{let hist=(l.history||[]).find(x=>x.month===k),paid=!!hist?.paid,amt=hist?((typeof hist.paid==='boolean'?(hist.paid?N(hist.regularPaid||l.payment):0):N(hist.regularPaid))+N(hist.extra)):N(l.payment)+N(l.extraMonthly);if(k>=(l.asOfDate||'0000-00').slice(0,7))items.push({day:Math.max(1,N(l.dueDay)||1),text:'Rata '+l.name,amount:amt,done:paid,kind:'kredyt'})});
- items.sort((a,b)=>a.day-b.day);
+ let h=G('actionBody');if(!h||!ensure())return;
+ let k=S.finance.analysisMonth||S.finance.selectedMonth||today().slice(0,7),d=monthData(k),items=[];
+ expenseRows(k).forEach(e=>items.push({day:Math.max(1,N(e.day)||1),text:e.name,amount:N(e.amount),done:false,kind:e.kind==='once'?'jednorazowy':'stały'}));
+ (S.loans||[]).forEach(l=>{
+  if(k<(l.asOfDate||'0000-00').slice(0,7))return;
+  let hist=(l.history||[]).find(x=>x.month===k),paid=!!hist?.paid,amt=0;
+  if(hist){let reg=typeof hist.paid==='boolean'?(hist.paid?N(hist.regularPaid||l.payment):0):N(hist.regularPaid!=null?hist.regularPaid:hist.paid);amt=reg+(hist.isOverpayment===false?0:N(hist.extra))}
+  else amt=N(l.payment)+N(l.extraMonthly);
+  items.push({day:Math.max(1,N(l.dueDay)||1),text:'Rata '+l.name,amount:amt,done:paid,kind:'kredyt'})
+ });
+ items.sort((x,y)=>x.day-y.day);
  h.innerHTML=`<div class="card"><div class="title">${FULL[d.m]} ${d.y} — plan płatności</div><div class="grid"><div class="tile"><small>WYDATKI</small><b>${PLN(d.e.total)}</b></div><div class="tile"><small>RATY</small><b>${PLN(d.lo)}</b></div><div class="tile"><small>PO PLANIE — FAKT</small><b class="${d.freeActual<0?'red':'green'}">${PLN(d.freeActual)}</b></div><div class="tile"><small>PO PLANIE — Z PROGNOZĄ</small><b class="${d.freeForecast<0?'red':'green'}">${PLN(d.freeForecast)}</b></div></div></div><div class="card">${items.length?items.map(x=>`<div class="action42 ${x.done?'done':''}"><b>${String(x.day).padStart(2,'0')}</b><div><strong>${esc(x.text)}</strong><small>${x.kind}${x.done?' • opłacone':''}</small></div><b>${PLN(x.amount)}</b></div>`).join(''):'<p class="muted">Brak zaplanowanych pozycji.</p>'}</div>`
 }
-
 function trendRows(k,count=6){let a=[];for(let i=count-1;i>=0;i--){let mk=addMonth(k,-i),d=monthData(mk);a.push(d)}return a}
 function renderMonthly42(){
- let h=G('monthlyBody');if(!h||!ensure())return,k=S.finance.selectedMonth||today().slice(0,7),d=monthData(k),trend=trendRows(k,6),incomeBase=d.totalIncome,burden=incomeBase>0?(d.e.recurring+d.lo)/incomeBase*100:0,freeRate=incomeBase>0?d.freeForecast/incomeBase*100:0;
+ let h=G('monthlyBody');if(!h||!ensure())return;let k=S.finance.selectedMonth||today().slice(0,7),d=monthData(k),trend=trendRows(k,6),incomeBase=d.totalIncome,burden=incomeBase>0?(d.e.recurring+d.lo)/incomeBase*100:0,freeRate=incomeBase>0?d.freeForecast/incomeBase*100:0;
  h.innerHTML=`<div class="card miniNav"><button class="btn" onclick="shiftMonth42(-1)">‹</button><b>${FULL[d.m]} ${d.y}</b><button class="btn" onclick="shiftMonth42(1)">›</button></div><div class="v25Kpis"><div><small>DOCHODY — FAKT</small><b class="green">${PLN(d.actualIncome)}</b></div><div><small>STAŁE</small><b>${PLN(d.e.recurring)}</b></div><div><small>JEDNORAZOWE</small><b>${PLN(d.e.once)}</b></div><div><small>KREDYTY</small><b>${PLN(d.lo)}</b></div></div>
  <div class="card"><div class="title">Przepływ miesiąca <span class="pill">fakt i prognoza osobno</span></div><div class="row"><span>Etat ${d.s.actual?'• fakt':'• prognoza'}</span><b>${PLN(d.s.total)}</b></div><div class="row"><span>Firma ${d.c.actual?'• fakt':'• prognoza'}</span><b>${PLN(d.c.profit)}</b></div><div class="row"><span>Wydatki razem</span><b>− ${PLN(d.e.total)}</b></div><div class="row"><span>Raty + planowane nadpłaty</span><b>− ${PLN(d.lo)}</b></div><div class="row"><span><b>Zostaje — tylko fakt</b></span><b class="${d.freeActual<0?'red':'green'}">${PLN(d.freeActual)}</b></div>${d.forecastIncome?`<div class="forecastBox42"><small>PROGNOZOWANY DODATKOWY DOCHÓD</small><b>+ ${PLN(d.forecastIncome)}</b><span>z prognozą zostanie ${PLN(d.freeForecast)}</span></div>`:''}</div>
  <div class="grid"><div class="tile"><small>STAŁE OBCIĄŻENIA / DOCHÓD</small><b>${burden.toFixed(1)}%</b></div><div class="tile"><small>WOLNA GOTÓWKA / DOCHÓD</small><b class="${freeRate<0?'red':'green'}">${freeRate.toFixed(1)}%</b></div></div>
@@ -104,7 +109,7 @@ function renderRadar42(){
 }
 
 function renderDiagnostics42(){
- let sec=G('settings');if(!sec||!ensure())return,id='diag42',box=G(id);if(!box){box=document.createElement('div');box.id=id;box.className='card';sec.appendChild(box)}
+ let sec=G('settings');if(!sec||!ensure())return;let id='diag42',box=G(id);if(!box){box=document.createElement('div');box.id=id;box.className='card';sec.appendChild(box)}
  let tests=[],add=(n,ok,txt)=>tests.push({n,ok:!!ok,txt});
  let yr=S.years?.[String(S.selectedYear)];add('12 miesięcy etatu',yr?.salary?.length===12,yr?.salary?.length+' / 12');add('12 miesięcy firmy',yr?.company?.length===12,yr?.company?.length+' / 12');
  try{let p=sal();add('Silnik etatu',p?.rows?.length===12,(p?.rows?.length||0)+' / 12')}catch(e){add('Silnik etatu',false,'błąd')}
