@@ -37,7 +37,7 @@ function sal41(){
   let p=baseFg?baseFg(ctl.modelGross,cum,emp,er,i):r;
   let out={...r,...p,total:N(p.net),n:N(p.net),b:0,actual:false,y:cum+N(p.base),i,payroll41:ctl,forecastGrossSource:N(raw.baseGross)>0?'manual':'lastKnownGross'};
   cum+=N(p.base);
-  if(ctl.modelGross>0)lastGross=ctl.modelGross;
+  if(N(raw.baseGross)>0)lastGross=N(raw.baseGross);
   return out;
  });
  let actualRows=rows.filter(x=>x.actual);
