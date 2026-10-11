@@ -1,7 +1,7 @@
 /* Moje Finanse 4.1 — bezpieczne rozszerzenia stabilnej wersji */
 (function(){
 'use strict';
-const VERSION='4.2.1',G=id=>document.getElementById(id),N=v=>+v||0,PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v)),esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const VERSION='4.3.0',G=id=>document.getElementById(id),N=v=>+v||0,PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v)),esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function ensure(){if(typeof S==='undefined')return false;S.finance||={};let f=S.finance;f.products||=[];f.categoryLimits||={};f.assets||=[];f.goals||=[];f.informalDebts||=[];f.ppkOpening=N(f.ppkOpening);f.ppkReturnPct=N(f.ppkReturnPct)||5;return true}
 function setVersion(){document.title='Moje Finanse '+VERSION;let h=document.querySelector('.top small');if(h)h.innerHTML=`<span id="headerYear">${typeof S!=='undefined'?S.selectedYear:''}</span> • wersja ${VERSION}`;document.documentElement.dataset.appVersion=VERSION}
 function currentBalance(l){try{return N(loanPoint(l).balance)}catch{return N(l.balance)}}
@@ -25,5 +25,5 @@ window.backupNow41=function(){backup(true);save();G('backup41')?.remove();inject
 function injectVersionNote(){let sec=G('settings');if(!sec||G('v41note'))return;let b=document.createElement('div');b.id='v41note';b.className='card';b.innerHTML=`<div class="title">Moje Finanse ${VERSION}</div><p class="muted">Stabilna baza + kadry, podatki per rok, wydatki stałe/jednorazowe, limity kategorii, PPK długoterminowe, rentowność produktów, zobowiązania 0%, symulatory nadpłat i automatyczne kopie danych.</p>`;sec.appendChild(b)}
 function inject(){if(!ensure())return;setVersion();injectPpk();injectProducts();injectLimits();injectDebt();injectWealthDebt();injectBackup();injectVersionNote()}
 function hook(){if(!ensure())return;wrapSave();let r=window.render;if(typeof r==='function'&&!r.__mf41){let fn=function(){let out=r();setTimeout(inject,0);return out};fn.__mf41=true;window.render=fn}let s=window.show;if(typeof s==='function'&&!s.__mf41){let fn=function(v){let out=s(v);setTimeout(inject,0);return out};fn.__mf41=true;window.show=fn}inject()}
-window.addEventListener('finance-modules-ready',()=>setTimeout(hook,60),{once:true});window.addEventListener('load',()=>setTimeout(hook,650),{once:true});setTimeout(hook,1200);
+window.addEventListener('finance-modules-ready',hook,{once:true});
 })();
