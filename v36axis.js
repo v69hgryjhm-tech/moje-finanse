@@ -10,7 +10,7 @@ function addAxis(svg,opt){if(!svg)return;svg.querySelector('.adaptiveAxis36')?.r
 function loanOverview(){let svg=document.querySelector('#loanOverview .overviewChart svg');if(!svg||typeof S==='undefined')return;let max=(S.loans||[]).reduce((a,l)=>a+Math.max(N(l.balance),N(l.originalBalance)),0);if(!max)return;addAxis(svg,{max,left:40,right:20,top:32,bottom:147})}
 function loanCards(){if(typeof S==='undefined')return;document.querySelectorAll('#loanList .loan').forEach((card,i)=>{let svg=card.querySelector('.loanUnifiedChart svg'),l=S.loans?.[i];if(!svg||!l)return;let max=Math.max(N(l.originalBalance),N(l.balance),1);addAxis(svg,{max,left:54,right:28,top:20,bottom:145})})}
 function taxAxes(){if(typeof sal!=='function'||typeof S==='undefined')return;let p;try{p=sal()}catch{return}let th=N(S.settings?.threshold)||120000,max=Math.max(th*1.15,N(p.rows?.[11]?.y),1);['homeTaxSvg','taxSvg'].forEach(id=>{let svg=document.getElementById(id);if(svg)addAxis(svg,{max,left:30,right:30,top:25,bottom:190})})}
-function apply(){setTimeout(()=>{loanOverview();loanCards();taxAxes()},0)}
+function apply(){loanOverview();loanCards();taxAxes()}
 const oldLoans=window.loans;if(typeof oldLoans==='function')window.loans=function(){oldLoans();apply()};
 const oldRender=window.render;if(typeof oldRender==='function')window.render=function(){oldRender();apply()};
 window.addAdaptiveAxes36=apply;
