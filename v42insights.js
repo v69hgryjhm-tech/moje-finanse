@@ -16,15 +16,14 @@ function expenseRows(k){return(S.finance.expenses||[]).filter(e=>inMonth(e,k))}
 function expenseSplit(k){let recurring=0,once=0;expenseRows(k).forEach(e=>{if(e.kind==='once')once+=N(e.amount);else recurring+=N(e.amount)});return{recurring,once,total:recurring+once}}
 function currentBalance(l){try{return N(loanPoint(l).balance)}catch{return N(l?.balance)}}
 function informalRemaining(d){return Math.max(0,N(d.amount)-(d.payments||[]).reduce((a,p)=>a+N(p.amount),0))}
-function loanSpend(k){
- return(S.loans||[]).reduce((sum,l)=>{
-  let h=(l.history||[]).find(x=>x.month===k);
-  if(h){let reg=typeof h.paid==='boolean'?(h.paid?N(h.regularPaid||l.payment):0):N(h.regularPaid!=null?h.regularPaid:h.paid),extra=h.isOverpayment===false?0:N(h.extra);return sum+reg+extra}
-  try{if(typeof sched==='function'){let rows=sched(l,N(l.extraMonthly),N(l.oneOff)).rows||[],r=rows.find(x=>x.date&&key(x.date.getFullYear(),x.date.getMonth())===k);if(r&&r.kind==='forecast')return sum+N(r.regular)+N(r.extra)}}catch{}
-  if(k<(l.asOfDate||'0000-00-00').slice(0,7))return sum;
-  return sum+N(l.payment)+N(l.extraMonthly)
- },0)
+function loanMonth(l,k){
+ let h=(l.history||[]).find(x=>x.month===k);
+ if(h){let reg=typeof h.paid==='boolean'?(h.paid?N(h.regularPaid||l.payment):0):N(h.regularPaid!=null?h.regularPaid:h.paid),extra=h.isOverpayment===false?0:N(h.extra);return{amount:reg+extra,done:!!h.paid,actual:true}}
+ try{if(typeof sched==='function'){let rows=sched(l,N(l.extraMonthly),N(l.oneOff)).rows||[],r=rows.find(x=>x.date&&key(x.date.getFullYear(),x.date.getMonth())===k);if(r)return{amount:N(r.regular)+N(r.extra),done:false,actual:r.kind==='actual'};return null}}catch{}
+ if(k<(l.asOfDate||'0000-00-00').slice(0,7)||currentBalance(l)<=0)return null;
+ return{amount:N(l.payment)+N(l.extraMonthly),done:false,actual:false}
 }
+function loanSpend(k){return(S.loans||[]).reduce((sum,l)=>{let p=loanMonth(l,k);return sum+(p?N(p.amount):0)},0)}
 function salaryAt(y,m){
  let old=S.selectedYear;
  try{S.selectedYear=y;window.mfTaxSync41?.(y);Y();let r=typeof sal==='function'?sal().rows[m]:null;return r||{total:0,g:0,pe:0,er:0,actual:false}}
@@ -81,16 +80,24 @@ function renderActions42(){
  let h=G('actionBody');if(!h||!ensure())return;
  let k=S.finance.analysisMonth||S.finance.selectedMonth||today().slice(0,7),d=monthData(k),items=[];
  expenseRows(k).forEach(e=>items.push({day:Math.max(1,N(e.day)||1),text:e.name,amount:N(e.amount),done:false,kind:e.kind==='once'?'jednorazowy':'stały'}));
- (S.loans||[]).forEach(l=>{
-  if(k<(l.asOfDate||'0000-00').slice(0,7))return;
-  let hist=(l.history||[]).find(x=>x.month===k),paid=!!hist?.paid,amt=0;
-  if(hist){let reg=typeof hist.paid==='boolean'?(hist.paid?N(hist.regularPaid||l.payment):0):N(hist.regularPaid!=null?hist.regularPaid:hist.paid);amt=reg+(hist.isOverpayment===false?0:N(hist.extra))}
-  else amt=N(l.payment)+N(l.extraMonthly);
-  items.push({day:Math.max(1,N(l.dueDay)||1),text:'Rata '+l.name,amount:amt,done:paid,kind:'kredyt'})
- });
+ (S.loans||[]).forEach(l=>{let p=loanMonth(l,k);if(p)items.push({day:Math.max(1,N(l.dueDay)||1),text:'Rata '+l.name,amount:N(p.amount),done:!!p.done,kind:'kredyt'})});
  items.sort((x,y)=>x.day-y.day);
  h.innerHTML=`<div class="card"><div class="title">${FULL[d.m]} ${d.y} — plan płatności</div><div class="grid"><div class="tile"><small>WYDATKI</small><b>${PLN(d.e.total)}</b></div><div class="tile"><small>RATY</small><b>${PLN(d.lo)}</b></div><div class="tile"><small>PO PLANIE — FAKT</small><b class="${d.freeActual<0?'red':'green'}">${PLN(d.freeActual)}</b></div><div class="tile"><small>PO PLANIE — Z PROGNOZĄ</small><b class="${d.freeForecast<0?'red':'green'}">${PLN(d.freeForecast)}</b></div></div></div><div class="card">${items.length?items.map(x=>`<div class="action42 ${x.done?'done':''}"><b>${String(x.day).padStart(2,'0')}</b><div><strong>${esc(x.text)}</strong><small>${x.kind}${x.done?' • opłacone':''}</small></div><b>${PLN(x.amount)}</b></div>`).join(''):'<p class="muted">Brak zaplanowanych pozycji.</p>'}</div>`
 }
+function renderCalendar42(){
+ let h=G('calendarBody');if(!h||!ensure())return;
+ let k=S.finance.analysisMonth||S.finance.selectedMonth||today().slice(0,7),{y,m}=parse(k),days=new Date(y,m+1,0).getDate(),offset=(new Date(y,m,1).getDay()+6)%7,events={};
+ let add=(d,label,kind,amount,done=false)=>{d=Math.max(1,Math.min(days,N(d)||1));(events[d]||=[]).push({label,kind,amount,done})};
+ expenseRows(k).forEach(e=>add(e.day||1,e.name,e.kind==='once'?'custom':'expense',e.amount,false));
+ (S.loans||[]).forEach(l=>{let p=loanMonth(l,k);if(p)add(l.dueDay||1,l.name,'loan',p.amount,p.done)});
+ (S.finance.calendarEvents||[]).filter(e=>e.month===k).forEach(e=>add(e.day,e.name,'custom',e.amount,false));
+ let cells='';for(let i=0;i<offset;i++)cells+='<div class="calDay empty"></div>';for(let d=1;d<=days;d++)cells+=`<div class="calDay"><b>${d}</b>${(events[d]||[]).map(e=>`<span class="calEvent ${e.kind}" style="${e.done?'opacity:.5;text-decoration:line-through':''}">${esc(e.label)}${N(e.amount)?' • '+PLN(e.amount):''}</span>`).join('')}</div>`;
+ h.innerHTML=`<div class="card miniNav"><button class="btn" onclick="shiftAnalysis42(-1)">‹</button><b>${FULL[m]} ${y}</b><button class="btn" onclick="shiftAnalysis42(1)">›</button><button class="btn primary" onclick="calendarEventModal42()">＋ Wydarzenie</button></div><div class="card"><div class="calWeek"><span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span></div><div class="calendarGrid">${cells}</div></div>`
+}
+window.shiftAnalysis42=function(d){S.finance.analysisMonth=addMonth(S.finance.analysisMonth||today().slice(0,7),d);save();renderCalendar42();renderActions42();renderEmergency42()};
+window.calendarEventModal42=function(){let k=S.finance.analysisMonth||today().slice(0,7);open(`<h2>Wydarzenie finansowe</h2><div class="form"><label>Miesiąc<input id="ce42m" type="month" value="${k}"></label><label>Dzień<input id="ce42d" type="number" min="1" max="31" value="1"></label><label>Nazwa<input id="ce42n"></label><label>Kwota opcjonalna<input id="ce42a" type="number" step="0.01"></label></div><div class="actions"><button class="btn" onclick="closeModal()">Anuluj</button><button class="btn primary" onclick="saveCalendarEvent42()">Zapisz</button></div>`)};
+window.saveCalendarEvent42=function(){let name=G('ce42n')?.value?.trim()||'Wydarzenie';S.finance.calendarEvents.push({month:G('ce42m')?.value||S.finance.analysisMonth,day:Math.max(1,Math.min(31,N(G('ce42d')?.value)||1)),name,amount:N(G('ce42a')?.value)});save();closeModal();renderCalendar42()};
+
 function trendRows(k,count=6){let a=[];for(let i=count-1;i>=0;i--){let mk=addMonth(k,-i),d=monthData(mk);a.push(d)}return a}
 function renderMonthly42(){
  let h=G('monthlyBody');if(!h||!ensure())return;let k=S.finance.selectedMonth||today().slice(0,7),d=monthData(k),trend=trendRows(k,6),incomeBase=d.totalIncome,burden=incomeBase>0?(d.e.recurring+d.lo)/incomeBase*100:0,freeRate=incomeBase>0?d.freeForecast/incomeBase*100:0;
@@ -121,10 +128,10 @@ function renderDiagnostics42(){
  try{let t='mf42-test',v=String(Date.now());localStorage.setItem(t,v);let ok=localStorage.getItem(t)===v;localStorage.removeItem(t);add('Zapis lokalny',ok,ok?'OK':'błąd')}catch{add('Zapis lokalny',false,'błąd')}
  let ok=tests.filter(x=>x.ok).length;box.innerHTML=`<div class="title">Diagnostyka aplikacji <span class="pill">${ok}/${tests.length} OK</span></div>${tests.map(t=>`<div class="row"><span>${t.ok?'✓':'⚠'} ${t.n}</span><b class="${t.ok?'green':'red'}">${esc(t.txt)}</b></div>`).join('')}<p class="muted">Test sprawdza strukturę danych, główne silniki i zapis lokalny. Nie zastępuje testu interakcji w Safari/iOS.</p>`
 }
-function renderAll42(){if(!ensure())return;setVersion();renderWealth42();renderGoals42();renderEmergency42();renderActions42();renderMonthly42();renderRadar42();renderDiagnostics42()}
+function renderAll42(){if(!ensure())return;setVersion();renderWealth42();renderGoals42();renderEmergency42();renderActions42();renderMonthly42();renderCalendar42();renderRadar42();renderDiagnostics42()}
 function hook(){if(!ensure())return;let r=window.render;if(typeof r==='function'&&!r.__mf42){let fn=function(){let out=r();setTimeout(renderAll42,10);return out};fn.__mf42=true;window.render=fn}let s=window.show;if(typeof s==='function'&&!s.__mf42){let fn=function(v){let out=s(v);setTimeout(renderAll42,10);return out};fn.__mf42=true;window.show=fn}renderAll42()}
 let st=document.createElement('style');st.textContent=`.forecastBox42{margin-top:10px;padding:12px;border:1px dashed #aebbd0;border-radius:12px;background:#f8faff}.forecastBox42 small,.forecastBox42 span{display:block;color:#6e7c91}.forecastBox42 b{display:block;font-size:20px;margin:4px 0}.radar42{margin-top:10px;padding:10px 12px;border-radius:12px;background:#f5f7fb;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.radar42.ok{background:#e8f7ee;color:#247548}.radar42.mid{background:#fff6df;color:#7a5b18}.radar42.warn{background:#fdebed;color:#9d3440}.trend42{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #edf1f6}.trend42 i{height:8px;border-radius:99px;background:#e8edf4;overflow:hidden}.trend42 i b{display:block;height:100%;background:#31b86a;border-radius:99px}.action42{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #edf1f6}.action42 small{display:block;color:#77849a}.action42.done{opacity:.55}.action42.done strong{text-decoration:line-through}@media(max-width:560px){.radar42{display:block}.radar42 span{display:block;margin-top:4px}.trend42{grid-template-columns:54px 1fr auto}}`;document.head.appendChild(st);
-window.renderWealth42=renderWealth42;window.renderGoals42=renderGoals42;window.renderEmergency42=renderEmergency42;window.renderActions42=renderActions42;window.renderMonthly42=renderMonthly42;window.renderRadar42=renderRadar42;window.renderDiagnostics42=renderDiagnostics42;
+window.renderWealth42=renderWealth42;window.renderGoals42=renderGoals42;window.renderEmergency42=renderEmergency42;window.renderActions42=renderActions42;window.renderMonthly42=renderMonthly42;window.renderCalendar42=renderCalendar42;window.renderRadar42=renderRadar42;window.renderDiagnostics42=renderDiagnostics42;
 window.addEventListener('finance-modules-ready',()=>setTimeout(hook,120),{once:true});
 window.addEventListener('load',()=>setTimeout(hook,900),{once:true});
 setTimeout(hook,1600);
