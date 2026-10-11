@@ -6,6 +6,8 @@ const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',mini
 const FULL=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const today=()=>typeof TODAY==='string'?TODAY:new Date().toISOString().slice(0,10);
+let salaryCache=new Map(),companyCache=new Map();
+function clearCalcCache(){salaryCache=new Map();companyCache=new Map()}
 const key=(y,m)=>`${y}-${String(m+1).padStart(2,'0')}`;
 const parse=k=>{let [y,m]=String(k||today().slice(0,7)).split('-').map(Number);return{y:y||new Date().getFullYear(),m:Math.max(0,(m||1)-1)}};
 function addMonth(k,d){let {y,m}=parse(k),x=new Date(y,m+d,1,12);return key(x.getFullYear(),x.getMonth())}
@@ -25,18 +27,20 @@ function loanMonth(l,k){
 }
 function loanSpend(k){return(S.loans||[]).reduce((sum,l)=>{let p=loanMonth(l,k);return sum+(p?N(p.amount):0)},0)}
 function salaryAt(y,m){
- let old=S.selectedYear;
- try{S.selectedYear=y;window.mfTaxSync41?.(y);Y();let r=typeof sal==='function'?sal().rows[m]:null;return r||{total:0,g:0,pe:0,er:0,actual:false}}
- catch{return{total:0,g:0,pe:0,er:0,actual:false}}
- finally{S.selectedYear=old;window.mfTaxSync41?.(old)}
+ if(!salaryCache.has(y)){
+  let old=S.selectedYear,rows=[];
+  try{S.selectedYear=y;window.mfTaxSync41?.(y);Y();rows=typeof sal==='function'?(sal().rows||[]):[]}catch{rows=[]}finally{S.selectedYear=old;window.mfTaxSync41?.(old)}
+  salaryCache.set(y,rows)
+ }
+ return salaryCache.get(y)?.[m]||{total:0,g:0,pe:0,er:0,actual:false}
 }
 function companyAt(y,m){
  let raw=S.years?.[String(y)]?.company?.[m]||{},rev=N(raw.revenue),cost=N(raw.costs),vat=(N(raw.vatOut)||N(raw.vatIn))?N(raw.vatOut)-N(raw.vatIn):N(raw.vat),zus=N(raw.zus),health=N(raw.health),tax=N(raw.tax),actual=!!(rev||cost||vat||zus||health||tax);
- let forecast={revenue:0,costs:0,vat:0};
- if(!actual){let old=S.selectedYear;try{S.selectedYear=y;Y();forecast=typeof comp==='function'?(comp().rows[m]||forecast):forecast}catch{}finally{S.selectedYear=old;window.mfTaxSync41?.(old)}}
  let ar=(S.years?.[String(y)]?.company||[]).filter(r=>N(r.revenue)||N(r.costs)||N(r.vat)||N(r.vatOut)||N(r.vatIn)||N(r.zus)||N(r.health)||N(r.tax)),avgCharges=ar.length?ar.reduce((a,r)=>a+N(r.zus)+N(r.health)+N(r.tax),0)/ar.length:0;
  if(actual)return{actual,rev,cost,vat,zus,health,tax,profit:rev-cost-vat-zus-health-tax};
- rev=N(forecast.revenue);cost=N(forecast.costs);vat=N(forecast.vat);return{actual:false,rev,cost,vat,zus:0,health:0,tax:0,profit:rev-cost-vat-avgCharges}
+ if(!companyCache.has(y)){let old=S.selectedYear,rows=[];try{S.selectedYear=y;Y();rows=typeof comp==='function'?(comp().rows||[]):[]}catch{rows=[]}finally{S.selectedYear=old;window.mfTaxSync41?.(old)}companyCache.set(y,rows)}
+ let forecast=companyCache.get(y)?.[m]||{revenue:0,costs:0,vat:0};rev=N(forecast.revenue);cost=N(forecast.costs);vat=N(forecast.vat);
+ return{actual:false,rev,cost,vat,zus:0,health:0,tax:0,profit:rev-cost-vat-avgCharges}
 }
 function monthData(k){
  let {y,m}=parse(k),s=salaryAt(y,m),c=companyAt(y,m),e=expenseSplit(k),lo=loanSpend(k),actualIncome=(s.actual?N(s.total):0)+(c.actual?N(c.profit):0),forecastIncome=(s.actual?0:N(s.total))+(c.actual?0:N(c.profit)),totalIncome=actualIncome+forecastIncome;
@@ -106,7 +110,7 @@ function renderMonthly42(){
  <div class="grid"><div class="tile"><small>STAŁE OBCIĄŻENIA / DOCHÓD</small><b>${burden.toFixed(1)}%</b></div><div class="tile"><small>WOLNA GOTÓWKA / DOCHÓD</small><b class="${freeRate<0?'red':'green'}">${freeRate.toFixed(1)}%</b></div></div>
  <div class="card"><div class="title">Trend 6 miesięcy</div>${trend.map(x=>`<div class="trend42"><span>${FULL[x.m].slice(0,3)} ${String(x.y).slice(-2)}</span><i><b style="width:${Math.max(0,Math.min(100,(x.totalIncome?Math.max(0,x.freeForecast)/x.totalIncome*100:0)))}%"></b></i><strong class="${x.freeForecast<0?'red':'green'}">${PLN(x.freeForecast)}</strong></div>`).join('')}</div>`
 }
-window.shiftMonth42=function(d){S.finance.selectedMonth=addMonth(S.finance.selectedMonth||today().slice(0,7),d);S.finance.analysisMonth=S.finance.selectedMonth;save();renderMonthly42();renderActions42();renderEmergency42();renderRadar42()};
+window.shiftMonth42=function(d){clearCalcCache();S.finance.selectedMonth=addMonth(S.finance.selectedMonth||today().slice(0,7),d);S.finance.analysisMonth=S.finance.selectedMonth;save();renderMonthly42();renderActions42();renderEmergency42();renderRadar42()};
 
 function recentActualMonths(count=3){let out=[],cy=S.selectedYear;for(let i=11;i>=0&&out.length<count;i--){let d=monthData(key(cy,i));if(d.s.actual||d.c.actual)out.push(d)}return out.reverse()}
 function renderRadar42(){
@@ -128,7 +132,7 @@ function renderDiagnostics42(){
  try{let t='mf42-test',v=String(Date.now());localStorage.setItem(t,v);let ok=localStorage.getItem(t)===v;localStorage.removeItem(t);add('Zapis lokalny',ok,ok?'OK':'błąd')}catch{add('Zapis lokalny',false,'błąd')}
  let ok=tests.filter(x=>x.ok).length;box.innerHTML=`<div class="title">Diagnostyka aplikacji <span class="pill">${ok}/${tests.length} OK</span></div>${tests.map(t=>`<div class="row"><span>${t.ok?'✓':'⚠'} ${t.n}</span><b class="${t.ok?'green':'red'}">${esc(t.txt)}</b></div>`).join('')}<p class="muted">Test sprawdza strukturę danych, główne silniki i zapis lokalny. Nie zastępuje testu interakcji w Safari/iOS.</p>`
 }
-function renderAll42(){if(!ensure())return;setVersion();renderWealth42();renderGoals42();renderEmergency42();renderActions42();renderMonthly42();renderCalendar42();renderRadar42();renderDiagnostics42()}
+function renderAll42(){if(!ensure())return;clearCalcCache();setVersion();renderWealth42();renderGoals42();renderEmergency42();renderActions42();renderMonthly42();renderCalendar42();renderRadar42();renderDiagnostics42()}
 function hook(){if(!ensure())return;let r=window.render;if(typeof r==='function'&&!r.__mf42){let fn=function(){let out=r();setTimeout(renderAll42,10);return out};fn.__mf42=true;window.render=fn}let s=window.show;if(typeof s==='function'&&!s.__mf42){let fn=function(v){let out=s(v);setTimeout(renderAll42,10);return out};fn.__mf42=true;window.show=fn}renderAll42()}
 let st=document.createElement('style');st.textContent=`.forecastBox42{margin-top:10px;padding:12px;border:1px dashed #aebbd0;border-radius:12px;background:#f8faff}.forecastBox42 small,.forecastBox42 span{display:block;color:#6e7c91}.forecastBox42 b{display:block;font-size:20px;margin:4px 0}.radar42{margin-top:10px;padding:10px 12px;border-radius:12px;background:#f5f7fb;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.radar42.ok{background:#e8f7ee;color:#247548}.radar42.mid{background:#fff6df;color:#7a5b18}.radar42.warn{background:#fdebed;color:#9d3440}.trend42{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #edf1f6}.trend42 i{height:8px;border-radius:99px;background:#e8edf4;overflow:hidden}.trend42 i b{display:block;height:100%;background:#31b86a;border-radius:99px}.action42{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #edf1f6}.action42 small{display:block;color:#77849a}.action42.done{opacity:.55}.action42.done strong{text-decoration:line-through}@media(max-width:560px){.radar42{display:block}.radar42 span{display:block;margin-top:4px}.trend42{grid-template-columns:54px 1fr auto}}`;document.head.appendChild(st);
 window.renderWealth42=renderWealth42;window.renderGoals42=renderGoals42;window.renderEmergency42=renderEmergency42;window.renderActions42=renderActions42;window.renderMonthly42=renderMonthly42;window.renderCalendar42=renderCalendar42;window.renderRadar42=renderRadar42;window.renderDiagnostics42=renderDiagnostics42;
