@@ -9,7 +9,7 @@ vm.runInContext(source.replace('window.renderWealth42=renderWealth42;','window.t
 const loan={name:'Test',loanType:'zero',balance:62105.48,payment:1000,rate:0,months:63,dueDay:1,asOfDate:'2026-09-01',history:[{month:'2026-10',paymentDate:'2026-10-01',paid:true,regularPaid:1000,isOverpayment:false,extra:0}]};
 ctx.S.loans=[loan];ctx.S.finance.informalDebts=[];
 let result=ctx.testLiabilities();
-assert.equal(result.bank,61105.48);assert.equal(result.total,61105.48);
+assert.equal(result.bank,61105.48);assert.equal(result.total,61105.48);assert.equal(result.interest,0);assert.equal(result.repaymentTotal,61105.48);
 ctx.S.finance.informalDebts=[{amount:27002.95,payments:[{amount:1000}]}];
 result=ctx.testLiabilities();
 assert.equal(result.informal,26002.95);assert.equal(Math.round(result.total*100)/100,87108.43);
@@ -17,6 +17,14 @@ ctx.S.loans=[{...loan,loanType:'interest',rate:12}];
 result=ctx.testLiabilities();
 assert.equal(result.bank,ctx.loanCurrentPoint15(ctx.S.loans[0]).balance);
 assert.notEqual(result.bank,ctx.loanPoint().balance);
+const expectedInterest=ctx.loanTimeline15(ctx.S.loans[0],true).forecast.reduce((a,r)=>a+r.interest,0);
+assert.ok(expectedInterest>0);
+assert.equal(result.interest,expectedInterest);
+assert.equal(result.repaymentTotal,result.total+expectedInterest);
+ctx.S.loans[0].extraMonthly=500;
+const overpaid=ctx.testLiabilities();
+assert.ok(overpaid.interest<expectedInterest);
+assert.equal(overpaid.repaymentTotal,overpaid.total+overpaid.interest);
 ctx.S.loans[0].history[0].balanceAfter=60000;
 assert.equal(ctx.testLiabilities().bank,60000);
 ctx.S.finance.informalDebts=[{amount:100,payments:[{amount:120}]}];
@@ -27,4 +35,6 @@ for(const file of ['v42insights.js','v41suite.js']){
  assert.equal(ctx.currentBalance(ctx.S.loans[0]),60000);
 }
 assert.ok(source.includes('Skąd ta kwota?'));
+assert.ok(source.includes('${PLN(debt.interest)}'));
+assert.ok(source.includes('${PLN(debt.repaymentTotal)}'));
 console.log('PASS — radar i kredyty używają tego samego salda; historia wpłat, odsetki dzienne, saldo bankowe, zobowiązania dodatkowe.');
