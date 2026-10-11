@@ -30,3 +30,17 @@
 .yearSummaryTotal26 strong{color:#293d57}
 @media(max-width:800px){#homeBars.kpiBars{grid-template-columns:repeat(2,minmax(0,1fr))}.yearSummaryNote26{min-height:0}.yearSummaryAmount26{font-size:23px}}
 @media(max-width:400px){#homeBars.kpiBars{gap:8px}.yearSummary26{padding:12px}.yearSummaryAmount26{font-size:19px}.yearSummaryNote26{min-height:33px}}
+
+/* Pełna szerokość sekcji startowych — 4.8.9 */
+#home .homeOverview44{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:16px}
+#home .homeOverview44>.card{width:100%;min-width:0;box-sizing:border-box;margin:0}
+.taxHomeCard44{overflow:hidden;border:1px solid #e7edf5;background:linear-gradient(180deg,#fff 0%,#f9fbff 100%)}
+#homeTaxOverview44{margin-top:16px;padding:16px;border-radius:14px;background:#f1f5fb;border:1px solid #e5ecf6}
+.taxOverviewAmount44,.taxOverviewLimit44{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px 16px;line-height:1.5}
+.taxOverviewAmount44 span{font-size:12px;color:#657791}.taxOverviewAmount44 b{font-size:23px;letter-spacing:-.03em;color:#263c5c;font-variant-numeric:tabular-nums}
+.taxOverviewLimit44{margin-top:8px;padding-top:8px;border-top:1px solid #dfe7f2;font-size:12px;color:#7b879a}.taxOverviewLimit44 b{color:#b95865;font-weight:600}
+.taxOverviewLegend44{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:14px;font-size:12px;color:#66768c}.taxOverviewLegend44 span{display:inline-flex;align-items:center;gap:6px}
+.taxOverviewLegend44 i{display:inline-block;width:16px;border-top:3px solid #26334b;border-radius:3px}.taxOverviewLegend44 .employment44{border-color:#38b96a}.taxOverviewLegend44 .business44{border-color:#9550d7}.taxOverviewLegend44 .forecast44{width:7px;height:7px;border:1.5px solid #8492a6;border-radius:50%;background:#fff}
+#homeTaxSvg{display:block;width:100%;height:auto;aspect-ratio:600/220;max-height:none!important;margin-top:16px}
+#pitStatus{margin:12px 0 0!important;padding:12px 14px;border:1px solid #e4ebf5;border-radius:12px;background:#fff;font-size:12px;line-height:1.6;color:#697c97}
+@media(max-width:560px){#homeTaxOverview44{padding:12px}.taxOverviewAmount44 b{font-size:21px}.taxOverviewLegend44{gap:8px 14px;font-size:11px}#homeTaxSvg{margin-top:12px}}
