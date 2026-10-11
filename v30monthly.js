@@ -20,5 +20,5 @@ function render(){ensure();let host=G('monthlyBody');if(!host)return;let k=S.fin
 window.shiftMonth30=function(d){ensure();let {y,m}=parse(S.finance.selectedMonth),x=new Date(y,m+d,1,12);S.finance.selectedMonth=key(x.getFullYear(),x.getMonth());save();render()};
 window.renderMonthly30=render;
 const oldShow=window.show;if(typeof oldShow==='function')window.show=function(v){oldShow(v);if(v==='monthly')setTimeout(render,0)};
-setTimeout(render,150);
+
 })();
