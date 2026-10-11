@@ -15,5 +15,5 @@ function render24(){
 }
 window.toggleRaise24=function(){ensure();S.finance.raiseCollapsed=!S.finance.raiseCollapsed;save();render24()};
 window.saveRaise24=function(){S.finance.raiseGross=num(G('raiseGross24').value);S.finance.raiseStartMonth=num(G('raiseMonth24').value);save();render24()};
-ensure();const prev=window.render;if(typeof prev==='function')window.render=function(){prev();render24()};
+let style46=document.createElement('style');style46.textContent='.raiseCollapsed46{display:flex;gap:14px;flex-wrap:wrap;color:#6f7b8d;font-size:11px}.raiseCollapsed46 b{color:#1d2b43}.raiseBody46{margin-top:8px}';document.head.appendChild(style46);ensure();const prev=window.render;if(typeof prev==='function')window.render=function(){prev();render24()};
 })();
