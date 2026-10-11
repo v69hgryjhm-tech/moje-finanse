@@ -100,5 +100,5 @@ window.fg=fg35;window.fn=fn35;window.sal=sal35;window.months=months35;
 window.saveS=function(i){let r=Y().salary[i];r.net=G('n'+i).value===''?null:+G('n'+i).value;r.bonus=G('b'+i).value===''?null:+G('b'+i).value;r.ppkEmployeePct=nullable(G('ppe'+i).value);r.ppkEmployerPct=nullable(G('ppr'+i).value);delete r.ppkEmployee;delete r.ppkEmployer;r.locked=true;save();render()};
 function apply35(){try{ensurePayrollProfile35();let p=sal35();renderSummary35(p);months35(p);renderPpk35(p);cleanSettings35()}catch(e){console.error('Etat 3.5',e)}}
 const prev=window.render;if(typeof prev==='function')window.render=function(){prev();apply35()};
-setTimeout(apply35,220);
+
 })();
