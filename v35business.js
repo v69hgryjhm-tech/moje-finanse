@@ -12,5 +12,5 @@ window.changeBusinessYear35=function(d){S.selectedYear+=d;if(typeof Y==='functio
 window.renderBusinessPlus35=renderBusinessPlus35;
 const oldShow=window.show;if(typeof oldShow==='function')window.show=function(v){oldShow(v);if(v==='businessplus')setTimeout(renderBusinessPlus35,0)};
 const oldRender=window.render;if(typeof oldRender==='function')window.render=function(){oldRender();let v=G('businessplus');if(v?.classList.contains('active'))setTimeout(renderBusinessPlus35,0)};
-setTimeout(()=>{let v=G('businessplus');if(v?.classList.contains('active'))renderBusinessPlus35()},300);
+
 })();
