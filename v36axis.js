@@ -14,6 +14,5 @@ function apply(){setTimeout(()=>{loanOverview();loanCards();taxAxes()},0)}
 const oldLoans=window.loans;if(typeof oldLoans==='function')window.loans=function(){oldLoans();apply()};
 const oldRender=window.render;if(typeof oldRender==='function')window.render=function(){oldRender();apply()};
 window.addAdaptiveAxes36=apply;
-window.addEventListener('finance-modules-ready',apply);
-setTimeout(apply,450);
+
 })();
