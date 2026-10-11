@@ -89,7 +89,7 @@ function lineHtml(line,i,kind,j){
   '<div class="bizLineFields44"><label>'+title+'<input id="b44gross_'+i+'_'+kind+'_'+j+'" type="number" min="0" step="0.01" value="'+(line.gross??'')+'" oninput="recalcBusiness44('+i+')"></label>'+
   '<label>VAT'+vatSelect(line.vatRate??23,i,kind,j)+'</label>'+
   '<button class="btn danger bizRemove44" onclick="removeBusinessLine44('+i+',\''+kind+'\','+j+')">Usuń</button></div>'+
-  '<div class="bizLineCalc44"><span>netto <b id="b44net_'+i+'_'+kind+'_'+j+'">'+PLN(c.net)+'</b></span><span>VAT <b id="b44vat_'+i+'_'+kind+'_'+j+'">'+PLN(c.vat)+'</b></span></div></div>';
+  '<div class="bizLineCalc44"><span>netto bez VAT <b id="b44net_'+i+'_'+kind+'_'+j+'">'+PLN(c.net)+'</b></span><span>VAT <b id="b44vat_'+i+'_'+kind+'_'+j+'">'+PLN(c.vat)+'</b></span></div></div>';
 }
 function captureLines(i,kind){
  const root=G('bp44_'+i),out=[];
@@ -163,14 +163,14 @@ function card(r,i){
    ((r.salesLines||[]).length?r.salesLines.map((l,j)=>lineHtml(l,i,'s',j)).join(''):'<p class="muted">Brak sprzedaży.</p>')+'</div>'+
   '<div class="bizSection44"><div class="bizSectionHead44"><b>Koszty</b><button class="btn" onclick="addBusinessLine44('+i+',\'c\')">＋ pozycja</button></div>'+
    ((r.costLines||[]).length?r.costLines.map((l,j)=>lineHtml(l,i,'c',j)).join(''):'<p class="muted">Brak kosztów.</p>')+'</div>'+
-  '<div class="bizSummary44"><div><small>SPRZEDAŻ BRUTTO</small><b id="b44sg_'+i+'">'+PLN(s.sales.gross)+'</b><span>netto <b id="b44sn_'+i+'">'+PLN(s.sales.net)+'</b> • VAT <b id="b44vo_'+i+'">'+PLN(s.sales.vat)+'</b></span></div>'+
-  '<div><small>KOSZTY BRUTTO</small><b id="b44cg_'+i+'">'+PLN(s.costs.gross)+'</b><span>netto <b id="b44cn_'+i+'">'+PLN(s.costs.net)+'</b> • VAT <b id="b44vi_'+i+'">'+PLN(s.costs.vat)+'</b></span></div></div>'+
+  '<div class="bizSummary44"><div><small>SPRZEDAŻ BRUTTO</small><b id="b44sg_'+i+'">'+PLN(s.sales.gross)+'</b><span>netto bez VAT <b id="b44sn_'+i+'">'+PLN(s.sales.net)+'</b> • VAT <b id="b44vo_'+i+'">'+PLN(s.sales.vat)+'</b></span></div>'+
+  '<div><small>KOSZTY BRUTTO</small><b id="b44cg_'+i+'">'+PLN(s.costs.gross)+'</b><span>netto bez VAT <b id="b44cn_'+i+'">'+PLN(s.costs.net)+'</b> • VAT <b id="b44vi_'+i+'">'+PLN(s.costs.vat)+'</b></span></div></div>'+
   '<div class="form bizCharges44"><label>ZUS społeczne<input id="b44zus_'+i+'" type="number" min="0" step="0.01" value="'+(r.zus??'')+'" oninput="recalcBusiness44('+i+')"></label>'+
   '<label>Składka zdrowotna<input id="b44health_'+i+'" type="number" min="0" step="0.01" value="'+(r.health??'')+'" oninput="recalcBusiness44('+i+')"></label>'+
   '<label>PIT faktycznie zapłacony<input id="b44tax_'+i+'" type="number" min="0" step="0.01" value="'+(r.tax??'')+'" oninput="recalcBusiness44('+i+')"></label></div>'+
   '<div class="bizResultGrid44"><div><small>VAT</small><b id="b44vs_'+i+'">'+(s.vatSaldo>=0?'do zapłaty ':'nadwyżka ')+PLN(Math.abs(s.vatSaldo))+'</b></div>'+
-  '<div><small>DOCHÓD DO PIT</small><b id="b44pit_'+i+'">'+PLN(s.taxable)+'</b></div>'+
-  '<div><small>REALNIE ZOSTAJE</small><b id="b44cash_'+i+'" class="'+(s.cash<0?'red':'green')+'">'+PLN(s.cash)+'</b></div></div>'+
+  '<div><small>DOCHÓD DO PIT — PO KOSZTACH I ZUS</small><b id="b44pit_'+i+'">'+PLN(s.taxable)+'</b></div>'+
+  '<div><small>ZOSTAJE PO KOSZTACH, VAT, ZUS I PIT</small><b id="b44cash_'+i+'" class="'+(s.cash<0?'red':'green')+'">'+PLN(s.cash)+'</b></div></div>'+
   '<button class="btn primary" onclick="saveBusinessMonth44('+i+')">Zapisz '+FULL[i]+'</button></div>';
 }
 function renderBusinessPlus44(){
@@ -181,7 +181,7 @@ function renderBusinessPlus44(){
  const vat=R2(total.vo-total.vi);
  host.innerHTML='<div class="sectionHead"><div class="yearNav"><button class="btn" onclick="changeBusinessYear44(-1)">‹</button><b>'+y+'</b><button class="btn" onclick="changeBusinessYear44(1)">›</button></div></div>'+
  '<div class="card businessIntro44"><b>Firma liczona od kwot brutto</b><p>Wpisujesz kwotę brutto i stawkę VAT. Netto oraz VAT liczą się automatycznie.</p><small>Stawki: 23%, 8%, 5%, 0% i zwolnienie.</small></div>'+
- '<div class="grid"><div class="tile"><small>SPRZEDAŻ BRUTTO</small><b>'+PLN(total.sg)+'</b></div><div class="tile"><small>SPRZEDAŻ NETTO</small><b>'+PLN(total.sn)+'</b></div><div class="tile"><small>VAT SALDO</small><b>'+(vat>=0?PLN(vat)+' do zapłaty':PLN(Math.abs(vat))+' nadwyżki')+'</b></div><div class="tile"><small>DOCHÓD FIRMY DO PIT</small><b>'+PLN(Math.max(0,total.taxable))+'</b></div><div class="tile"><small>REALNIE ZOSTAJE</small><b class="'+(total.cash<0?'red':'green')+'">'+PLN(total.cash)+'</b></div></div>'+
+ '<div class="grid"><div class="tile"><small>SPRZEDAŻ BRUTTO</small><b>'+PLN(total.sg)+'</b></div><div class="tile"><small>SPRZEDAŻ NETTO BEZ VAT</small><b>'+PLN(total.sn)+'</b></div><div class="tile"><small>VAT SALDO</small><b>'+(vat>=0?PLN(vat)+' do zapłaty':PLN(Math.abs(vat))+' nadwyżki')+'</b></div><div class="tile"><small>DOCHÓD DO PIT — PO KOSZTACH I ZUS</small><b>'+PLN(Math.max(0,total.taxable))+'</b></div><div class="tile"><small>ZOSTAJE PO KOSZTACH, VAT, ZUS I PIT</small><b class="'+(total.cash<0?'red':'green')+'">'+PLN(total.cash)+'</b></div></div>'+
  '<div class="card"><div class="title">Firma+ — pozycje brutto miesiąc po miesiącu</div><p class="muted">Każdy miesiąc może mieć wiele pozycji sprzedaży i kosztów z różnymi stawkami VAT.</p><div class="businessGrid businessGrid44">'+rows.map((r,i)=>card(r,i)).join('')+'</div></div>';
  rows.forEach((r,i)=>window.recalcBusiness44(i));
 }

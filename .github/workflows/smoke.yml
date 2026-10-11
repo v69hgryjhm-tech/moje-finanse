@@ -16,3 +16,5 @@ jobs:
           node-version: 20
       - name: Static integration test
         run: node tests/static-smoke.mjs
+      - name: Company net VAT regression test
+        run: node tests/company-net-vat.mjs
