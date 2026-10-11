@@ -4,11 +4,11 @@ import assert from 'node:assert/strict';
 
 const source=fs.readFileSync('v26forecast.js','utf8');
 const nodes=new Map();
-function element(){return {children:[],textContent:'',append(...items){this.children.push(...items)},appendChild(item){this.children.push(item)},querySelector(){return null},remove(){},insertAdjacentElement(_,item){this.hint=item}}}
-for(const id of ['home','companyTile','companyProfitHome','companyNetHome','companyRevenueHome','homeBars']){
+function element(){return {children:[],style:{},textContent:'',append(...items){this.children.push(...items)},appendChild(item){this.children.push(item)},querySelector(){return null},remove(){},insertAdjacentElement(_,item){this.hint=item}}}
+for(const id of ['home','companyTile','companyProfitHome','companyNetHome','companyRevenueHome','homeBars','earningsChart']){
  const e=element();e.previousElementSibling=element();e.parentElement=element();e.closest=()=>({firstElementChild:element()});nodes.set(id,e);
 }
-const ctx={Intl,Date,console,S:{selectedYear:new Date().getFullYear()+1,loans:[]},document:{getElementById:id=>nodes.get(id),querySelector:()=>null,createElement:element,head:element()},render(){}};
+const ctx={Intl,Date,console,M:['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'],S:{selectedYear:new Date().getFullYear()+1,loans:[]},document:{getElementById:id=>nodes.get(id),querySelector:()=>null,createElement:element,head:element()},render(){}};
 ctx.window=ctx;
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync('v44business.js','utf8'),ctx);
@@ -26,6 +26,13 @@ for(const [lines,expected] of [
  year=makeYear(lines);
  ctx.render();
  assert.equal(nodes.get('companyTile').textContent,fmt(expected));
+ const chart=nodes.get('earningsChart').innerHTML;
+ assert.ok(chart.includes('earningsScroll26'));
+ assert.ok(chart.includes('viewBox="0 0 840 310"'));
+ assert.ok(chart.includes('firma netto bez VAT '+fmt(expected)));
+ assert.ok(chart.includes('Średnia wpisanych <strong>'+fmt(expected)+'</strong>'));
+ assert.ok(!chart.includes('font-size="7'));
+ assert.ok(!chart.includes('>prog.</text>'));
  const bars=nodes.get('homeBars').innerHTML;
  assert.ok(bars.includes('<b>'+fmt(expected)+'</b><small>FIRMA — NETTO BEZ VAT</small><span>prognoza +'+fmt(expected*11)+'</span>'), 'Słupek firmy musi pokazywać sprzedaż bez VAT, przed kosztami');
  assert.equal(nodes.get('companyNetHome').textContent,fmt(expected));
@@ -39,7 +46,7 @@ for(const [lines,expected] of [
 }
 const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/FIRMA — SPRZEDAŻ NETTO BEZ VAT/);
-for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.8\.2/);
-assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='482'));
-assert.match(fs.readFileSync('manifest.json','utf8'),/v=482/);
+for(const file of ['index.html','v43boot.js','v47ux.js','fresh-260.html','app-252.html'])assert.match(fs.readFileSync(file,'utf8'),/4\.8\.3/);
+assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='483'));
+assert.match(fs.readFileSync('manifest.json','utf8'),/v=483/);
 console.log('PASS — karta i prognoza netto bez VAT, mieszane stawki, zero, brutto, wynik po kosztach oraz wersja/cache.');
