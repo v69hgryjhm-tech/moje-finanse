@@ -110,6 +110,7 @@ function styleLoanOverview(){
  let head=box.querySelector('.loanChartHead');
  if(head){let title=head.querySelector('b'),small=head.querySelector('small');if(title)title.textContent='Wszystkie kredyty — kapitał i pełny koszt spłaty';if(small)small.textContent='Niebieska linia = pozostały kapitał. Fioletowa przerywana = kapitał + przyszłe odsetki. Dolne słupki = raty i nadpłaty.'}
  let legend=chart?.nextElementSibling;if(legend?.classList.contains('legend'))legend.innerHTML='<span><i class="lineSolid"></i> kapitał</span><span><i class="ux47PurpleLine"></i> łącznie do zapłaty</span><span><i class="unpaidLegend"></i> raty miesiąca</span><span class="green">--- zakończenie kredytu</span>';
+ renderMonthlyPayments47(chart,svg,series,xs);
 }
 function styleLoanCards(){
  if(typeof S==='undefined')return;
