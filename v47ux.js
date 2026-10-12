@@ -1,7 +1,7 @@
 /* Moje Finanse 4.7 — czytelność, edycja kredytów i dopracowanie wykresów */
 (function(){
 'use strict';
-const VERSION='4.9.3';
+const VERSION='4.10.0';
 const NS='http://www.w3.org/2000/svg';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
@@ -56,7 +56,7 @@ function renderMonthlyPayments47(chart,svg,series,xs){
  if(!chart||!series||!xs.length)return;
  chart.querySelector('.overviewPayments47')?.remove();
  const months=monthlyPayments47(),rows=series.rows.slice(0,xs.length).map(r=>({...r,...(months.get(monthKey47(r.d))||{regular:0,extra:0,actual:0,forecast:0})}));
- const w=N((svg.getAttribute('viewBox')||'0 0 760 248').split(/\\s+/)[2])||760,top=48,bottom=132,max=Math.max(1,...rows.map(r=>r.regular+r.extra)),step=niceStep(max),axis=Math.ceil(max/step)*step,y=v=>bottom-v/axis*(bottom-top);
+ const w=N((svg.getAttribute('viewBox')||'0 0 760 248').split(/\s+/)[2])||760,top=48,bottom=132,max=Math.max(1,...rows.map(r=>r.regular+r.extra)),step=niceStep(max),axis=Math.ceil(max/step)*step,y=v=>bottom-v/axis*(bottom-top);
  const section=document.createElement('div');section.className='overviewPayments47';section.style.width=w+'px';
  const title=document.createElement('div');title.className='paymentsTitle47';title.textContent='Raty i nadpłaty miesiąc po miesiącu — zł / miesiąc';section.appendChild(title);
  const plot=svgEl('svg',{viewBox:'0 0 '+w+' 178',width:w,height:178,role:'img','aria-label':'Podpisane sumy rat i nadpłat w każdym miesiącu'});
@@ -211,4 +211,3 @@ let st=document.createElement('style');st.textContent=`
 `;document.head.appendChild(st);
 addFirmaShortcut();setVersion();
 })()
- renderMonthlyPayments47(chart,svg,series,xs);;

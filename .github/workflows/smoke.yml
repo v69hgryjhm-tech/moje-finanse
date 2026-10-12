@@ -30,3 +30,6 @@ jobs:
 
       - name: Monthly payments and reduced instalments
         run: node tests/monthly-payments.mjs
+
+      - name: Accountant ledger and XLSX export
+        run: node tests/accounting-export.mjs

@@ -97,7 +97,7 @@ function captureLines(i,kind){
  root.querySelectorAll('.bizLine44[data-kind="'+kind+'"]').forEach((el,j)=>{
   const gross=N(G('b44gross_'+i+'_'+kind+'_'+j)?.value);
   const raw=G('b44rate_'+i+'_'+kind+'_'+j)?.value;
-  out.push({gross,vatRate:raw==='zw'?'zw':N(raw)});
+  out.push({...rowFor(S.selectedYear,i)[kind==='s'?'salesLines':'costLines'][j],gross,vatRate:raw==='zw'?'zw':N(raw)});
  });
  return out;
 }
@@ -189,6 +189,7 @@ function renderBusinessPlus44(){
 }
 window.toggleBusinessMonth44=function(i){const r=captureMonth(i);sync(r);r.uiCollapsed44=r.uiCollapsed44===false;save();renderBusinessPlus44()};
 window.renderBusinessPlus44=renderBusinessPlus44;
+window.mfCompanyLine44=calcLine;
 window.mfCompanySummary44=summary;
 window.mfCompanySync44=sync;
 
