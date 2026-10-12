@@ -69,9 +69,9 @@ function employmentReconciliationHtml44(rows){
  return '<section><h3>Etat — '+(actual?'tylko wpisane':'dodatkowa prognoza')+'</h3><div class="row"><span>Brutto (szacunek)</span><b>'+PLN(a.gross)+'</b></div><div class="row"><span>− Składki społeczne pracownika</span><b>'+PLN(a.social)+'</b></div><div class="row"><span>− Koszty uzyskania przychodu</span><b>'+PLN(a.kup)+'</b></div><div class="row"><span>+ PPK pracodawcy</span><b>'+PLN(a.ppk)+'</b></div><div class="row"><span>Zaokrąglenia podstaw miesięcznych</span><b>'+(a.rounding<0?'− ':'+ ')+PLN(Math.abs(a.rounding))+'</b></div><div class="row pitReconciliationTotal44"><span>Podstawa PIT etatu</span><b>'+PLN(a.base)+'</b></div></section>';
  }).join('')+'<p class="muted">Brutto jest szacowane z wpisanego netto. To rozbicie wyjaśnia obliczenia aplikacji; dokładne kwoty rozliczenia wynikają z listy płac.</p></details>';
 }
-function taxOverviewHtml44(final,actual,forecast,threshold){
+function taxOverviewHtml44(final,actual,forecast,threshold,year=S.selectedYear){
  const remaining=threshold-final;
- return '<div class="taxForecastHero44"><small>SUMA ROCZNA Z PROGNOZĄ — PODSTAWA PIT</small><strong>'+PLN(final)+'</strong><span>Etat + dochód firmy do PIT</span></div><div class="taxForecastParts44"><div><span>Dane wpisane</span><b>'+PLN(actual)+'</b></div><div><span>Dodatkowa prognoza</span><b>'+PLN(forecast)+'</b></div><div><span>Próg PIT</span><b>'+PLN(threshold)+'</b></div><div><span>'+(remaining>=0?'Pozostaje do progu':'Powyżej progu')+'</span><b>'+PLN(Math.abs(remaining))+'</b></div></div><div class="taxOverviewLegend44"><span><i class="total44"></i>Suma do progu</span><span><i class="employment44"></i>Etat</span><span><i class="business44"></i>Firma</span><span class="taxForecastKey44">Jasne tło — miesiące z prognozą</span></div>';
+ return '<div class="taxForecastHero44"><small>PROGNOZA NA 31.12.'+year+' — PODSTAWA PIT</small><strong>'+PLN(final)+'</strong><span>Etat + dochód firmy do PIT</span></div><div class="taxForecastParts44"><div><span>Dane wpisane</span><b>'+PLN(actual)+'</b></div><div><span>Dodatkowa prognoza</span><b>'+PLN(forecast)+'</b></div><div><span>Próg PIT</span><b>'+PLN(threshold)+'</b></div><div><span>'+(remaining>=0?'Pozostaje do progu':'Powyżej progu')+'</span><b>'+PLN(Math.abs(remaining))+'</b></div></div><div class="taxOverviewLegend44"><span><i class="total44"></i>Suma do progu</span><span><i class="employment44"></i>Etat</span><span><i class="business44"></i>Firma</span><span class="taxForecastKey44">Jasne tło — miesiące z prognozą</span></div>';
 }
 function chartSvg(d){
  const th=d.threshold,max=Math.max(th*1.18,...d.rows.map(r=>r.combined),1),step=niceStep(max),axis=Math.ceil(max/step)*step;
@@ -94,7 +94,7 @@ function chartSvg(d){
  out+='<polyline points="'+empPts+'" fill="none" stroke="#56b68a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
  out+='<polyline points="'+bizPts+'" fill="none" stroke="#a58aca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
  out+='<polyline points="'+totalPts+'" fill="none" stroke="#365f9b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
- const last=d.rows.at(-1);if(last)out+='<circle cx="'+x(last.i)+'" cy="'+y(last.combined)+'" r="4.5" fill="#365f9b" stroke="#fff" stroke-width="2"/>';
+ const last=d.rows.at(-1);if(last)out+='<text x="'+(right-5)+'" y="'+Math.max(top+12,y(last.combined)-12)+'" text-anchor="end" fill="#365f9b" font-size="10" font-weight="700">31.12 — '+compact(last.combined)+'</text><circle cx="'+x(last.i)+'" cy="'+y(last.combined)+'" r="4.5" fill="#365f9b" stroke="#fff" stroke-width="2"/>';
  out+=SHORT.map((m,i)=>'<text x="'+x(i)+'" y="205" text-anchor="middle" fill="#6f7c91" font-size="9">'+m+'</text>').join('');
  return out;
 }
@@ -102,16 +102,17 @@ function renderTax44(){
  if(typeof S==='undefined')return;
  const d=combined(S.selectedYear),svg=chartSvg(d),cross=d.rows.find(r=>r.combined>=d.threshold),last=d.rows[11]||{},final=N(last.combined),empAct=N(last.employmentActual),empFc=N(last.employmentForecast),bizAct=N(last.businessActual),bizFc=N(last.businessForecast);
  ['taxSvg','homeTaxSvg'].forEach(id=>{const e=G(id);if(e)e.innerHTML=svg});
- const msg=cross?'Łączna podstawa opodatkowania (etat + firma) może przekroczyć próg około '+FULL[cross.i]+'.':'Łączna podstawa opodatkowania nie powinna przekroczyć progu.';
+ const outlook='Podstawa PIT — wpisane: '+PLN(empAct+Math.max(0,bizAct))+'. Dodatkowa prognoza: '+PLN(final-empAct-Math.max(0,bizAct))+'. Na 31.12.'+S.selectedYear+': '+PLN(final)+'. ';
+ const msg=outlook+(cross?'Łączna podstawa opodatkowania (etat + firma) może przekroczyć próg około '+FULL[cross.i]+'.':'Według obecnej prognozy próg nie zostanie przekroczony.');
  if(G('pitStatus'))G('pitStatus').textContent=msg;
  const homeSvg=G('homeTaxSvg');
  if(homeSvg){
   let panel=G('homeTaxOverview44');
   if(!panel){panel=document.createElement('div');panel.id='homeTaxOverview44';homeSvg.insertAdjacentElement('beforebegin',panel)}
-  panel.innerHTML=taxOverviewHtml44(final,empAct+Math.max(0,bizAct),final-empAct-Math.max(0,bizAct),d.threshold)+employmentReconciliationHtml44(employmentRows(S.selectedYear));
+  panel.innerHTML=taxOverviewHtml44(final,empAct+Math.max(0,bizAct),final-empAct-Math.max(0,bizAct),d.threshold,S.selectedYear)+employmentReconciliationHtml44(employmentRows(S.selectedYear));
  }
 
- if(G('cross'))G('cross').textContent=msg+' Prognoza końca roku: '+PLN(final)+'.';
+ if(G('cross'))G('cross').textContent=msg+' Prognoza jest przeliczana po zmianie wpisów.';
  const legend=document.querySelector('#tax .chart .legend');if(legend)legend.innerHTML='<span><i style="display:inline-block;width:18px;border-top:4px solid #172238;margin-right:5px;vertical-align:middle"></i>razem do progu</span><span><i style="display:inline-block;width:18px;border-top:3px solid #38b96a;margin-right:5px;vertical-align:middle"></i>etat</span><span><i style="display:inline-block;width:18px;border-top:3px solid #9550d7;margin-right:5px;vertical-align:middle"></i>firma</span><span class="red">--- próg PIT</span><span>○ prognoza</span>'; const tax=G('tax');
  if(tax){
   let box=G('taxBusiness44');
