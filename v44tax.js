@@ -107,30 +107,6 @@ function taxComparison44(empAct,empFc,bizAct,bizFc,final){
 }
 
 
-function homeGrossData44(rows){
- let actual=0,forecast=0,total=0,lastActual=-1;
- const months=rows.map((r,i)=>{const gross=N(r.g);if(r.actual){actual=R2(actual+gross);lastActual=i}else forecast=R2(forecast+gross);total=R2(total+gross);return{i,gross,total,actual:!!r.actual}});
- return{months,actual,forecast,total,lastActual};
-}
-function renderHomeGross44(rows){
- const svg=G('homeTaxSvg');if(!svg)return;
- const d=homeGrossData44(rows),max=Math.max(1,d.total*1.12),step=niceStep(max),axis=Math.ceil(max/step)*step,left=60,right=565,top=32,bottom=184,x=i=>left+i*(right-left)/11,y=v=>bottom-v/axis*(bottom-top);
- let out='';
- if(d.lastActual<11){const boundary=d.lastActual<0?left:(x(d.lastActual)+x(d.lastActual+1))/2;out+='<rect x="'+boundary+'" y="8" width="'+(right-boundary)+'" height="'+(bottom-8)+'" rx="10" fill="#eef3fa"/><text x="'+(right-6)+'" y="23" text-anchor="end" fill="#63758f" font-size="10">PROGNOZA</text>'}
- for(let v=0;v<=axis+.001;v+=step)out+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+right+'" y2="'+y(v)+'" stroke="#e8edf4"/><text x="'+(left-8)+'" y="'+(y(v)+3)+'" text-anchor="end" fill="#69778c" font-size="11">'+compact(v)+'</text>';
- const points=a=>a.map(r=>x(r.i)+','+y(r.total)).join(' ');
- const actual=d.months.filter(r=>r.i<=d.lastActual),future=d.months.filter(r=>r.i>=Math.max(0,d.lastActual));
- if(actual.length)out+='<polyline points="'+points(actual)+'" fill="none" stroke="#365f9b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
- if(d.lastActual<11&&future.length)out+='<polyline points="'+points(future)+'" fill="none" stroke="#91a9ce" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
- if(d.lastActual>=0){const r=d.months[d.lastActual];out+='<circle cx="'+x(r.i)+'" cy="'+y(r.total)+'" r="5" fill="#365f9b" stroke="#fff" stroke-width="2"/><text x="'+(x(r.i)-8)+'" y="'+Math.max(top+12,y(r.total)-12)+'" text-anchor="end" fill="#365f9b" font-size="10" font-weight="700">'+SHORT[r.i]+' — '+PLN(d.actual)+'</text>'}
- const last=d.months.at(-1);if(last&&d.lastActual<11)out+='<circle cx="'+right+'" cy="'+y(last.total)+'" r="4.5" fill="#91a9ce" stroke="#fff" stroke-width="2"/><title>Grudzień — z prognozą: '+PLN(d.total)+'</title>';
- out+=SHORT.map((m,i)=>'<text x="'+x(i)+'" y="205" text-anchor="middle" fill="#6f7c91" font-size="9">'+m+'</text>').join('');
- svg.innerHTML=out;
- let panel=G('homeTaxOverview44');if(!panel){panel=document.createElement('div');panel.id='homeTaxOverview44';svg.insertAdjacentElement('beforebegin',panel)}
- panel.innerHTML='<div class="taxForecastHero44"><small>ETAT BRUTTO — WPISANE WYPŁATY '+S.selectedYear+'</small><strong>'+PLN(d.actual)+'</strong><span>Brutto szacowane z wpisanego netto i miesięcznego PPK</span></div><div class="taxForecastParts44"><div><span>Dodatkowa prognoza</span><b>'+PLN(d.forecast)+'</b></div><div><span>Brutto na 31.12 — z prognozą</span><b>'+PLN(d.total)+'</b></div></div><div class="taxOverviewLegend44"><span><i class="total44"></i>Wpisane miesiące</span><span>Jasna linia i tło — prognoza</span></div>';
- if(G('pitStatus'))G('pitStatus').textContent='Wykres: narastające brutto etatu. Wpisane '+PLN(d.actual)+'; prognoza kolejnych miesięcy +'+PLN(d.forecast)+'; na koniec roku '+PLN(d.total)+'.';
-}
-
 function renderTax44(){
  if(typeof S==='undefined')return;
  const d=combined(S.selectedYear),svg=chartSvg(d),cross=d.rows.find(r=>r.combined>=d.threshold),last=d.rows[11]||{},final=N(last.combined),empAct=N(last.employmentActual),empFc=N(last.employmentForecast),bizAct=N(last.businessActual),bizFc=N(last.businessForecast);
@@ -162,6 +138,31 @@ function renderTax44(){
 
  }
 }
+function homeGrossData44(rows){
+ let actual=0,forecast=0,total=0,lastActual=-1;
+ const months=rows.map((r,i)=>{const gross=N(r.g);if(r.actual){actual=R2(actual+gross);lastActual=i}else forecast=R2(forecast+gross);total=R2(total+gross);return{i,gross,total,actual:!!r.actual}});
+ return{months,actual,forecast,total,lastActual};
+}
+function renderHomeGross44(rows){
+ const svg=G('homeTaxSvg');if(!svg)return;
+ const d=homeGrossData44(rows),max=Math.max(1,d.total*1.12),step=niceStep(max),axis=Math.ceil(max/step)*step,left=60,right=565,top=32,bottom=184,x=i=>left+i*(right-left)/11,y=v=>bottom-v/axis*(bottom-top);
+ let out='';
+ if(d.lastActual<11){const boundary=d.lastActual<0?left:(x(d.lastActual)+x(d.lastActual+1))/2;out+='<rect x="'+boundary+'" y="8" width="'+(right-boundary)+'" height="'+(bottom-8)+'" rx="10" fill="#eef3fa"/><text x="'+(right-6)+'" y="23" text-anchor="end" fill="#63758f" font-size="10">PROGNOZA</text>'}
+ for(let v=0;v<=axis+.001;v+=step)out+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+right+'" y2="'+y(v)+'" stroke="#e8edf4"/><text x="'+(left-8)+'" y="'+(y(v)+3)+'" text-anchor="end" fill="#69778c" font-size="11">'+compact(v)+'</text>';
+ const points=a=>a.map(r=>x(r.i)+','+y(r.total)).join(' ');
+ const actual=d.months.filter(r=>r.i<=d.lastActual),future=d.months.filter(r=>r.i>=Math.max(0,d.lastActual));
+ if(actual.length)out+='<polyline points="'+points(actual)+'" fill="none" stroke="#365f9b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
+ if(d.lastActual<11&&future.length)out+='<polyline points="'+points(future)+'" fill="none" stroke="#91a9ce" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+ if(d.lastActual>=0){const r=d.months[d.lastActual];out+='<circle cx="'+x(r.i)+'" cy="'+y(r.total)+'" r="5" fill="#365f9b" stroke="#fff" stroke-width="2"/><text x="'+(x(r.i)-8)+'" y="'+Math.max(top+12,y(r.total)-12)+'" text-anchor="end" fill="#365f9b" font-size="10" font-weight="700">'+SHORT[r.i]+' — '+PLN(d.actual)+'</text>'}
+ const last=d.months.at(-1);if(last&&d.lastActual<11)out+='<circle cx="'+right+'" cy="'+y(last.total)+'" r="4.5" fill="#91a9ce" stroke="#fff" stroke-width="2"/><title>Grudzień — z prognozą: '+PLN(d.total)+'</title>';
+ out+=SHORT.map((m,i)=>'<text x="'+x(i)+'" y="205" text-anchor="middle" fill="#6f7c91" font-size="9">'+m+'</text>').join('');
+ svg.innerHTML=out;
+ let panel=G('homeTaxOverview44');if(!panel){panel=document.createElement('div');panel.id='homeTaxOverview44';svg.insertAdjacentElement('beforebegin',panel)}
+ panel.innerHTML='<div class="taxForecastHero44"><small>ETAT BRUTTO — WPISANE WYPŁATY '+S.selectedYear+'</small><strong>'+PLN(d.actual)+'</strong><span>Brutto szacowane z wpisanego netto i miesięcznego PPK</span></div><div class="taxForecastParts44"><div><span>Dodatkowa prognoza</span><b>'+PLN(d.forecast)+'</b></div><div><span>Brutto na 31.12 — z prognozą</span><b>'+PLN(d.total)+'</b></div></div><div class="taxOverviewLegend44"><span><i class="total44"></i>Wpisane miesiące</span><span>Jasna linia i tło — prognoza</span></div>';
+ if(G('pitStatus'))G('pitStatus').textContent='Wykres: narastające brutto etatu. Wpisane '+PLN(d.actual)+'; prognoza kolejnych miesięcy +'+PLN(d.forecast)+'; na koniec roku '+PLN(d.total)+'.';
+}
+
+
 function renderCompanySummary44(){
  const host=G('companyMonths');if(!host||typeof S==='undefined')return;
  const y=S.selectedYear,d=combined(y),yr=S.years?.[String(y)]||{},rows=yr.company||[];

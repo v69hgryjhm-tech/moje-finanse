@@ -9,7 +9,7 @@ let d=ctx.homeGrossData44(rows);
 assert.equal(d.actual,90001.2);assert.equal(d.forecast,16600.5);assert.equal(d.total,106601.7);assert.equal(d.lastActual,9);
 rows[10]={g:8500.35,actual:true};d=ctx.homeGrossData44(rows);
 assert.equal(d.actual,98501.55);assert.equal(d.forecast,8300.25);assert.equal(d.lastActual,10);
-const renderer=src.slice(src.indexOf('function renderHomeGross44('),src.indexOf('function renderTax44('));
+const renderer=src.slice(src.indexOf('function renderHomeGross44('),src.indexOf('function renderCompanySummary44('));
 assert.ok(!renderer.includes('threshold'));
 assert.ok(renderer.includes('PLN(d.actual)'));
 assert.ok(src.includes("['taxSvg'].forEach"));
