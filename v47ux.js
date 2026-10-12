@@ -1,7 +1,7 @@
 /* Moje Finanse 4.7 — czytelność, edycja kredytów i dopracowanie wykresów */
 (function(){
 'use strict';
-const VERSION='4.10.0';
+const VERSION='4.10.1';
 const NS='http://www.w3.org/2000/svg';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
@@ -101,15 +101,15 @@ function styleLoanOverview(){
   svg.querySelector('.ux47FullCost')?.remove();
   let p=svgEl('polyline',{class:'ux47FullCost',points:fullPts,fill:'none',stroke:'#8b5cf6','stroke-width':'3.8','stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':'8 5'});svg.appendChild(p);
  }
- svg.querySelectorAll(':scope > rect:not(.ux47Keep)').forEach(r=>{if(!r.closest('.ux47Grid')){r.setAttribute('fill','#75aef4');r.setAttribute('opacity','.42')}});
+ 
  let k=box.querySelector('.loanOverviewKpis');
  if(k)k.innerHTML='<div><small>KAPITAŁ DO SPŁATY</small><b>'+PLN(costs.capital)+'</b><span>bez przyszłych odsetek</span></div><div><small>ODSETKI DO KOŃCA</small><b>'+PLN(costs.interest)+'</b><span>wg obecnego planu</span></div><div class="ux47TotalPay"><small>ŁĄCZNIE DO ZAPŁATY</small><b>'+PLN(costs.total)+'</b><span>kapitał + przyszłe odsetki</span></div><div><small>NAJBLIŻSZE RATY — PROGNOZA</small><b>'+PLN((S.loans||[]).reduce((a,l)=>a+N(loanPlan47(l,true).forecast[0]?.planned),0))+'</b></div><div><small>WPŁACONO DOTĄD</small><b>'+PLN((S.loans||[]).reduce((a,l)=>{try{return a+N(window.loanTotals15?.(l)?.paid)}catch{return a}},0))+'</b></div><div><small>OSZCZ. NADPŁAT</small><b class="green">'+PLN(costs.saving)+'</b><span>mniej przyszłych odsetek</span></div>';
  let chart=box.querySelector('.overviewChart');
- if(chart&&!chart.querySelector('.ux47AxisNote')){let n=document.createElement('div');n.className='ux47AxisNote';n.innerHTML='<span>↑ kapitał / pełna kwota do zapłaty</span><span>↓ raty w danym miesiącu</span>';chart.prepend(n)}
- else if(chart?.querySelector('.ux47AxisNote'))chart.querySelector('.ux47AxisNote').innerHTML='<span>↑ kapitał / pełna kwota do zapłaty</span><span>↓ raty w danym miesiącu</span>';
+ if(chart&&!chart.querySelector('.ux47AxisNote')){let n=document.createElement('div');n.className='ux47AxisNote';n.innerHTML='<span>↑ kapitał / pełna kwota do zapłaty</span>';chart.prepend(n)}
+ else if(chart?.querySelector('.ux47AxisNote'))chart.querySelector('.ux47AxisNote').innerHTML='<span>↑ kapitał / pełna kwota do zapłaty</span>';
  let head=box.querySelector('.loanChartHead');
- if(head){let title=head.querySelector('b'),small=head.querySelector('small');if(title)title.textContent='Wszystkie kredyty — kapitał i pełny koszt spłaty';if(small)small.textContent='Niebieska linia = pozostały kapitał. Fioletowa przerywana = kapitał + przyszłe odsetki. Dolne słupki = raty i nadpłaty.'}
- let legend=chart?.nextElementSibling;if(legend?.classList.contains('legend'))legend.innerHTML='<span><i class="lineSolid"></i> kapitał</span><span><i class="ux47PurpleLine"></i> łącznie do zapłaty</span><span><i class="unpaidLegend"></i> raty miesiąca</span><span class="green">--- zakończenie kredytu</span>';
+ if(head){let title=head.querySelector('b'),small=head.querySelector('small');if(title)title.textContent='Wszystkie kredyty — kapitał i pełny koszt spłaty';if(small)small.textContent='Niebieska linia = pozostały kapitał. Fioletowa przerywana = kapitał + przyszłe odsetki. Raty i nadpłaty pokazuje osobny wykres poniżej.'}
+ let legend=chart?.nextElementSibling;if(legend?.classList.contains('legend'))legend.innerHTML='<span><i class="lineSolid"></i> kapitał</span><span><i class="ux47PurpleLine"></i> łącznie do zapłaty</span><span class="green">--- zakończenie kredytu</span>';
  renderMonthlyPayments47(chart,svg,series,xs);
 }
 function styleLoanCards(){
