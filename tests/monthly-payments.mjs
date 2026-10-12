@@ -26,3 +26,8 @@ const business=fs.readFileSync('v44business.js','utf8');
 assert.ok(business.includes('aria-controls="bizBody44_'));
 assert.ok(business.includes('window.toggleBusinessMonth44='));
 console.log('PASS — rata po nadpłacie maleje, wykres sumuje raty i nadpłaty, widok używa planu, zwijanie Firma+ dostępne.');
+
+const homeSource=fs.readFileSync('v15loan.js','utf8');
+assert.ok(homeSource.includes('nextPayment=N(plan.forecast[0]?.planned)'));
+assert.ok(homeSource.includes('money(nextPayment)'));
+assert.ok(!homeSource.includes('money(l.payment)}/m'));
