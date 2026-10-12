@@ -5,7 +5,7 @@ const fmt=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',mini
 function actualLoanPaid(year){return (S.loans||[]).reduce((sum,l)=>sum+(l.history||[]).reduce((a,h)=>{if(!(h.month||'').startsWith(String(year)+'-'))return a;let reg=typeof h.paid==='boolean'?(h.paid?n(h.regularPaid||l.payment):0):n(h.regularPaid!=null?h.regularPaid:h.paid);let ex=h.isOverpayment===false?0:n(h.extra);return a+reg+ex},0),0)}
 function forecastLoanLeft(year){let total=0;(S.loans||[]).forEach(l=>{for(let m=0;m<12;m++){let k=year+'-'+String(m+1).padStart(2,'0'),base=(l.asOfDate||TODAY).slice(0,7);if(k<base)continue;if((l.history||[]).some(x=>x.month===k))continue;total+=n(l.payment)+n(l.extraMonthly)}});return total}
 function snapshot(){
- let p=sal(),yr=Y(),sAct=0,sFc=0,gAct=0,gFc=0,crAct=0,crFc=0,cgrossAct=0,cgrossFc=0,ccAct=0,ccFc=0,cvAct=0,cvFc=0,cpAct=0,cpFc=0;
+ let p=sal(),yr=Y(),sAct=0,sFc=0,gAct=0,gFc=0,baseAct=0,baseFc=0,crAct=0,crFc=0,cgrossAct=0,cgrossFc=0,ccAct=0,ccFc=0,cvAct=0,cvFc=0,cpAct=0,cpFc=0;
  let cy=new Date().getFullYear(),cm=new Date().getMonth(),year=S.selectedYear;
  let rawCompany=yr.company||[],actualRows=[];
  let companyMonths=rawCompany.map((rr,i)=>{
@@ -20,13 +20,13 @@ function snapshot(){
  let avgCash=actualRows.length?actualRows.reduce((a,r)=>a+r.cash,0)/actualRows.length:0,avgRev=actualRows.length?actualRows.reduce((a,r)=>a+r.revenue,0)/actualRows.length:0,avgGross=actualRows.length?actualRows.reduce((a,r)=>a+r.gross,0)/actualRows.length:0,avgCost=actualRows.length?actualRows.reduce((a,r)=>a+r.costs,0)/actualRows.length:0,avgVat=actualRows.length?actualRows.reduce((a,r)=>a+r.vat,0)/actualRows.length:0;
  for(let i=0;i<12;i++){
   let sa=!!p.rows[i]?.actual;
-  if(sa){sAct+=n(p.rows[i].total);gAct+=n(p.rows[i].g)}else{sFc+=n(p.rows[i].total);gFc+=n(p.rows[i].g)}
+  if(sa){sAct+=n(p.rows[i].total);gAct+=n(p.rows[i].g);baseAct+=n(p.rows[i].base)}else{sFc+=n(p.rows[i].total);gFc+=n(p.rows[i].g);baseFc+=n(p.rows[i].base)}
   let m=companyMonths[i],future=year>cy||(year===cy&&i>=cm);
   if(m.actual){crAct+=m.revenue;cgrossAct+=m.gross;ccAct+=m.costs;cvAct+=m.vat;cpAct+=m.cash}
   else if(future&&actualRows.length){m.forecast=true;m.cash=avgCash;m.revenue=avgRev;m.gross=avgGross;m.costs=avgCost;m.vat=avgVat;crFc+=avgRev;cgrossFc+=avgGross;ccFc+=avgCost;cvFc+=avgVat;cpFc+=avgCash}
  }
  let loanAct=actualLoanPaid(S.selectedYear),loanFc=forecastLoanLeft(S.selectedYear),freeAct=sAct+cpAct-loanAct,freeFc=freeAct+sFc+cpFc-loanFc;
- return{p,yr,companyMonths,sAct,sFc,gAct,gFc,crAct,crFc,cgrossAct,cgrossFc,ccAct,ccFc,cvAct,cvFc,cpAct,cpFc,loanAct,loanFc,freeAct,freeFc}
+ return{p,yr,companyMonths,sAct,sFc,gAct,gFc,baseAct,baseFc,crAct,crFc,cgrossAct,cgrossFc,ccAct,ccFc,cvAct,cvFc,cpAct,cpFc,loanAct,loanFc,freeAct,freeFc}
 }
 function hint(el,text){if(!el)return;let old=el.parentElement.querySelector('.forecastHint26');if(old)old.remove();let s=document.createElement('span');s.className='forecastHint26';s.textContent=text;el.insertAdjacentElement('afterend',s)}
 function companyHint(el,d){
@@ -41,12 +41,12 @@ function companyHint(el,d){
  el.insertAdjacentElement('afterend',box);
 }
 function apply(){if(typeof S==='undefined'||!document.getElementById('home'))return;let d=snapshot(),hero=document.querySelector('#home .hero');if(hero){let lab=hero.querySelector('small');if(lab)lab.textContent='WOLNA GOTÓWKA — TYLKO DANE WPISANE';let v=document.getElementById('freeYear');if(v)v.textContent=fmt(d.freeAct);let sub=document.getElementById('avgNet');if(sub){sub.className='forecastLine26';sub.textContent='prognoza końca roku ≈ '+fmt(d.freeFc)+' • nie jest doliczana do wyniku powyżej'}}
-let net=document.getElementById('netTile'),gross=document.getElementById('grossTile'),company=document.getElementById('companyTile'),loan=document.getElementById('loanTile');if(net){net.textContent=fmt(d.sAct);net.previousElementSibling.textContent='ETAT NETTO — WPISANE';hint(net,'prognoza +'+fmt(d.sFc)+' → '+fmt(d.sAct+d.sFc))}if(gross){gross.textContent=fmt(d.gAct);gross.previousElementSibling.textContent='ETAT BRUTTO — WPISANE';hint(gross,'prognoza +'+fmt(d.gFc)+' → '+fmt(d.gAct+d.gFc))}if(company){company.textContent=fmt(d.crAct);company.previousElementSibling.textContent='FIRMA — SPRZEDAŻ NETTO BEZ VAT';companyHint(company,d)}if(loan){loan.textContent=fmt(d.loanAct);loan.previousElementSibling.textContent='KREDYTY — FAKTYCZNIE WPŁACONE';hint(loan,'planowane do końca roku +'+fmt(d.loanFc))}
+let net=document.getElementById('netTile'),gross=document.getElementById('grossTile'),company=document.getElementById('companyTile'),loan=document.getElementById('loanTile');if(net){net.textContent=fmt(d.sAct);net.previousElementSibling.textContent='ETAT NETTO — WPISANE';hint(net,'prognoza +'+fmt(d.sFc)+' → '+fmt(d.sAct+d.sFc))}if(gross){gross.textContent=fmt(d.baseAct);gross.previousElementSibling.textContent='ETAT — PODSTAWA PIT WPISANA';hint(gross,'Podstawa PIT: prognoza +'+fmt(d.baseFc)+' → rocznie '+fmt(d.baseAct+d.baseFc)+'. Brutto osobno: wpisane '+fmt(d.gAct)+' → rocznie '+fmt(d.gAct+d.gFc))}if(company){company.textContent=fmt(d.crAct);company.previousElementSibling.textContent='FIRMA — SPRZEDAŻ NETTO BEZ VAT';companyHint(company,d)}if(loan){loan.textContent=fmt(d.loanAct);loan.previousElementSibling.textContent='KREDYTY — FAKTYCZNIE WPŁACONE';hint(loan,'planowane do końca roku +'+fmt(d.loanFc))}
 let rev=document.getElementById('companyRevenueHome'),netRev=document.getElementById('companyNetHome'),cost=document.getElementById('companyCostsHome'),prof=document.getElementById('companyProfitHome'),vat=document.getElementById('companyVatHome');if(rev){rev.textContent=fmt(d.cgrossAct);let row=rev.closest('.row');if(row?.firstElementChild)row.firstElementChild.textContent='Sprzedaż brutto'}if(netRev)netRev.textContent=fmt(d.crAct);if(cost)cost.textContent=fmt(d.ccAct);if(prof){prof.textContent=fmt(d.cpAct);let row=prof.closest('.row');if(row?.firstElementChild)row.firstElementChild.textContent='Zostaje po kosztach, VAT, ZUS i PIT'}if(vat)vat.textContent=fmt(d.cvAct);let total=document.getElementById('allIncomeTotal');if(total){total.textContent=fmt(d.sAct+d.crAct);let row=total.closest('.row');if(row?.firstElementChild)row.firstElementChild.textContent='Etat netto + sprzedaż firmy netto bez VAT — wpisane';hint(total,'prognoza razem '+fmt(d.sAct+d.sFc+d.crAct+d.crFc))}renderBars26(d);renderEarnings26(d)}
 function renderBars26(d){
  let h=document.getElementById('homeBars');if(!h)return;
  const values=[
-  ['Etat brutto','Wynagrodzenie przed potrąceniami',d.gAct,d.gFc,'gross'],
+  ['Etat — podstawa PIT','Ta sama podstawa co na wykresie progu. Brutto osobno: '+fmt(d.gAct)+' wpisane / '+fmt(d.gAct+d.gFc)+' z prognozą.',d.baseAct,d.baseFc,'gross'],
   ['Etat netto','Wypłaty na konto',d.sAct,d.sFc,'net'],
   ['Firma','Sprzedaż netto bez VAT',d.crAct,d.crFc,'company'],
   ['Kredyty','Raty i nadpłaty',d.loanAct,d.loanFc,'loans']

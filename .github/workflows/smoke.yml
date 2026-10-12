@@ -33,3 +33,6 @@ jobs:
 
       - name: Accountant ledger and XLSX export
         run: node tests/accounting-export.mjs
+
+      - name: Unified employment PIT display
+        run: node tests/pit-unified.mjs

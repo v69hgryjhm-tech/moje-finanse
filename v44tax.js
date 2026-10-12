@@ -98,6 +98,14 @@ function chartSvg(d){
  out+=SHORT.map((m,i)=>'<text x="'+x(i)+'" y="205" text-anchor="middle" fill="#6f7c91" font-size="9">'+m+'</text>').join('');
  return out;
 }
+
+function taxComparison44(empAct,empFc,bizAct,bizFc,final){
+ const row=(label,a,f)=>'<div class="row"><span>'+label+'</span><b>'+PLN(a)+' wpisane · + '+PLN(f)+' prognoza → '+PLN(a+f)+'</b></div>';
+ return '<section class="pitUnified44"><h3>Podstawa PIT — wspólne kwoty z podsumowaniem roku</h3>'+
+ row('Etat — podstawa PIT',empAct,empFc)+row('Firma — dochód do PIT',Math.max(0,bizAct),Math.max(0,bizAct+bizFc)-Math.max(0,bizAct))+
+ '<div class="row"><span><b>Etat + firma — podstawa PIT z prognozą</b></span><b>'+PLN(final)+'</b></div></section>';
+}
+
 function renderTax44(){
  if(typeof S==='undefined')return;
  const d=combined(S.selectedYear),svg=chartSvg(d),cross=d.rows.find(r=>r.combined>=d.threshold),last=d.rows[11]||{},final=N(last.combined),empAct=N(last.employmentActual),empFc=N(last.employmentForecast),bizAct=N(last.businessActual),bizFc=N(last.businessForecast);
@@ -109,7 +117,7 @@ function renderTax44(){
  if(homeSvg){
   let panel=G('homeTaxOverview44');
   if(!panel){panel=document.createElement('div');panel.id='homeTaxOverview44';homeSvg.insertAdjacentElement('beforebegin',panel)}
-  panel.innerHTML=taxOverviewHtml44(final,empAct+Math.max(0,bizAct),final-empAct-Math.max(0,bizAct),d.threshold,S.selectedYear)+employmentReconciliationHtml44(employmentRows(S.selectedYear));
+  panel.innerHTML=taxOverviewHtml44(final,empAct+Math.max(0,bizAct),final-empAct-Math.max(0,bizAct),d.threshold,S.selectedYear)+taxComparison44(empAct,empFc,bizAct,bizFc,final)+employmentReconciliationHtml44(employmentRows(S.selectedYear));
  }
 
  if(G('cross'))G('cross').textContent=msg+' Prognoza jest przeliczana po zmianie wpisów.';
