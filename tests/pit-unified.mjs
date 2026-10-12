@@ -17,5 +17,5 @@ const updated=ctx.snapshot(),updatedTax=ctx.combined(2026).rows.at(-1);
 assert.equal(updated.baseAct,updatedTax.employmentActual);assert.equal(updated.baseAct,85600);
 assert.ok(forecast.includes("gross.textContent=fmt(d.gAct)"));
 assert.ok(forecast.includes("['Etat brutto'"));
-assert.ok(tax.includes('taxComparison44(empAct,empFc,bizAct,bizFc,final)+employmentReconciliationHtml44'));
+assert.ok(tax.includes('renderHomeGross44(employmentRows(S.selectedYear))'));
 console.log('PASS — employment shows gross from entered pay; tax keeps consistent PIT basis.');

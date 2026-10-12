@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const src=fs.readFileSync('v44tax.js','utf8');
+const helper=src.slice(src.indexOf('function homeGrossData44('),src.indexOf('function renderHomeGross44('));
+const ctx={N:v=>+v||0,R2:v=>Math.round(v*100)/100};vm.createContext(ctx);vm.runInContext(helper,ctx);
+const rows=Array.from({length:12},(_,i)=>({g:i<10?9000.12:8300.25,base:7000,actual:i<10}));
+let d=ctx.homeGrossData44(rows);
+assert.equal(d.actual,90001.2);assert.equal(d.forecast,16600.5);assert.equal(d.total,106601.7);assert.equal(d.lastActual,9);
+rows[10]={g:8500.35,actual:true};d=ctx.homeGrossData44(rows);
+assert.equal(d.actual,98501.55);assert.equal(d.forecast,8300.25);assert.equal(d.lastActual,10);
+const renderer=src.slice(src.indexOf('function renderHomeGross44('),src.indexOf('function renderTax44('));
+assert.ok(!renderer.includes('threshold'));
+assert.ok(renderer.includes('PLN(d.actual)'));
+assert.ok(src.includes("['taxSvg'].forEach"));
+console.log('PASS — home gross chart uses entered-month gross, preserves cents, separates future forecast, has no tax threshold.');

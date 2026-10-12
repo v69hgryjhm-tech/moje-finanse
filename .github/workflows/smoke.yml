@@ -36,3 +36,6 @@ jobs:
 
       - name: Unified employment PIT display
         run: node tests/pit-unified.mjs
+
+      - name: Gross earnings chart
+        run: node tests/home-gross-chart.mjs
