@@ -5,7 +5,7 @@ const forecast=fs.readFileSync('v26forecast.js','utf8'),tax=fs.readFileSync('v44
 const salary=Array.from({length:12},(_,i)=>({g:10000,base:8400,total:7000,actual:i<10}));
 const year={company:Array.from({length:12},()=>({salesLines:[],costLines:[]}))};
 const ctx={Date,S:{selectedYear:2026,years:{2026:year},loans:[],settings:{threshold:120000}},Y:()=>year,sal:()=>({rows:salary}),n:v=>+v||0,N:v=>+v||0,R2:v=>Math.round(v*100)/100,employmentRows:()=>salary,rowActual:()=>false,companySummary:()=>({taxable:0})};
-vm.createContext(ctx);
+ctx.window={};vm.createContext(ctx);
 vm.runInContext(forecast.slice(forecast.indexOf('function actualLoanPaid('),forecast.indexOf('function hint(')),ctx);
 vm.runInContext(tax.slice(tax.indexOf('function combined('),tax.indexOf('window.mfCombinedTax44=')),ctx);
 const d=ctx.snapshot(),p=ctx.combined(2026).rows.at(-1);
