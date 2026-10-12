@@ -1,7 +1,7 @@
 /* Moje Finanse 4.7 — czytelność, edycja kredytów i dopracowanie wykresów */
 (function(){
 'use strict';
-const VERSION='4.9.2';
+const VERSION='4.9.3';
 const NS='http://www.w3.org/2000/svg';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
@@ -43,6 +43,37 @@ function loanSeries47(){
  }
  return{start,end,rows}
 }
+function monthlyPayments47(){
+ const months=new Map();
+ (S.loans||[]).forEach(l=>loanPlan47(l,true).rows.forEach(r=>{
+  const key=monthKey47(r.date);let m=months.get(key)||{regular:0,extra:0,actual:0,forecast:0};
+  const regular=r.kind==='actual'?N(r.regularPaid):N(r.planned),extra=N(r.extra);
+  m.regular+=regular;m.extra+=extra;m[r.kind==='actual'?'actual':'forecast']+=regular+extra;months.set(key,m);
+ }));
+ return months;
+}
+function renderMonthlyPayments47(chart,svg,series,xs){
+ if(!chart||!series||!xs.length)return;
+ chart.querySelector('.overviewPayments47')?.remove();
+ const months=monthlyPayments47(),rows=series.rows.slice(0,xs.length).map(r=>({...r,...(months.get(monthKey47(r.d))||{regular:0,extra:0,actual:0,forecast:0})}));
+ const w=N((svg.getAttribute('viewBox')||'0 0 760 248').split(/\\s+/)[2])||760,top=48,bottom=132,max=Math.max(1,...rows.map(r=>r.regular+r.extra)),step=niceStep(max),axis=Math.ceil(max/step)*step,y=v=>bottom-v/axis*(bottom-top);
+ const section=document.createElement('div');section.className='overviewPayments47';section.style.width=w+'px';
+ const title=document.createElement('div');title.className='paymentsTitle47';title.textContent='Raty i nadpłaty miesiąc po miesiącu — zł / miesiąc';section.appendChild(title);
+ const plot=svgEl('svg',{viewBox:'0 0 '+w+' 178',width:w,height:178,role:'img','aria-label':'Podpisane sumy rat i nadpłat w każdym miesiącu'});
+ for(let v=0;v<=axis+.001;v+=step){plot.appendChild(svgEl('line',{x1:44,x2:w-20,y1:y(v),y2:y(v),stroke:'#e7edf4'}));plot.appendChild(svgEl('text',{x:38,y:y(v)+3,'text-anchor':'end',fill:'#7b8a9f','font-size':9},compact(v)))}
+ rows.forEach((r,i)=>{
+  const x=xs[i],total=r.regular+r.extra,bw=18,yr=y(r.regular),yt=y(total),group=svgEl('g',{});
+  group.appendChild(svgEl('title',{},monthKey47(r.d)+': raty '+PLN(r.regular)+', nadpłaty '+PLN(r.extra)+', razem '+PLN(total)+(r.forecast?' — zawiera prognozę':'')));
+  if(r.regular>0)group.appendChild(svgEl('rect',{x:x-bw/2,y:yr,width:bw,height:bottom-yr,rx:3,fill:'#78a7e3',opacity:r.forecast?0.65:1}));
+  if(r.extra>0)group.appendChild(svgEl('rect',{x:x-bw/2,y:yt,width:bw,height:yr-yt,rx:3,fill:'#f2b554',opacity:r.forecast?0.65:1}));
+  if(total>0)group.appendChild(svgEl('text',{x:x-1,y:Math.max(18,yt-7),transform:'rotate(-45 '+(x-1)+' '+Math.max(18,yt-7)+')',fill:'#49617e','font-size':8.5},PLN(total)));
+  group.appendChild(svgEl('text',{x,y:154,'text-anchor':'middle',fill:'#79879b','font-size':8},String(r.d.getMonth()+1).padStart(2,'0')+'.'+String(r.d.getFullYear()).slice(-2)));
+  plot.appendChild(group);
+ });
+ section.appendChild(plot);
+ const legend=document.createElement('div');legend.className='paymentsLegend47';legend.innerHTML='<span><i></i>Raty</span><span><i class="extra47"></i>Nadpłaty</span><span>Jasne słupki — prognoza</span>';section.appendChild(legend);
+ chart.appendChild(section);
+}
 function niceStep(max,target=4){max=Math.max(1,N(max));let raw=max/target,p=Math.pow(10,Math.floor(Math.log10(raw))),q=raw/p,m=q<=1?1:q<=2?2:q<=2.5?2.5:q<=5?5:10;return m*p}
 function addBalanceGrid(svg,max,opt={}){
  if(!svg)return;
@@ -72,7 +103,7 @@ function styleLoanOverview(){
  }
  svg.querySelectorAll(':scope > rect:not(.ux47Keep)').forEach(r=>{if(!r.closest('.ux47Grid')){r.setAttribute('fill','#75aef4');r.setAttribute('opacity','.42')}});
  let k=box.querySelector('.loanOverviewKpis');
- if(k)k.innerHTML='<div><small>KAPITAŁ DO SPŁATY</small><b>'+PLN(costs.capital)+'</b><span>bez przyszłych odsetek</span></div><div><small>ODSETKI DO KOŃCA</small><b>'+PLN(costs.interest)+'</b><span>wg obecnego planu</span></div><div class="ux47TotalPay"><small>ŁĄCZNIE DO ZAPŁATY</small><b>'+PLN(costs.total)+'</b><span>kapitał + przyszłe odsetki</span></div><div><small>RATY / MIES.</small><b>'+PLN((S.loans||[]).reduce((a,l)=>a+N(l.payment),0))+'</b></div><div><small>WPŁACONO DOTĄD</small><b>'+PLN((S.loans||[]).reduce((a,l)=>{try{return a+N(window.loanTotals15?.(l)?.paid)}catch{return a}},0))+'</b></div><div><small>OSZCZ. NADPŁAT</small><b class="green">'+PLN(costs.saving)+'</b><span>mniej przyszłych odsetek</span></div>';
+ if(k)k.innerHTML='<div><small>KAPITAŁ DO SPŁATY</small><b>'+PLN(costs.capital)+'</b><span>bez przyszłych odsetek</span></div><div><small>ODSETKI DO KOŃCA</small><b>'+PLN(costs.interest)+'</b><span>wg obecnego planu</span></div><div class="ux47TotalPay"><small>ŁĄCZNIE DO ZAPŁATY</small><b>'+PLN(costs.total)+'</b><span>kapitał + przyszłe odsetki</span></div><div><small>NAJBLIŻSZE RATY — PROGNOZA</small><b>'+PLN((S.loans||[]).reduce((a,l)=>a+N(loanPlan47(l,true).forecast[0]?.planned),0))+'</b></div><div><small>WPŁACONO DOTĄD</small><b>'+PLN((S.loans||[]).reduce((a,l)=>{try{return a+N(window.loanTotals15?.(l)?.paid)}catch{return a}},0))+'</b></div><div><small>OSZCZ. NADPŁAT</small><b class="green">'+PLN(costs.saving)+'</b><span>mniej przyszłych odsetek</span></div>';
  let chart=box.querySelector('.overviewChart');
  if(chart&&!chart.querySelector('.ux47AxisNote')){let n=document.createElement('div');n.className='ux47AxisNote';n.innerHTML='<span>↑ kapitał / pełna kwota do zapłaty</span><span>↓ raty w danym miesiącu</span>';chart.prepend(n)}
  else if(chart?.querySelector('.ux47AxisNote'))chart.querySelector('.ux47AxisNote').innerHTML='<span>↑ kapitał / pełna kwota do zapłaty</span><span>↓ raty w danym miesiącu</span>';
@@ -179,4 +210,5 @@ let st=document.createElement('style');st.textContent=`
 @media(max-width:760px){.loanOverviewKpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}}@media(max-width:560px){.nav button[data-v]>span{font-size:8px}.nav{width:calc(100% - 12px)}.loanTitleActions{max-width:190px}.editLoan47{padding:7px 8px}.loanModal47{grid-template-columns:1fr}.loanOverviewKpis{grid-template-columns:1fr 1fr!important}}
 `;document.head.appendChild(st);
 addFirmaShortcut();setVersion();
-})();
+})()
+ renderMonthlyPayments47(chart,svg,series,xs);;

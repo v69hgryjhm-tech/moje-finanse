@@ -27,3 +27,6 @@ jobs:
 
       - name: Payroll PIT reconciliation test
         run: node tests/payroll-pit-reconciliation.mjs
+
+      - name: Monthly payments and reduced instalments
+        run: node tests/monthly-payments.mjs

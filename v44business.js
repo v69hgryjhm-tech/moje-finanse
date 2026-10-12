@@ -155,9 +155,11 @@ window.changeBusinessYear44=function(d){
 };
 function card(r,i){
  const s=summary(r);
+ const collapsed=r.uiCollapsed44!==false;
  const migrated=[...(r.salesLines||[]),...(r.costLines||[])].some(x=>x.migrated);
- return '<div class="bizMonth bizMonth44" id="bp44_'+i+'">'+
-  '<div class="mh"><b>'+FULL[i]+'</b><span class="status '+((r.salesLines?.length||r.costLines?.length||r.zus||r.health||r.tax)?'actual':'')+'">'+((r.salesLines?.length||r.costLines?.length||r.zus||r.health||r.tax)?'wpisane':'puste')+'</span></div>'+
+ return '<div class="bizMonth bizMonth44 '+(collapsed?'bizCollapsed44':'')+'" id="bp44_'+i+'">'+
+  '<div class="mh"><b>'+FULL[i]+' '+S.selectedYear+'</b><div class="bizMonthActions44"><span class="status '+((r.salesLines?.length||r.costLines?.length||r.zus||r.health||r.tax)?'actual':'')+'">'+((r.salesLines?.length||r.costLines?.length||r.zus||r.health||r.tax)?'wpisane':'puste')+'</span><button type="button" class="btn" aria-expanded="'+!collapsed+'" aria-controls="bizBody44_'+i+'" onclick="toggleBusinessMonth44('+i+')">'+(collapsed?'Rozwiń ▾':'Zwiń ▴')+'</button></div></div>'+
+  '<div class="bizCompact44"><span>Sprzedaż netto bez VAT <b>'+PLN(s.sales.net)+'</b></span><span>Po kosztach i podatkach <b>'+PLN(s.cash)+'</b></span></div><div class="bizBody44" id="bizBody44_'+i+'">'+
   (migrated?'<p class="bizWarn44">Dane z poprzedniej wersji zostały wstępnie przeliczone. Sprawdź stawkę VAT przed zapisaniem miesiąca.</p>':'')+
   '<div class="bizSection44"><div class="bizSectionHead44"><b>Sprzedaż</b><button class="btn" onclick="addBusinessLine44('+i+',\'s\')">＋ pozycja</button></div>'+
    ((r.salesLines||[]).length?r.salesLines.map((l,j)=>lineHtml(l,i,'s',j)).join(''):'<p class="muted">Brak sprzedaży.</p>')+'</div>'+
@@ -171,7 +173,7 @@ function card(r,i){
   '<div class="bizResultGrid44"><div><small>VAT</small><b id="b44vs_'+i+'">'+(s.vatSaldo>=0?'do zapłaty ':'nadwyżka ')+PLN(Math.abs(s.vatSaldo))+'</b></div>'+
   '<div><small>DOCHÓD DO PIT — PO KOSZTACH I ZUS</small><b id="b44pit_'+i+'">'+PLN(s.taxable)+'</b></div>'+
   '<div><small>ZOSTAJE PO KOSZTACH, VAT, ZUS I PIT</small><b id="b44cash_'+i+'" class="'+(s.cash<0?'red':'green')+'">'+PLN(s.cash)+'</b></div></div>'+
-  '<button class="btn primary" onclick="saveBusinessMonth44('+i+')">Zapisz '+FULL[i]+'</button></div>';
+  '<button class="btn primary" onclick="saveBusinessMonth44('+i+')">Zapisz '+FULL[i]+'</button></div></div>';
 }
 function renderBusinessPlus44(){
  if(!ensure())return;
@@ -181,10 +183,11 @@ function renderBusinessPlus44(){
  const vat=R2(total.vo-total.vi);
  host.innerHTML='<div class="sectionHead"><div class="yearNav"><button class="btn" onclick="changeBusinessYear44(-1)">‹</button><b>'+y+'</b><button class="btn" onclick="changeBusinessYear44(1)">›</button></div></div>'+
  '<div class="card businessIntro44"><b>Firma liczona od kwot brutto</b><p>Wpisujesz kwotę brutto i stawkę VAT. Netto oraz VAT liczą się automatycznie.</p><small>Stawki: 23%, 8%, 5%, 0% i zwolnienie.</small></div>'+
- '<div class="grid"><div class="tile"><small>SPRZEDAŻ BRUTTO</small><b>'+PLN(total.sg)+'</b></div><div class="tile"><small>SPRZEDAŻ NETTO BEZ VAT</small><b>'+PLN(total.sn)+'</b></div><div class="tile"><small>VAT SALDO</small><b>'+(vat>=0?PLN(vat)+' do zapłaty':PLN(Math.abs(vat))+' nadwyżki')+'</b></div><div class="tile"><small>DOCHÓD DO PIT — PO KOSZTACH I ZUS</small><b>'+PLN(Math.max(0,total.taxable))+'</b></div><div class="tile"><small>ZOSTAJE PO KOSZTACH, VAT, ZUS I PIT</small><b class="'+(total.cash<0?'red':'green')+'">'+PLN(total.cash)+'</b></div></div>'+
+ '<div class="businessOverview44"><section><h3>Sprzedaż i VAT — wpisane</h3><div class="businessOverviewRows44"><div><span>Sprzedaż brutto</span><b>'+PLN(total.sg)+'</b></div><div><span>Sprzedaż netto bez VAT</span><b>'+PLN(total.sn)+'</b></div><div><span>VAT — '+(vat>=0?'do zapłaty':'nadwyżka')+'</span><b>'+PLN(Math.abs(vat))+'</b></div></div></section><section><h3>Wynik firmy — wpisane</h3><div class="businessOverviewRows44"><div><span>Koszty netto bez VAT</span><b>'+PLN(total.cn)+'</b></div><div><span>Dochód do PIT — po kosztach i ZUS</span><b>'+PLN(Math.max(0,total.taxable))+'</b></div><div class="businessCashTotal44"><span>Zostaje po kosztach, VAT, ZUS i PIT</span><b>'+PLN(total.cash)+'</b></div></div></section></div>'+
  '<div class="card"><div class="title">Firma+ — pozycje brutto miesiąc po miesiącu</div><p class="muted">Każdy miesiąc może mieć wiele pozycji sprzedaży i kosztów z różnymi stawkami VAT.</p><div class="businessGrid businessGrid44">'+rows.map((r,i)=>card(r,i)).join('')+'</div></div>';
  rows.forEach((r,i)=>window.recalcBusiness44(i));
 }
+window.toggleBusinessMonth44=function(i){const r=captureMonth(i);sync(r);r.uiCollapsed44=r.uiCollapsed44===false;save();renderBusinessPlus44()};
 window.renderBusinessPlus44=renderBusinessPlus44;
 window.mfCompanySummary44=summary;
 window.mfCompanySync44=sync;

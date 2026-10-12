@@ -129,8 +129,9 @@ function renderTax44(){
   let box=G('businessTax44');
   if(!box){box=document.createElement('div');box.id='businessTax44';box.className='card';bp.insertBefore(box,bp.children[2]||null)}
   const remain=d.threshold-final;
-  box.innerHTML='<div class="title">Próg PIT — wspólnie z etatem</div>'+
-   '<div class="grid"><div class="tile"><small>ETAT WPISANE</small><b>'+PLN(empAct)+'</b></div><div class="tile"><small>ETAT PROGNOZA</small><b>'+PLN(empFc)+'</b></div><div class="tile"><small>FIRMA WPISANE</small><b>'+PLN(Math.max(0,bizAct))+'</b></div><div class="tile"><small>FIRMA PROGNOZA</small><b>'+PLN(bizFc)+'</b></div><div class="tile"><small>RAZEM Z PROGNOZĄ</small><b>'+PLN(final)+'</b></div><div class="tile"><small>'+(remain>=0?'DO PROGU':'PONAD PRÓG')+'</small><b class="'+(remain<0?'red':'')+'">'+PLN(Math.abs(remain))+'</b></div></div>';
+  box.classList.add('businessTaxOverview44');
+  box.innerHTML='<div class="title">Próg PIT — etat i firma</div><p class="muted">Podstawa opodatkowania, osobno dane wpisane i dodatkowa prognoza.</p><div class="businessOverview44"><section><h3>Etat — podstawa PIT</h3><div class="businessOverviewRows44"><div><span>Wpisane</span><b>'+PLN(empAct)+'</b></div><div><span>Dodatkowa prognoza</span><b>'+PLN(empFc)+'</b></div><div><span>Etat łącznie z prognozą</span><b>'+PLN(empAct+empFc)+'</b></div></div></section><section><h3>Firma — dochód do PIT</h3><div class="businessOverviewRows44"><div><span>Wpisane</span><b>'+PLN(Math.max(0,bizAct))+'</b></div><div><span>Dodatkowa prognoza</span><b>'+PLN(bizFc)+'</b></div><div><span>Firma łącznie z prognozą</span><b>'+PLN(Math.max(0,bizAct+bizFc))+'</b></div></div></section></div><div class="businessTaxTotal44"><div><span>Razem — tylko wpisane</span><b>'+PLN(empAct+Math.max(0,bizAct))+'</b></div><div class="businessTaxForecast44"><span>Razem — z prognozą roczną</span><b>'+PLN(final)+'</b></div><div><span>'+(remain>=0?'Pozostaje do progu':'Powyżej progu')+'</span><b>'+PLN(Math.abs(remain))+'</b></div></div>';
+
  }
 }
 function renderCompanySummary44(){
