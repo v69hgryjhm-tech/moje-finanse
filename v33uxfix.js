@@ -1,6 +1,6 @@
 /* Moje Finanse 3.4 — stabilne moduły i końcowy start aplikacji */
 (function(){
-const VERSION='4.10.9';
+const VERSION='4.10.10';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
 const FULL=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
