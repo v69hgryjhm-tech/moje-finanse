@@ -1,7 +1,7 @@
 /* Moje Finanse 4.7 — czytelność, edycja kredytów i dopracowanie wykresów */
 (function(){
 'use strict';
-const VERSION='4.10.6';
+const VERSION='4.10.7';
 const NS='http://www.w3.org/2000/svg';
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
@@ -53,27 +53,37 @@ function monthlyPayments47(){
  return months;
 }
 function renderMonthlyPayments47(chart,svg,series,xs){
- if(!chart||!series||!xs.length)return;
+ if(!chart)return;
  chart.querySelector('.overviewPayments47')?.remove();
- const months=monthlyPayments47(),rows=series.rows.slice(0,xs.length).map(r=>({...r,...(months.get(monthKey47(r.d))||{regular:0,extra:0,actual:0,forecast:0})}));
- const w=N((svg.getAttribute('viewBox')||'0 0 760 248').split(/\s+/)[2])||760,top=48,bottom=132,max=Math.max(1,...rows.map(r=>r.regular+r.extra)),step=niceStep(max),axis=Math.ceil(max/step)*step,y=v=>bottom-v/axis*(bottom-top);
+ const months=monthlyPayments47(),keys=[...months.keys()].sort();
+ if(!keys.length)return;
+ const parseKey=k=>{let [y,m]=k.split('-').map(Number);return new Date(y,m-1,1,12)};
+ const first=parseKey(keys[0]),last=parseKey(keys.at(-1)),count=Math.max(1,(last.getFullYear()-first.getFullYear())*12+last.getMonth()-first.getMonth()+1),rows=[];
+ for(let i=0;i<count;i++){
+  const d=new Date(first.getFullYear(),first.getMonth()+i,1,12),m=months.get(monthKey47(d))||{regular:0,extra:0,actual:0,forecast:0};
+  rows.push({d,...m,isForecast:N(m.forecast)>0&&N(m.actual)===0});
+ }
+ const sourceW=N((svg?.getAttribute('viewBox')||'0 0 760 248').split(/\s+/)[2])||760,w=Math.max(760,sourceW),left=54,right=28,top=48,bottom=132,plotW=w-left-right,stepX=count>1?plotW/(count-1):0,x=i=>count>1?left+i*stepX:left+plotW/2;
+ const max=Math.max(1,...rows.map(r=>N(r.regular)+N(r.extra))),step=niceStep(max),axis=Math.ceil(max/step)*step,y=v=>bottom-N(v)/axis*(bottom-top);
  const section=document.createElement('div');section.className='overviewPayments47';section.style.width=w+'px';
  const title=document.createElement('div');title.className='paymentsTitle47';title.textContent='Raty i nadpłaty miesiąc po miesiącu — zł / miesiąc';section.appendChild(title);
- const plot=svgEl('svg',{viewBox:'0 0 '+w+' 178',width:w,height:178,role:'img','aria-label':'Podpisane sumy rat i nadpłat w każdym miesiącu'});
- for(let v=0;v<=axis+.001;v+=step){plot.appendChild(svgEl('line',{x1:44,x2:w-20,y1:y(v),y2:y(v),stroke:'#e7edf4'}));plot.appendChild(svgEl('text',{x:38,y:y(v)+3,'text-anchor':'end',fill:'#7b8a9f','font-size':9},compact(v)))}
+ const plot=svgEl('svg',{viewBox:'0 0 '+w+' 178',width:w,height:178,role:'img','aria-label':'Raty i nadpłaty; każda data jest wyśrodkowana dokładnie pod odpowiadającym słupkiem'});
+ for(let v=0;v<=axis+.001;v+=step){plot.appendChild(svgEl('line',{x1:left-10,x2:w-right,y1:y(v),y2:y(v),stroke:'#e7edf4'}));plot.appendChild(svgEl('text',{x:left-16,y:y(v)+3,'text-anchor':'end',fill:'#7b8a9f','font-size':9},compact(v)))}
  rows.forEach((r,i)=>{
-  const x=xs[i],total=r.regular+r.extra,bw=18,yr=y(r.regular),yt=y(total),group=svgEl('g',{});
-  group.appendChild(svgEl('title',{},monthKey47(r.d)+': raty '+PLN(r.regular)+', nadpłaty '+PLN(r.extra)+', razem '+PLN(total)+(r.forecast?' — zawiera prognozę':'')));
-  if(r.regular>0)group.appendChild(svgEl('rect',{x:x-bw/2,y:yr,width:bw,height:bottom-yr,rx:3,fill:'#78a7e3',opacity:r.forecast?0.65:1}));
-  if(r.extra>0)group.appendChild(svgEl('rect',{x:x-bw/2,y:yt,width:bw,height:yr-yt,rx:3,fill:'#f2b554',opacity:r.forecast?0.65:1}));
-  if(total>0)group.appendChild(svgEl('text',{x:x-1,y:Math.max(18,yt-7),transform:'rotate(-45 '+(x-1)+' '+Math.max(18,yt-7)+')',fill:'#49617e','font-size':8.5},PLN(total)));
-  group.appendChild(svgEl('text',{x,y:154,'text-anchor':'middle',fill:'#79879b','font-size':8},String(r.d.getMonth()+1).padStart(2,'0')+'.'+String(r.d.getFullYear()).slice(-2)));
+  const xx=x(i),total=N(r.regular)+N(r.extra),bw=Math.max(12,Math.min(20,stepX*.52||18)),yr=y(r.regular),yt=y(total),group=svgEl('g',{});
+  group.appendChild(svgEl('title',{},monthKey47(r.d)+': raty '+PLN(r.regular)+', nadpłaty '+PLN(r.extra)+', razem '+PLN(total)+(r.isForecast?' — prognoza':'')));
+  if(N(r.regular)>0)group.appendChild(svgEl('rect',{x:xx-bw/2,y:yr,width:bw,height:bottom-yr,rx:3,fill:'#78a7e3',opacity:r.isForecast?0.58:1}));
+  if(N(r.extra)>0)group.appendChild(svgEl('rect',{x:xx-bw/2,y:yt,width:bw,height:yr-yt,rx:3,fill:'#f2b554',opacity:r.isForecast?0.58:1}));
+  if(total>0)group.appendChild(svgEl('text',{x:xx,y:Math.max(17,yt-7),transform:'rotate(-45 '+xx+' '+Math.max(17,yt-7)+')','text-anchor':'start',fill:'#49617e','font-size':8.2},PLN(total)));
+  group.appendChild(svgEl('line',{x1:xx,x2:xx,y1:bottom,y2:bottom+4,stroke:'#cbd4e0','stroke-width':1}));
+  group.appendChild(svgEl('text',{x:xx,y:154,'text-anchor':'middle',fill:'#65758c','font-size':8,'font-weight':'600'},String(r.d.getMonth()+1).padStart(2,'0')+'.'+String(r.d.getFullYear()).slice(-2)));
   plot.appendChild(group);
  });
  section.appendChild(plot);
- const legend=document.createElement('div');legend.className='paymentsLegend47';legend.innerHTML='<span><i></i>Raty</span><span><i class="extra47"></i>Nadpłaty</span><span>Jasne słupki — prognoza</span>';section.appendChild(legend);
+ const legend=document.createElement('div');legend.className='paymentsLegend47';legend.innerHTML='<span><i></i>Raty</span><span><i class="extra47"></i>Nadpłaty</span><span>Jasne słupki — prognoza</span><span>Data pod słupkiem = miesiąc płatności</span>';section.appendChild(legend);
  chart.appendChild(section);
 }
+
 function niceStep(max,target=4){max=Math.max(1,N(max));let raw=max/target,p=Math.pow(10,Math.floor(Math.log10(raw))),q=raw/p,m=q<=1?1:q<=2?2:q<=2.5?2.5:q<=5?5:10;return m*p}
 function addBalanceGrid(svg,max,opt={}){
  if(!svg)return;
