@@ -83,3 +83,16 @@
 
 /* Czytelne rozdzielenie obrotu firmy od pieniędzy do dyspozycji — 4.10.8 */
 .earningsTurnover26{margin-top:10px!important;padding-top:10px;border-top:1px dashed #d8e1ed}.earningsTurnover26 span{color:#8a97aa!important}.earningsTurnover26 b{color:#6c7d94!important}.earningsBasis26 b{color:#536985}.earningsTotals26 .earningsFactTotal26{background:#f8fbfa;border-color:#dfece6}.earningsTotals26 .earningsFullTotal26{background:#f5f7fc}
+
+/* Jedna tabela podsumowania zarobków — 4.10.9 */
+.earningsTableWrap26{margin-top:16px;overflow-x:auto;border:1px solid #dfe7f1;border-radius:14px;background:#fbfcfe}
+.earningsTable26{width:100%;border-collapse:collapse;min-width:640px;font-size:12px}
+.earningsTable26 th{padding:11px 14px;background:#f1f5fa;color:#6f8097;font-size:10px;text-transform:uppercase;letter-spacing:.04em;text-align:right;border-bottom:1px solid #dfe7f1}
+.earningsTable26 th:first-child{text-align:left}
+.earningsTable26 td{padding:12px 14px;border-bottom:1px solid #e8edf4;text-align:right;color:#526884;font-variant-numeric:tabular-nums}
+.earningsTable26 td:first-child{text-align:left;color:#687b95}
+.earningsTable26 tr:last-child td{border-bottom:0}
+.earningsTable26 .earningsMain26 td{background:#eef4fb;color:#27476f;font-size:13px}
+.earningsTable26 .earningsMain26 strong{font-size:18px;color:#1f426f}
+.earningsTable26 .earningsTurnoverRow26 td{background:#fafbfd;color:#7d8ba0}
+@media(max-width:560px){.earningsTable26{min-width:560px}.earningsTable26 th,.earningsTable26 td{padding:10px 11px}}
