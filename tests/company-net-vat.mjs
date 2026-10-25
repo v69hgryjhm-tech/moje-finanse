@@ -29,7 +29,7 @@ for(const [lines,expected] of [
  const chart=nodes.get('earningsChart').innerHTML;
  assert.ok(chart.includes('earningsScroll26'));
  assert.ok(chart.includes('viewBox="0 0 840 310"'));
- assert.ok(chart.includes('firma netto bez VAT '+fmt(expected)));
+ assert.ok(chart.includes('sprzedaż firmy netto bez VAT '+fmt(expected)));
  assert.ok(chart.includes('Etat netto vs sprzedaż firmy netto bez VAT'));
  assert.ok(!chart.includes('font-size="7'));
  assert.ok(!chart.includes('>prog.</text>'));
