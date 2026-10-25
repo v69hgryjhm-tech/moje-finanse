@@ -58,26 +58,23 @@ function compact26(v){v=n(v);if(v>=1000)return (v/1000).toLocaleString('pl-PL',{
 function renderEarnings26(d){
  let h=document.getElementById('earningsChart');if(!h)return;
  let rows=d.p.rows.map((r,i)=>{let cm=d.companyMonths?.[i]||{};return{salary:Math.max(0,n(r.total)),company:Math.max(0,n(cm.revenue)),sa:!!r.actual,ca:!!cm.actual,cf:!!cm.forecast}});
- let totals=rows.map(r=>r.salary+r.company),actualRows=rows.filter(r=>r.sa||r.ca);
- let avgActual=actualRows.length?actualRows.reduce((a,r)=>a+(r.sa?r.salary:0)+(r.ca?r.company:0),0)/actualRows.length:0;
- let max=Math.max(1,...totals,avgActual),step=nice26(max),axis=Math.ceil(max/step)*step;
- let W=840,H=310,left=64,right=20,top=34,bottom=252,slot=(W-left-right)/12,barW=34,y=v=>bottom-(v/axis)*(bottom-top),svg='';
+ let max=Math.max(1,...rows.map(r=>Math.max(r.salary,r.company))),step=nice26(max),axis=Math.ceil(max/step)*step;
+ let W=840,H=310,left=64,right=20,top=34,bottom=252,slot=(W-left-right)/12,barW=20,gap=5,y=v=>bottom-(v/axis)*(bottom-top),svg='';
  rows.forEach((r,i)=>{if((!r.sa&&r.salary>0)||r.cf)svg+='<rect x="'+(left+slot*i+3)+'" y="12" width="'+(slot-6)+'" height="272" rx="10" fill="#f4f6fa"/>'});
  for(let v=0;v<=axis+.001;v+=step){let yy=y(v);svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(W-right)+'" y2="'+yy+'" stroke="'+(v?'#e7edf3':'#cbd5e1')+'" stroke-width="1" '+(v?'stroke-dasharray="3 5"':'')+'/><text x="'+(left-12)+'" y="'+(yy+4)+'" text-anchor="end" fill="#718096" font-size="11">'+compact26(v)+'</text>'}
- if(avgActual>0){let ay=y(avgActual);svg+='<line x1="'+left+'" y1="'+ay+'" x2="'+(W-right)+'" y2="'+ay+'" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5 5"/>'}
  rows.forEach((r,i)=>{
-  let x=left+slot*i+slot/2,hs=r.salary/axis*(bottom-top),hc=r.company/axis*(bottom-top),ys=bottom-hs,yc=ys-hc,total=totals[i];
+  let x=left+slot*i+slot/2,hs=r.salary/axis*(bottom-top),hc=r.company/axis*(bottom-top),ys=bottom-hs,yc=bottom-hc,xs=x-barW-gap/2,xc=x+gap/2;
   let desc=M[i]+': etat netto '+fmt(r.salary)+(r.sa?' — wpisane':' — prognoza')+', sprzedaż firmy netto bez VAT '+fmt(r.company)+(r.ca?' — wpisane':r.cf?' — prognoza':'')+'.';
   svg+='<g tabindex="0" role="img" aria-label="'+desc+'"><title>'+desc+'</title>';
-  if(hs>0)svg+='<rect x="'+(x-barW/2)+'" y="'+ys+'" width="'+barW+'" height="'+hs+'" rx="5" fill="'+(r.sa?'#2eaa71':'#d5eadf')+'" '+(r.sa?'':'stroke="#74aa8c" stroke-dasharray="4 3"')+'/>';
-  if(hc>0)svg+='<rect x="'+(x-barW/2)+'" y="'+yc+'" width="'+barW+'" height="'+hc+'" rx="5" fill="'+(r.ca?'#8860c9':'#e0d5ef')+'" '+(r.ca?'':'stroke="#aa90cd" stroke-dasharray="4 3"')+'/>';
-  if(r.salary>0)svg+='<text x="'+(x-9)+'" y="'+Math.max(23,ys-8)+'" text-anchor="end" fill="#267d57" font-size="10" font-weight="600" stroke="#fff" stroke-width="3" paint-order="stroke">'+compact26(r.salary)+'</text>';if(r.company>0)svg+='<text x="'+(x+9)+'" y="'+Math.max(23,yc-8)+'" text-anchor="start" fill="#7550a8" font-size="10" font-weight="600" stroke="#fff" stroke-width="3" paint-order="stroke">'+compact26(r.company)+'</text>';
+  if(hs>0)svg+='<rect x="'+xs+'" y="'+ys+'" width="'+barW+'" height="'+hs+'" rx="5" fill="'+(r.sa?'#2eaa71':'#d5eadf')+'" '+(r.sa?'':'stroke="#74aa8c" stroke-dasharray="4 3"')+'/>';
+  if(hc>0)svg+='<rect x="'+xc+'" y="'+yc+'" width="'+barW+'" height="'+hc+'" rx="5" fill="'+(r.ca?'#8860c9':'#e0d5ef')+'" '+(r.ca?'':'stroke="#aa90cd" stroke-dasharray="4 3"')+'/>';
+  if(r.salary>0)svg+='<text x="'+(xs+barW/2)+'" y="'+Math.max(23,ys-8)+'" text-anchor="middle" fill="#267d57" font-size="9.5" font-weight="600" stroke="#fff" stroke-width="3" paint-order="stroke">'+compact26(r.salary)+'</text>';if(r.company>0)svg+='<text x="'+(xc+barW/2)+'" y="'+Math.max(23,yc-8)+'" text-anchor="middle" fill="#7550a8" font-size="9.5" font-weight="600" stroke="#fff" stroke-width="3" paint-order="stroke">'+compact26(r.company)+'</text>';
   svg+='<text x="'+x+'" y="276" text-anchor="middle" fill="#54657a" font-size="12" font-weight="500">'+M[i]+'</text></g>';
  });
  h.style.display='block';h.style.height='auto';
  const actualCash=d.sAct+d.cpAct,forecastCash=d.sAct+d.sFc+d.cpAct+d.cpFc;
  const summary='<div class="earningsTotals26"><section class="earningsFactTotal26"><small>DO DYSPOZYCJI — TYLKO WPISANE</small><strong>'+fmt(actualCash)+'</strong><div><span>Etat netto na konto</span><b>'+fmt(d.sAct)+'</b></div><div><span>Firma — realnie zostaje</span><b>'+fmt(d.cpAct)+'</b></div><div class="earningsTurnover26"><span>Sprzedaż firmy netto bez VAT</span><b>'+fmt(d.crAct)+'</b></div></section><section class="earningsFullTotal26"><small>DO DYSPOZYCJI — Z PROGNOZĄ ROCZNĄ</small><strong>'+fmt(forecastCash)+'</strong><div><span>Etat netto z prognozą</span><b>'+fmt(d.sAct+d.sFc)+'</b></div><div><span>Firma — realnie zostaje z prognozą</span><b>'+fmt(d.cpAct+d.cpFc)+'</b></div><div class="earningsAddedForecast26"><span>Dodatkowa prognoza do dyspozycji</span><b>'+fmt(d.sFc+d.cpFc)+'</b></div><div class="earningsTurnover26"><span>Sprzedaż firmy netto bez VAT z prognozą</span><b>'+fmt(d.crAct+d.crFc)+'</b></div></section></div><p class="earningsBasis26"><b>Ważne:</b> wykres porównuje etat netto z obrotem firmy netto bez VAT. Karty „do dyspozycji” nie dodają obrotu firmy do pensji — używają tego, co realnie zostaje z firmy po kosztach, VAT, ZUS, zdrowotnej i PIT.</p>';
- h.innerHTML=summary+'<div class="earningsMeta26"><span>Wpisane kwoty i prognoza</span><span class="earningsAverage26">Średnia wpisanych <strong>'+fmt(avgActual)+'</strong></span></div><div class="earningsScroll26" tabindex="0" role="region" aria-label="Wykres miesięczny. Na małym ekranie przewiń w poziomie."><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Etat netto i sprzedaż firmy netto bez VAT, miesiąc po miesiącu">'+svg+'</svg></div>';
+ h.innerHTML=summary+'<div class="earningsMeta26"><span>Porównanie miesięczne — wartości nie są sumowane na wykresie</span><span class="earningsAverage26">Etat netto vs sprzedaż firmy netto bez VAT</span></div><div class="earningsScroll26" tabindex="0" role="region" aria-label="Wykres miesięczny. Na małym ekranie przewiń w poziomie."><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Etat netto i sprzedaż firmy netto bez VAT, miesiąc po miesiącu">'+svg+'</svg></div>';
  let lg=h.parentElement.querySelector('.legend');if(lg){lg.classList.add('earningsLegend26');lg.innerHTML='<span><i class="earningsDot26 salary26"></i>Etat netto</span><span><i class="earningsDot26 company26"></i>Firma netto bez VAT</span><span><i class="earningsForecast26"></i>Prognoza — jasne słupki</span>'}
 }
 const oldRender=window.render;if(typeof oldRender==='function'){window.render=function(){oldRender();apply()}}
