@@ -63,6 +63,6 @@ assert.ok(!totalHtml.includes('Firma — realnie zostaje'));
 const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/FIRMA — SPRZEDAŻ NETTO BEZ VAT/);
 for(const file of ['index.html','v43boot.js','fresh-260.html'])assert.match(fs.readFileSync(file,'utf8'),/5\.4\.0/);
-assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='5300'));
+assert.ok([...html.matchAll(/[?]v=(\d+)/g)].every(m=>m[1]==='5400'));
 assert.match(fs.readFileSync('manifest.json','utf8'),/v=5400/);
 console.log('PASS — karta i prognoza netto bez VAT, mieszane stawki, zero, brutto, wynik po kosztach oraz wersja/cache.');
