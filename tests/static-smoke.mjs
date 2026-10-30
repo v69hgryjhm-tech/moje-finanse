@@ -19,7 +19,7 @@ for(const file of scripts){
 }
 try{ JSON.parse(read('manifest.json')); }catch(e){ failures.push('manifest.json: '+e.message); }
 
-const requiredIds=['home','salary','loans','businessplus','tax','settings','earningsChart','homeTaxSvg','taxSvg','loanList','businessPlusBody'];
+const requiredIds=['home','salary','loans','businessplus','control','tax','settings','earningsChart','homeTaxSvg','taxSvg','loanList','businessPlusBody','controlBody51'];
 for(const id of requiredIds){
   if(!html.includes('id="'+id+'"')) failures.push('Brak kontenera #'+id);
 }
@@ -32,7 +32,9 @@ const forbidden=['v35business.js','v36axis.js','v40app.js','v40planning.js','v40
 for(const file of forbidden) if(scripts.includes(file)) failures.push('Legacy nadal ładowany: '+file);
 
 if(!html.includes('data-v="businessplus"')) failures.push('Brak Firma+ w dolnej nawigacji');
-if(!html.includes('v47ux.js')) failures.push('Brak końcowej warstwy UX 4.7');
+if(!html.includes('v47ux.js')) failures.push('Brak końcowej warstwy UX');
+if(!html.includes('v51control.js')) failures.push('Brak Centrum finansowego 5.0');
+if(!html.includes("show('control')")) failures.push('Brak wejścia do Centrum finansowego');
 if(!read('v14a.js').includes('moje-finanse-v14')) failures.push('Zmieniono główny klucz danych localStorage');
 
 console.log('Aktywne JS:',scripts.length);
