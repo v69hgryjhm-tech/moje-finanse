@@ -64,7 +64,7 @@ function goalNeed(){
  });
  return best
 }
-function actionId(type,extra=''){return type+':'+extra}
+function actionId(type,extra=''){return type+':'+String(extra||'').replace(/[^a-zA-Z0-9_-]/g,'_')}
 function actionPlan(k){
  let a=control(),p=planner(),c=command();if(!a||!p)return[];
  let plan=p.monthPlan(k),score=c?.financialScore?.(k),items=[],today=new Date(),up=a.upcoming(k)||[];
