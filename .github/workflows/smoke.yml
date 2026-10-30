@@ -51,3 +51,6 @@ jobs:
 
       - name: Operations layer 5.3
         run: node tests/ops-54.mjs
+
+      - name: Strategy lab 5.4
+        run: node tests/lab-55.mjs
