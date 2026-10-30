@@ -13,11 +13,11 @@ function ensure55(){
  if(typeof S==='undefined')return false;
  S.finance||={};S.finance.lab55||={};let o=S.finance.lab55;
  if(!Array.isArray(o.scenarios))o.scenarios=[];
- if(!o.scenarios.length)o.scenarios=[
+ if(!o.scenariosInitialized){if(!o.scenarios.length)o.scenarios=[
   {name:'Bezpieczny',salaryDelta:0,companyPct:0,costDelta:-200,extraDebt:300,investMonthly:200,oneOff:0},
   {name:'Dług najpierw',salaryDelta:0,companyPct:0,costDelta:-300,extraDebt:700,investMonthly:0,oneOff:0},
   {name:'Rozwój',salaryDelta:0,companyPct:20,costDelta:200,extraDebt:300,investMonthly:300,oneOff:1000}
- ];
+ ];o.scenariosInitialized=true;}
  o.dividendTargetMonthly=N(o.dividendTargetMonthly);
  o.defaultReturnPct=N(o.defaultReturnPct)||5;
  o.reviewYear=N(o.reviewYear)||S.selectedYear||new Date().getFullYear();
@@ -46,13 +46,13 @@ function loanPlan55(l,extra=0){
 function scenarioResult55(s,y){
  let base=command()?.annualForecast?.(y);if(!base)return null;
  let incomeAdj=N(s.salaryDelta)*12+N(base.company)*N(s.companyPct)/100;
- let costAdj=N(s.costDelta)*12;
- let freeBefore=N(base.free)+incomeAdj-costAdj;
+ let costAdj=N(s.costDelta)*12,income=N(base.income)+incomeAdj,required=Math.max(0,N(base.required)+costAdj);
+ let freeBefore=income-required;
  let allocations=N(s.extraDebt)*12+N(s.investMonthly)*12+N(s.oneOff);
  let after=freeBefore-allocations;
  let loan=loanTarget55(),debt={monthsSaved:0,interestSaved:0};
  if(loan&&N(s.extraDebt)>0){let b=loanPlan55(loan,0),x=loanPlan55(loan,N(s.extraDebt));if(b&&x)debt={monthsSaved:Math.max(0,b.months-x.months),interestSaved:Math.max(0,b.interest-x.interest)}}
- return{scenario:s,base,income:N(base.income)+incomeAdj,required:N(base.required)+costAdj,freeBefore,after,allocations,debt,investAnnual:N(s.investMonthly)*12}
+ return{scenario:s,base,income,required,freeBefore,after,allocations,debt,investAnnual:N(s.investMonthly)*12}
 }
 function scenarioModal55(i=null){
  ensure55();let s=i==null?{}:S.finance.lab55.scenarios[i]||{},v=k=>s[k]??0;
@@ -87,7 +87,7 @@ window.saveInvestment55=function(assetIndex){
 };
 window.removeInvestment55=function(i){if(confirm('Usunąć pozycję inwestycyjną z majątku?')){S.finance.assets.splice(i,1);save55();renderInvestments55();window.renderWealth42?.();renderWealth55()}};
 function investmentFuture55(a,years){
- let v=N(a.value),monthly=N(a.monthly55),annual=N(a.growthPct55)+(a.reinvest55!==false?N(a.dividendYield55):0),r=annual/100/12;
+ let v=N(a.value),monthly=N(a.monthly55),growth=a.growthPct55==null?N(S.finance.lab55.defaultReturnPct):N(a.growthPct55),annual=growth+(a.reinvest55!==false?N(a.dividendYield55):0),r=annual/100/12;
  for(let i=0;i<years*12;i++)v=v*(1+r)+monthly;
  return v
 }
