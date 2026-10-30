@@ -39,3 +39,6 @@ jobs:
 
       - name: Gross earnings chart
         run: node tests/home-gross-chart.mjs
+
+      - name: Control center 5.0
+        run: node tests/control-center.mjs
