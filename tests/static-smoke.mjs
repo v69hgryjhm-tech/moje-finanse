@@ -34,7 +34,9 @@ for(const file of forbidden) if(scripts.includes(file)) failures.push('Legacy na
 if(!html.includes('data-v="businessplus"')) failures.push('Brak Firma+ w dolnej nawigacji');
 if(!html.includes('v47ux.js')) failures.push('Brak końcowej warstwy UX');
 if(!html.includes('v51control.js')) failures.push('Brak Centrum finansowego 5.0');
+if(!html.includes('v52planner.js')) failures.push('Brak planera finansowego 5.1');
 if(!html.includes("show('control')")) failures.push('Brak wejścia do Centrum finansowego');
+if(!html.includes('Moje Finanse 5.1.0')) failures.push('Nieprawidłowa wersja aplikacji');
 if(!read('v14a.js').includes('moje-finanse-v14')) failures.push('Zmieniono główny klucz danych localStorage');
 
 console.log('Aktywne JS:',scripts.length);
