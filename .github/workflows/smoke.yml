@@ -48,3 +48,6 @@ jobs:
 
       - name: Command center 5.2
         run: node tests/command-53.mjs
+
+      - name: Operations layer 5.3
+        run: node tests/ops-54.mjs
