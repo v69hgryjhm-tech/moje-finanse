@@ -19,7 +19,7 @@ for(const file of scripts){
 }
 try{ JSON.parse(read('manifest.json')); }catch(e){ failures.push('manifest.json: '+e.message); }
 
-const requiredIds=['home','salary','loans','businessplus','control','tax','settings','earningsChart','homeTaxSvg','taxSvg','loanList','businessPlusBody','controlBody51'];
+const requiredIds=['home','salary','loans','businessplus','control','lab','investments','review','tax','settings','earningsChart','homeTaxSvg','taxSvg','loanList','businessPlusBody','controlBody51','labBody55','investmentsBody55','reviewBody55'];
 for(const id of requiredIds){
   if(!html.includes('id="'+id+'"')) failures.push('Brak kontenera #'+id);
 }
@@ -37,8 +37,9 @@ if(!html.includes('v51control.js')) failures.push('Brak Centrum finansowego 5.0'
 if(!html.includes('v52planner.js')) failures.push('Brak planera finansowego 5.1');
 if(!html.includes('v53command.js')) failures.push('Brak Centrum dowodzenia 5.2');
 if(!html.includes('v54ops.js')) failures.push('Brak warstwy operacyjnej 5.3');
+if(!html.includes('v55lab.js')) failures.push('Brak Laboratorium i strategii 5.4');
 if(!html.includes("show('control')")) failures.push('Brak wejścia do Centrum dowodzenia');
-if(!html.includes('Moje Finanse 5.3.0')) failures.push('Nieprawidłowa wersja aplikacji');
+if(!html.includes('Moje Finanse 5.4.0')) failures.push('Nieprawidłowa wersja aplikacji');
 if(!read('v14a.js').includes('moje-finanse-v14')) failures.push('Zmieniono główny klucz danych localStorage');
 
 console.log('Aktywne JS:',scripts.length);
