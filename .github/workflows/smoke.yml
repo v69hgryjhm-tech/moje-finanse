@@ -45,3 +45,6 @@ jobs:
 
       - name: Planner 90 days and decision layer 5.1
         run: node tests/planner-52.mjs
+
+      - name: Command center 5.2
+        run: node tests/command-53.mjs
