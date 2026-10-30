@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.0.0**.
+Aktualna gałąź produkcyjna: **5.1.0**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -20,14 +20,15 @@ Aktualna gałąź produkcyjna: **5.0.0**.
 9. `v47ux.js` — końcowy UX, edycja kredytów i czytelność wykresów.
 10. `v50accounting.js` — rejestr i eksport danych dla księgowej.
 11. `v51control.js` — Centrum finansowe 5.0: rezerwy podatkowe, zamknięcie miesiąca, minimalny dochód, scenariusz kryzysowy, podział nadwyżki, historia majątku, tempo celów, trendy firmy i refinansowanie kredytów.
-12. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
+12. `v52planner.js` — warstwa planowania 5.1: plan 90 dni, alerty i decyzje, kondycja miesiąca, audyt stałych kosztów oraz szybkie symulacje nadpłat.
+13. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
 
 ## Dane
 Główny klucz localStorage pozostaje bez zmian: `moje-finanse-v14`.
 
 Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje nowe dane wyłącznie wewnątrz `S.finance.control51`, więc starsze dane pozostają kompatybilne.
 
-## Założenia 5.0
+## Założenia 5.1
 - aplikacja nie wymaga podawania stanu konta ani gotówki,
 - moduł „Dzisiaj” korzysta z terminów, dochodów, rat, podatków i kosztów już zapisanych w aplikacji,
 - historia majątku jest zapisywana ręcznie albo przy zamknięciu miesiąca,
