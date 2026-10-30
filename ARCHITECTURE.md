@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.3.0**.
+Aktualna gałąź produkcyjna: **5.4.0**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -23,14 +23,15 @@ Aktualna gałąź produkcyjna: **5.3.0**.
 12. `v52planner.js` — warstwa planowania 5.1: plan 90 dni, alerty i decyzje, kondycja miesiąca, audyt stałych kosztów oraz szybkie symulacje nadpłat.
 13. `v53command.js` — Centrum dowodzenia 5.2: kondycja 0–100, forecast roku, radar 12 miesięcy, centralne alerty, jakość danych i próg rentowności firmy.
 14. `v54ops.js` — warstwa operacyjna 5.3: automatyczny plan działania, odhaczanie kroków, rezerwy roczne, audyt kosztów stałych, raport miesiąca i dziennik decyzji.
-15. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
+15. `v55lab.js` — strategia 5.4: Laboratorium decyzji, inwestycje i dywidendy, review kwartalny/roczny, prognoza majątku 5/10/20 lat oraz ranking portfela produktów MOHE.
+16. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
 
 ## Dane
 Główny klucz localStorage pozostaje bez zmian: `moje-finanse-v14`.
 
 Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje nowe dane wyłącznie wewnątrz `S.finance.control51`, więc starsze dane pozostają kompatybilne.
 
-## Założenia 5.3
+## Założenia 5.4
 - aplikacja nie wymaga podawania stanu konta ani gotówki,
 - moduł „Dzisiaj” korzysta z terminów, dochodów, rat, podatków i kosztów już zapisanych w aplikacji,
 - historia majątku jest zapisywana ręcznie albo przy zamknięciu miesiąca,
@@ -47,3 +48,8 @@ Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje
 - każda nowa funkcja ma korzystać z istniejącego modelu danych albo mieć migrację,
 - po zmianach uruchamiamy wszystkie testy GitHub Actions i sprawdzamy Pages,
 - nie zmieniamy znaczenia istniejących danych bez testu regresyjnego.
+
+- scenariusze 5.4 są wyłącznie symulacjami i nie zmieniają danych źródłowych,
+- pozycje tworzone w Centrum inwestycji są zapisywane jako aktywa typu „Inwestycje”, dzięki czemu są widoczne także w Majątku,
+- prognoza majątku zakłada stałą wartość pozostałych aktywów, harmonogramy obecnych kredytów oraz parametry inwestycji i PPK,
+- ranking MOHE nie udaje danych sprzedażowych: wolumen i czas pracy muszą być uzupełnione, aby wejść do oceny portfela.
