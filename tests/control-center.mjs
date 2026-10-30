@@ -24,10 +24,10 @@ for(const token of [
 assert.match(html,/id="control"/);
 assert.match(html,/id="controlBody51"/);
 assert.match(html,/show\('control'\)/);
-assert.match(html,/v51control\.js\?v=5000/);
-assert.match(html,/Moje Finanse 5\.0\.0/);
+assert.match(html,/v51control\.js\?v=5100/);
+assert.match(html,/Moje Finanse 5\.1\.0/);
 assert.ok(!src.includes('accountBalance'),'Centrum nie powinno wymagać stanu konta');
 assert.ok(!src.includes('cashBalance'),'Centrum nie powinno wymagać stanu gotówki');
 assert.match(fs.readFileSync('v14a.js','utf8'),/moje-finanse-v14/);
 
-console.log('PASS — Centrum finansowe 5.0: podatki, zamknięcie miesiąca, majątek, cele, firma, kredyty i scenariusze bez stanu konta/gotówki.');
+console.log('PASS — Centrum finansowe 5.1: podatki, zamknięcie miesiąca, majątek, cele, firma, kredyty i scenariusze bez stanu konta/gotówki.');
