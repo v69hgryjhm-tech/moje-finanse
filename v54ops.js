@@ -38,13 +38,14 @@ function annualReserve(){
  return{rows,yearTotal,monthly}
 }
 function monthsUntilDue(x,fromK){
- let {y,m}=parseKey(fromK),ty=N(x.month)||1,yy=N(x.year)||y;
+ let {y,m}=parseKey(fromK),ty=CL(N(x.month)||1,1,12),yy=N(x.year)||y;
+ if(x.repeat!==false&&((yy<y)||(yy===y&&ty-1<m)))yy=y+1;
  let d=(yy-y)*12+(ty-1-m);return Math.max(1,d+1)
 }
 function dueReserveNow(k){
- let rows=annualCosts().map(x=>{
-  let months=monthsUntilDue(x,k),needed=N(x.amount)/months;
-  return{...x,months,needed}
+ let source=S.finance.ops54.annualCosts||[],rows=source.map((x,idx)=>({x,idx})).filter(q=>q.x.active!==false).map(q=>{
+  let months=monthsUntilDue(q.x,k),needed=N(q.x.amount)/months;
+  return{...q.x,idx:q.idx,months,needed}
  });
  return{rows,total:rows.reduce((a,x)=>a+x.needed,0)}
 }
@@ -105,17 +106,17 @@ function renderActions54(){
 }
 function annualCostModal54(i=null){
  let x=i==null?{}:S.finance.ops54.annualCosts[i]||{},now=new Date();
- open('<h2>'+(i==null?'Nowy koszt roczny':'Edytuj koszt roczny')+'</h2><div class="form"><label>Nazwa<input id="ac54n" value="'+esc(x.name||'')+'"></label><label>Kwota roczna / jednorazowa<input id="ac54a" type="number" step="0.01" value="'+N(x.amount)+'"></label><label>Miesiąc płatności<select id="ac54m">'+Array.from({length:12},(_,m)=>'<option value="'+(m+1)+'" '+(N(x.month||now.getMonth()+1)===m+1?'selected':'')+'>'+FULL[m]+'</option>').join('')+'</select></label><label>Rok<input id="ac54y" type="number" value="'+N(x.year||now.getFullYear())+'"></label><label>Kategoria<input id="ac54c" value="'+esc(x.category||'Inne')+'"></label></div><div class="actions"><button class="btn" onclick="closeModal()">Anuluj</button><button class="btn primary" onclick="saveAnnualCost54('+(i==null?'null':i)+')">Zapisz</button></div>')
+ open('<h2>'+(i==null?'Nowy koszt roczny':'Edytuj koszt roczny')+'</h2><div class="form"><label>Nazwa<input id="ac54n" value="'+esc(x.name||'')+'"></label><label>Kwota roczna / jednorazowa<input id="ac54a" type="number" step="0.01" value="'+N(x.amount)+'"></label><label>Miesiąc płatności<select id="ac54m">'+Array.from({length:12},(_,m)=>'<option value="'+(m+1)+'" '+(N(x.month||now.getMonth()+1)===m+1?'selected':'')+'>'+FULL[m]+'</option>').join('')+'</select></label><label>Rok<input id="ac54y" type="number" value="'+N(x.year||now.getFullYear())+'"></label><label>Kategoria<input id="ac54c" value="'+esc(x.category||'Inne')+'"></label><label>Powtarzaj<select id="ac54r"><option value="yes" '+(x.repeat!==false?'selected':'')+'>Co roku</option><option value="no" '+(x.repeat===false?'selected':'')+'>Tylko raz</option></select></label></div><div class="actions"><button class="btn" onclick="closeModal()">Anuluj</button><button class="btn primary" onclick="saveAnnualCost54('+(i==null?'null':i)+')">Zapisz</button></div>')
 }
 window.annualCostModal54=annualCostModal54;
 window.saveAnnualCost54=function(i){
- ensure54();let x={name:G('ac54n')?.value?.trim()||'Koszt roczny',amount:Math.max(0,N(G('ac54a')?.value)),month:CL(Math.round(N(G('ac54m')?.value)||1),1,12),year:Math.max(2000,Math.round(N(G('ac54y')?.value)||new Date().getFullYear())),category:G('ac54c')?.value?.trim()||'Inne',active:true};
+ ensure54();let x={name:G('ac54n')?.value?.trim()||'Koszt roczny',amount:Math.max(0,N(G('ac54a')?.value)),month:CL(Math.round(N(G('ac54m')?.value)||1),1,12),year:Math.max(2000,Math.round(N(G('ac54y')?.value)||new Date().getFullYear())),category:G('ac54c')?.value?.trim()||'Inne',repeat:G('ac54r')?.value!=='no',active:true};
  if(i==null)S.finance.ops54.annualCosts.push(x);else S.finance.ops54.annualCosts[i]=x;save54();closeModal();renderBudget54();renderControl54();renderActions54()
 };
 window.removeAnnualCost54=function(i){if(confirm('Usunąć koszt roczny?')){S.finance.ops54.annualCosts.splice(i,1);save54();renderBudget54();renderControl54();renderActions54()}};
 function annualCostHtml54(k){
  let ar=annualReserve(),due=dueReserveNow(k);
- return '<section class="card"><div class="title">Rezerwy na koszty roczne <button class="btn primary" onclick="annualCostModal54()">＋ Dodaj</button></div><div class="opsKpis54"><div><small>ROCZNE KOSZTY</small><b>'+PLN(ar.yearTotal)+'</b></div><div><small>ŚREDNIA REZERWA / MIES.</small><b>'+PLN(ar.monthly)+'</b></div><div><small>REZERWA WG TERMINÓW</small><b>'+PLN(due.total)+'</b></div><div><small>POZYCJE</small><b>'+ar.rows.length+'</b></div></div>'+(due.rows.length?'<div class="annualList54">'+due.rows.map((x,i)=>'<div class="row"><div><b>'+esc(x.name)+'</b><small>'+FULL[N(x.month)-1]+' '+x.year+' • '+esc(x.category)+' • '+x.months+' mies. do terminu</small></div><div><b>'+PLN(x.amount)+'</b><small>odkładaj ~ '+PLN(x.needed)+'/m</small></div><button class="btn" onclick="annualCostModal54('+S.finance.ops54.annualCosts.indexOf(x)+')">Edytuj</button><button class="btn danger" onclick="removeAnnualCost54('+S.finance.ops54.annualCosts.indexOf(x)+')">Usuń</button></div>').join('')+'</div>':'<p class="muted">Dodaj np. OC, ubezpieczenie domu, podatek, serwis auta, opał, przegląd albo większy zakup cykliczny.</p>')+'</section>'
+ return '<section class="card"><div class="title">Rezerwy na koszty roczne <button class="btn primary" onclick="annualCostModal54()">＋ Dodaj</button></div><div class="opsKpis54"><div><small>ROCZNE KOSZTY</small><b>'+PLN(ar.yearTotal)+'</b></div><div><small>ŚREDNIA REZERWA / MIES.</small><b>'+PLN(ar.monthly)+'</b></div><div><small>REZERWA WG TERMINÓW</small><b>'+PLN(due.total)+'</b></div><div><small>POZYCJE</small><b>'+ar.rows.length+'</b></div></div>'+(due.rows.length?'<div class="annualList54">'+due.rows.map((x,i)=>'<div class="row"><div><b>'+esc(x.name)+'</b><small>'+FULL[N(x.month)-1]+' '+(x.repeat!==false?'• co roku':x.year)+' • '+esc(x.category)+' • '+x.months+' mies. do terminu</small></div><div><b>'+PLN(x.amount)+'</b><small>odkładaj ~ '+PLN(x.needed)+'/m</small></div><button class="btn" onclick="annualCostModal54('+x.idx+')">Edytuj</button><button class="btn danger" onclick="removeAnnualCost54('+x.idx+')">Usuń</button></div>').join('')+'</div>':'<p class="muted">Dodaj np. OC, ubezpieczenie domu, podatek, serwis auta, opał, przegląd albo większy zakup cykliczny.</p>')+'</section>'
 }
 function recurringAuditHtml54(k){
  let a=annualSummary(k),inc=N(control()?.monthIncome?.(k)?.total),share=inc>0?a.monthly/inc*100:0;
@@ -162,7 +163,7 @@ function renderHome54(){
  let cmd=G('commandHome53');if(cmd)cmd.insertAdjacentElement('afterend',box);else h.prepend(box)
 }
 function renderCalendar54(){
- let h=G('calendarBody');if(!h||!ensure54())return;G('annualCalendar54')?.remove();let k=S.finance.analysisMonth||nowKey(),{y,m}=parseKey(k),rows=annualCosts().filter(x=>N(x.year)===y&&N(x.month)===m+1),box=document.createElement('div');box.id='annualCalendar54';box.className='card';
+ let h=G('calendarBody');if(!h||!ensure54())return;G('annualCalendar54')?.remove();let k=S.finance.analysisMonth||nowKey(),{y,m}=parseKey(k),rows=annualCosts().filter(x=>N(x.month)===m+1&&(x.repeat!==false||N(x.year)===y)),box=document.createElement('div');box.id='annualCalendar54';box.className='card';
  box.innerHTML='<div class="title">Koszty roczne w tym miesiącu</div>'+(rows.length?rows.map(x=>'<div class="row"><span>'+esc(x.name)+' <small>'+esc(x.category)+'</small></span><b>'+PLN(x.amount)+'</b></div>').join(''):'<p class="muted">Brak kosztów rocznych przypisanych do tego miesiąca.</p>');h.appendChild(box)
 }
 function renderSettings54(){
