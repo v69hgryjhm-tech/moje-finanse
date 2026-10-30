@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.1.0**.
+Aktualna gałąź produkcyjna: **5.2.0**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -21,19 +21,22 @@ Aktualna gałąź produkcyjna: **5.1.0**.
 10. `v50accounting.js` — rejestr i eksport danych dla księgowej.
 11. `v51control.js` — Centrum finansowe 5.0: rezerwy podatkowe, zamknięcie miesiąca, minimalny dochód, scenariusz kryzysowy, podział nadwyżki, historia majątku, tempo celów, trendy firmy i refinansowanie kredytów.
 12. `v52planner.js` — warstwa planowania 5.1: plan 90 dni, alerty i decyzje, kondycja miesiąca, audyt stałych kosztów oraz szybkie symulacje nadpłat.
-13. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
+13. `v53command.js` — Centrum dowodzenia 5.2: kondycja 0–100, forecast roku, radar 12 miesięcy, centralne alerty, jakość danych i próg rentowności firmy.
+14. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
 
 ## Dane
 Główny klucz localStorage pozostaje bez zmian: `moje-finanse-v14`.
 
 Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje nowe dane wyłącznie wewnątrz `S.finance.control51`, więc starsze dane pozostają kompatybilne.
 
-## Założenia 5.1
+## Założenia 5.2
 - aplikacja nie wymaga podawania stanu konta ani gotówki,
 - moduł „Dzisiaj” korzysta z terminów, dochodów, rat, podatków i kosztów już zapisanych w aplikacji,
 - historia majątku jest zapisywana ręcznie albo przy zamknięciu miesiąca,
 - rezerwa PIT bez wpisanej faktycznej kwoty jest oznaczona jako estymacja,
 - symulator refinansowania niczego nie zapisuje do kredytu — służy wyłącznie do porównania.
+- Kondycja 0–100 jest wskaźnikiem zarządczym, nie oceną kredytową; opiera się na pokryciu planu, długu, poduszce, celach, jakości danych i stabilności kolejnych miesięcy.
+- próg rentowności firmy jest operacyjnym progiem sprzedaży netto opartym na ostatnich rzeczywistych miesiącach firmy.
 
 ## Zasady rozwoju
 - nie dodawać dynamicznego ładowania kolejnych wersji plików,
