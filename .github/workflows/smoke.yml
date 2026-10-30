@@ -40,5 +40,8 @@ jobs:
       - name: Gross earnings chart
         run: node tests/home-gross-chart.mjs
 
-      - name: Control center 5.0
+      - name: Control center 5.1
         run: node tests/control-center.mjs
+
+      - name: Planner 90 days and decision layer 5.1
+        run: node tests/planner-52.mjs
