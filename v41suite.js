@@ -1,7 +1,7 @@
 /* Moje Finanse 4.1 — bezpieczne rozszerzenia stabilnej wersji */
 (function(){
 'use strict';
-const VERSION='5.0.0',G=id=>document.getElementById(id),N=v=>+v||0,PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v)),esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const VERSION='5.3.0',G=id=>document.getElementById(id),N=v=>+v||0,PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v)),esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function ensure(){if(typeof S==='undefined')return false;S.finance||={};let f=S.finance;f.products||=[];f.categoryLimits||={};f.assets||=[];f.goals||=[];f.informalDebts||=[];f.ppkOpening=N(f.ppkOpening);f.ppkReturnPct=N(f.ppkReturnPct)||5;return true}
 function setVersion(){document.title='Moje Finanse '+VERSION;let h=document.querySelector('.top small');if(h)h.innerHTML=`<span id="headerYear">${typeof S!=='undefined'?S.selectedYear:''}</span> • wersja ${VERSION}`;document.documentElement.dataset.appVersion=VERSION}
 function currentBalance(l){if(typeof window.loanCurrentPoint15==='function')return N(window.loanCurrentPoint15(l).balance);try{return N(loanPoint(l).balance)}catch{return N(l?.balance)}}
