@@ -25,8 +25,8 @@ for(const id of ['lab','investments','review','labBody55','investmentsBody55','r
   assert.ok(html.includes('id="'+id+'"'),'Brak widoku/kontenera #'+id);
 }
 
-assert.match(html,/v55lab\.js\?v=5400/);
-assert.match(html,/Moje Finanse 5\.4\.0/);
+assert.match(html,/v55lab\.js\?v=5500/);
+assert.match(html,/Moje Finanse 5\.5\.0/);
 assert.match(html,/Laboratorium decyzji/);
 assert.match(html,/Inwestycje i dywidendy/);
 assert.match(html,/Review finansowy/);
