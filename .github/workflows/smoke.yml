@@ -54,3 +54,6 @@ jobs:
 
       - name: Strategy lab 5.4
         run: node tests/lab-55.mjs
+
+      - name: Autopilot 5.5
+        run: node tests/autopilot-56.mjs
