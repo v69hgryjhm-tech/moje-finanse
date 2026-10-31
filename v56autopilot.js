@@ -40,6 +40,12 @@ function fallback56(id,title,e){
 function safe56(scope,fn,fallbackId='',fallbackTitle='Moduł'){
  try{return fn()}catch(e){error56(scope,e);if(fallbackId)fallback56(fallbackId,fallbackTitle,e);return null}
 }
+function filled56(id,title){
+ let h=G(id);if(!h)return false;
+ if(String(h.innerHTML||'').trim())return true;
+ let e=new Error('Renderer zakończył się bez zawartości');
+ error56('pusty kontener '+id,e);fallback56(id,title,e);return false
+}
 function loanBalance56(l){try{return N(window.loanCurrentPoint15?.(l)?.balance)}catch{return N(l?.balance)}}
 function strategy56(){
  const map={
@@ -267,9 +273,9 @@ function renderAll56(){
  safe56('score snapshot',snapshotScore56);
  safe56('Start 5.5',renderHome56);
  safe56('Centrum 5.5',renderControl56);
- safe56('Autopilot',renderAutopilot56,'autopilotBody56','Autopilot finansowy');
- safe56('Capacity',renderCapacity56,'capacityBody56','MOHE Capacity Planner');
- safe56('Watchlista',renderWatch56,'watchBody56','Watchlista decyzji');
+ safe56('Autopilot',renderAutopilot56,'autopilotBody56','Autopilot finansowy');filled56('autopilotBody56','Autopilot finansowy');
+ safe56('Capacity',renderCapacity56,'capacityBody56','MOHE Capacity Planner');filled56('capacityBody56','MOHE Capacity Planner');
+ safe56('Watchlista',renderWatch56,'watchBody56','Watchlista decyzji');filled56('watchBody56','Watchlista decyzji');
  safe56('Firma Capacity',renderBusiness56);
  safe56('Ustawienia 5.5',renderSettings56)
 }
@@ -309,7 +315,28 @@ if(typeof oldShow==='function'&&!oldShow.__mf56){
  };
  fn.__mf56=true;window.show=fn
 }
-window.addEventListener('finance-modules-ready',()=>safe56('start 5.5',renderAll56),{once:true});
-window.mfAutopilot56={allocation:allocation56,stress:stress56,debtSim:debtSim56,timeline:timeline56,goalOptimizer:goalOptimizer56,taxCenter:taxCenter56,capacityPlan:capacityPlan56,watchMetric:watchMetric56,scoreHistory:scoreHistory56,runtimeErrors:ERR56};
+function installFinalGuard56(){
+ let s=window.show;
+ if(typeof s==='function'&&!s.__mf56final){
+  let fn=function(v){
+   let out;
+   try{out=s(v)}catch(e){error56('FINAL show('+v+')',e)}
+   finally{
+    safe56('FINAL version',setVersion56);
+    if(v==='autopilot'){safe56('FINAL Autopilot',renderAutopilot56,'autopilotBody56','Autopilot finansowy');filled56('autopilotBody56','Autopilot finansowy')}
+    if(v==='capacity'){safe56('FINAL Capacity',renderCapacity56,'capacityBody56','MOHE Capacity Planner');filled56('capacityBody56','MOHE Capacity Planner')}
+    if(v==='watch'){safe56('FINAL Watchlista',renderWatch56,'watchBody56','Watchlista decyzji');filled56('watchBody56','Watchlista decyzji')}
+    if(v==='settings')safe56('FINAL Ustawienia',renderSettings56)
+   }
+   return out
+  };fn.__mf56final=true;window.show=fn
+ }
+ let r=window.render;
+ if(typeof r==='function'&&!r.__mf56final){
+  let fn=function(){let out;try{out=r()}catch(e){error56('FINAL render()',e)}finally{safe56('FINAL renderAll 5.5',renderAll56)}return out};fn.__mf56final=true;window.render=fn
+ }
+}
+window.addEventListener('finance-modules-ready',()=>{installFinalGuard56();safe56('start 5.5',renderAll56)},{once:true});
+window.mfAutopilot56={allocation:allocation56,stress:stress56,debtSim:debtSim56,timeline:timeline56,goalOptimizer:goalOptimizer56,taxCenter:taxCenter56,capacityPlan:capacityPlan56,watchMetric:watchMetric56,scoreHistory:scoreHistory56,runtimeErrors:ERR56,repair:window.repairViews56};
 let st=document.createElement('style');st.textContent='.strategyBtns56{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.allocTop56,.allocGrid56,.autoKpis56,.taxKpis56,.capacityKpis56,.changeGrid56{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.allocGrid56{grid-template-columns:repeat(5,minmax(0,1fr));margin-top:9px}.allocTop56>div,.allocGrid56>div,.autoKpis56>div,.taxKpis56>div,.capacityKpis56>div,.changeGrid56>div{padding:11px;border:1px solid #e3e9f1;border-radius:11px;background:#f8fafc}.allocTop56 small,.allocGrid56 small,.autoKpis56 small,.taxKpis56 small,.capacityKpis56 small,.changeGrid56 small{display:block;font-size:8px;color:#7d899b;font-weight:800}.allocTop56 b,.allocGrid56 b,.autoKpis56 b,.taxKpis56 b,.capacityKpis56 b,.changeGrid56 b{display:block;margin-top:4px;color:#315274}.allocGrid56 span,.changeGrid56 span{display:block;margin-top:3px;font-size:9px;color:#7d899b}.stressForm56,.capacityForm56,.inline56{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.stressTable56{overflow-x:auto}.stressHead56,.stressRow56{display:grid;grid-template-columns:1.2fr repeat(4,1fr);gap:8px;align-items:center;min-width:650px;padding:9px;border-bottom:1px solid #e7ecf2;font-size:10px}.stressHead56{background:#f4f7fb;color:#7d899b;font-size:8px;font-weight:800}.stressRow56 em{font-style:normal;font-weight:800}.good56{color:#2e7a50}.mid56{color:#9a6a14}.bad56{color:#b24450}.debtFreedom56{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.debtFreedom56>div{padding:12px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}.debtFreedom56 small,.debtFreedom56 span,.debtFreedom56 strong{display:block}.debtFreedom56 small{font-size:8px;color:#7f8c9e;font-weight:800}.debtFreedom56 b{display:block;margin:5px 0;color:#315274}.debtFreedom56 span{font-size:9px;color:#768498}.debtFreedom56 strong{margin-top:5px;font-size:9px;color:#2f7851}.timeline56{max-height:620px;overflow:auto;border:1px solid #e5eaf1;border-radius:12px}.timelineRow56{display:grid;grid-template-columns:85px 120px 120px 1fr;gap:9px;align-items:center;padding:9px 10px;border-bottom:1px solid #e8edf3;font-size:9px}.timelineRow56.hasEvent{background:#fbfdff}.timelineRow56 small{color:#8692a2}.timelineEvents56{display:flex;gap:5px;flex-wrap:wrap}.timelineEvents56 em{font-style:normal;background:#edf3fa;border-radius:99px;padding:4px 7px;color:#4f6885}.goalOpt56>div{display:grid;grid-template-columns:1.3fr repeat(3,1fr);gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #e8edf3;font-size:10px}.goalOpt56 small{display:block;color:#7e8b9c}.taxBars56{display:flex;gap:7px;align-items:end;height:125px;overflow-x:auto;margin-top:10px}.taxBars56>div{min-width:44px;display:grid;grid-template-rows:80px 13px 18px;justify-items:center;align-items:end}.taxBars56 i{display:block;width:22px;background:#5b82b5;border-radius:5px 5px 2px 2px}.taxBars56 small,.taxBars56 b{font-size:8px;color:#738196}.capacityRows56>div{display:grid;grid-template-columns:1.3fr repeat(3,.8fr) auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #e7ecf2;font-size:10px}.capacityRows56 small{display:block;color:#8491a3}.watchRows56>div{display:grid;grid-template-columns:1.2fr .8fr 1fr auto;gap:9px;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:11px;margin-top:8px}.watchRows56 .hit56{background:#eef8f2;border-color:#cfe7d7}.watchRows56 small,.watchRows56 span{display:block;color:#7d899b;font-size:9px}.watchRows56 em{font-style:normal;font-size:9px;color:#596c83}.scoreHistory56{display:flex;gap:7px;height:135px;align-items:end;overflow-x:auto}.scoreHistory56>div{display:grid;grid-template-rows:95px 14px 14px;min-width:38px;justify-items:center;align-items:end}.scoreHistory56 i{width:20px;background:#5b82b5;border-radius:5px 5px 2px 2px}.scoreHistory56 small,.scoreHistory56 b{font-size:8px;color:#6f7e91}.deployStatus56{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.deployStatus56 span{padding:5px 7px;border-radius:99px;background:#eaf6ef;color:#33714f;font-size:8px;font-weight:800}.deployStatus56 span.bad{background:#fdebed;color:#9d3440}.runtimeError56{border-color:#e6a6ad;background:#fffafb}.runtimeError56 code{display:block;white-space:pre-wrap;padding:9px;border-radius:9px;background:#f7eef0;color:#8b3f48;margin:8px 0}.runtimeLog56{display:grid;gap:6px;margin:8px 0}.runtimeLog56>div{padding:8px;border:1px solid #ecd6d9;border-radius:9px;background:#fffafb}.runtimeLog56 b,.runtimeLog56 code{display:block}.runtimeLog56 code{margin-top:3px;font-size:9px;white-space:pre-wrap;color:#874650}@media(max-width:900px){.allocGrid56{grid-template-columns:repeat(3,minmax(0,1fr))}.debtFreedom56{grid-template-columns:repeat(2,minmax(0,1fr))}.timelineRow56{grid-template-columns:75px 100px 100px 1fr}.goalOpt56>div{grid-template-columns:1fr 1fr}.capacityRows56>div{grid-template-columns:1.2fr .8fr .8fr}.capacityRows56>div .btn{grid-column:1/-1;justify-self:start}.watchRows56>div{grid-template-columns:1fr 1fr}.watchRows56>div .btn{justify-self:start}}@media(max-width:600px){.allocTop56,.autoKpis56,.taxKpis56,.capacityKpis56,.changeGrid56{grid-template-columns:1fr 1fr}.allocGrid56{grid-template-columns:1fr 1fr}.debtFreedom56{grid-template-columns:1fr 1fr}.timelineRow56{grid-template-columns:68px 1fr}.timelineRow56>span{grid-column:2}.timelineEvents56{grid-column:1/-1}.goalOpt56>div{grid-template-columns:1fr}.watchRows56>div{grid-template-columns:1fr}.capacityRows56>div{grid-template-columns:1fr 1fr}}';document.head.appendChild(st);
 })();
