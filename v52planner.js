@@ -1,7 +1,7 @@
 /* Moje Finanse 5.1 — plan 90 dni, kondycja, alerty i decyzje */
 (function(){
 'use strict';
-const VERSION='5.4.0',G=id=>document.getElementById(id),N=v=>+v||0;
+const VERSION='5.5.0',G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const MONTHS=['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
