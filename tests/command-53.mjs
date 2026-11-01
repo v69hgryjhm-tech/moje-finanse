@@ -20,8 +20,8 @@ for(const token of [
   assert.ok(src.includes(token),'Brak funkcji/modułu: '+token);
 }
 
-assert.match(html,/v53command\.js\?v=5700/);
-assert.match(html,/Moje Finanse 5\.7\.0/);
+assert.match(html,/v53command\.js\?v=5710/);
+assert.match(html,/Moje Finanse 5\.7\.1/);
 assert.match(html,/Centrum dowodzenia/);
 assert.match(html,/class="plus" onclick="show\('control'\)"/);
 assert.ok(!src.includes('accountBalance'),'Centrum dowodzenia nie powinno wymagać stanu konta');
