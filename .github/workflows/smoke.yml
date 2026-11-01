@@ -63,3 +63,6 @@ jobs:
 
       - name: Central kernel 5.8
         run: node tests/kernel-59.mjs
+
+      - name: Salary work/payment period 5.8.1
+        run: node tests/salary-period-60.mjs
