@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.6.0**.
+Aktualna gałąź produkcyjna: **5.7.0**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -26,14 +26,15 @@ Aktualna gałąź produkcyjna: **5.6.0**.
 15. `v55lab.js` — strategia 5.4: Laboratorium decyzji, inwestycje i dywidendy, review kwartalny/roczny, prognoza majątku 5/10/20 lat oraz ranking portfela produktów MOHE.
 16. `v56autopilot.js` — Autopilot 5.5: silnik alokacji nadwyżki, Stress Test 360°, droga do zera długu, timeline 36 miesięcy, zmiany m/m, optymalizator celów, podatki 2.0, MOHE Capacity Planner, watchlista warunkowa i historia score.
 17. `v57mission.js` + `v57mission.css` — Mission Control 5.6: briefing startowy, 3 priorytety, prywatne vs MOHE, następne 30 dni, rekomendacja Autopilota i zmiany m/m. Dotychczasowy Start pozostaje dostępny jako rozwijane szczegóły.
-18. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
+18. `v58performance.js` — optymalizacja 5.7: szybka nawigacja bez pełnego renderu, lekkie renderery per widok i diagnostyka czasu pełnego renderu.
+19. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
 
 ## Dane
 Główny klucz localStorage pozostaje bez zmian: `moje-finanse-v14`.
 
 Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje nowe dane wyłącznie wewnątrz `S.finance.control51`, więc starsze dane pozostają kompatybilne.
 
-## Założenia 5.6
+## Założenia 5.7
 - aplikacja nie wymaga podawania stanu konta ani gotówki,
 - moduł „Dzisiaj” korzysta z terminów, dochodów, rat, podatków i kosztów już zapisanych w aplikacji,
 - historia majątku jest zapisywana ręcznie albo przy zamknięciu miesiąca,
@@ -65,3 +66,8 @@ Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje
 - Start 5.6 domyślnie pokazuje Mission Control, a dotychczasowe kafelki i wykresy są zachowane w DOM i można je rozwinąć przyciskiem „Pokaż szczegóły finansowe”,
 - Mission Control nie duplikuje magazynu danych: czyta istniejące obliczenia z Centrum dowodzenia, Operacji, Strategii i Autopilota,
 - ekran startowy ma odpowiadać najpierw na pytania „jak jest?”, „co wymaga uwagi?” i „co zrobić teraz?”, a dopiero później pokazywać pełną analitykę.
+
+- Dla księgowej 5.7 zapisuje jedną sprzedaż jako grupę pozycji z wspólnym `saleGroupId`; każda pozycja zachowuje własną ilość, cenę jednostkową brutto i VAT, a Firma+ sumuje pozycje z istniejącego `salesLines`,
+- istniejące pojedyncze wpisy sprzedaży pozostają kompatybilne i są traktowane jak jednoelementowe grupy,
+- szybka nawigacja 5.7 nie wywołuje pełnego `render()` przy zwykłym przejściu między większością ekranów; pełny render zostaje przy zmianach danych, roku i wejściu do pełnego Centrum dowodzenia,
+- przy starcie aplikacji moduły instalują swoje wrapery, ale nie wykonują już dodatkowych pełnych renderów przed końcowym renderem boot.
