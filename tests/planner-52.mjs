@@ -21,8 +21,8 @@ for(const token of [
   assert.ok(src.includes(token),'Brak funkcji/modułu: '+token);
 }
 
-assert.match(html,/v52planner\.js\?v=5700/);
-assert.match(html,/Moje Finanse 5\.7\.0/);
+assert.match(html,/v52planner\.js\?v=5710/);
+assert.match(html,/Moje Finanse 5\.7\.1/);
 assert.ok(!src.includes('accountBalance'),'Planer nie powinien wymagać stanu konta');
 assert.ok(!src.includes('cashBalance'),'Planer nie powinien wymagać stanu gotówki');
 assert.match(fs.readFileSync('v14a.js','utf8'),/moje-finanse-v14/);
