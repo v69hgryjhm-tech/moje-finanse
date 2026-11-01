@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.5.1**.
+Aktualna gałąź produkcyjna: **5.6.0**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -25,14 +25,15 @@ Aktualna gałąź produkcyjna: **5.5.1**.
 14. `v54ops.js` — warstwa operacyjna 5.3: automatyczny plan działania, odhaczanie kroków, rezerwy roczne, audyt kosztów stałych, raport miesiąca i dziennik decyzji.
 15. `v55lab.js` — strategia 5.4: Laboratorium decyzji, inwestycje i dywidendy, review kwartalny/roczny, prognoza majątku 5/10/20 lat oraz ranking portfela produktów MOHE.
 16. `v56autopilot.js` — Autopilot 5.5: silnik alokacji nadwyżki, Stress Test 360°, droga do zera długu, timeline 36 miesięcy, zmiany m/m, optymalizator celów, podatki 2.0, MOHE Capacity Planner, watchlista warunkowa i historia score.
-17. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
+17. `v57mission.js` + `v57mission.css` — Mission Control 5.6: briefing startowy, 3 priorytety, prywatne vs MOHE, następne 30 dni, rekomendacja Autopilota i zmiany m/m. Dotychczasowy Start pozostaje dostępny jako rozwijane szczegóły.
+18. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
 
 ## Dane
 Główny klucz localStorage pozostaje bez zmian: `moje-finanse-v14`.
 
 Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje nowe dane wyłącznie wewnątrz `S.finance.control51`, więc starsze dane pozostają kompatybilne.
 
-## Założenia 5.5
+## Założenia 5.6
 - aplikacja nie wymaga podawania stanu konta ani gotówki,
 - moduł „Dzisiaj” korzysta z terminów, dochodów, rat, podatków i kosztów już zapisanych w aplikacji,
 - historia majątku jest zapisywana ręcznie albo przy zamknięciu miesiąca,
@@ -60,3 +61,7 @@ Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje
 - symulacja zera długu stosuje metodę avalanche i utrzymuje łączny miesięczny budżet spłaty, przekierowując uwolnione raty na najdroższy aktywny kredyt,
 - Capacity Planner MOHE wymaga czasu druku produktu; limit popytu jest opcjonalny i bez niego używa średniego wolumenu produktu,
 - watchlista warunkowa bazuje na danych lokalnych; zewnętrzną ofertę refinansowania użytkownik wpisuje ręcznie.
+
+- Start 5.6 domyślnie pokazuje Mission Control, a dotychczasowe kafelki i wykresy są zachowane w DOM i można je rozwinąć przyciskiem „Pokaż szczegóły finansowe”,
+- Mission Control nie duplikuje magazynu danych: czyta istniejące obliczenia z Centrum dowodzenia, Operacji, Strategii i Autopilota,
+- ekran startowy ma odpowiadać najpierw na pytania „jak jest?”, „co wymaga uwagi?” i „co zrobić teraz?”, a dopiero później pokazywać pełną analitykę.
