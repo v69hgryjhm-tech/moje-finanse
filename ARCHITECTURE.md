@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.7.0**.
+Aktualna gałąź produkcyjna: **5.7.1**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -71,3 +71,5 @@ Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje
 - istniejące pojedyncze wpisy sprzedaży pozostają kompatybilne i są traktowane jak jednoelementowe grupy,
 - szybka nawigacja 5.7 nie wywołuje pełnego `render()` przy zwykłym przejściu między większością ekranów; pełny render zostaje przy zmianach danych, roku i wejściu do pełnego Centrum dowodzenia,
 - przy starcie aplikacji moduły instalują swoje wrapery, ale nie wykonują już dodatkowych pełnych renderów przed końcowym renderem boot.
+
+- poprawka 5.7.1: Etat korzysta z lokalnego renderowania, wspólnego wyniku wyliczeń dla PPK/paska/podwyżki/kadr oraz cache historycznych podstaw L4; zapis i rozwijanie miesiąca nie uruchamiają pełnego renderu aplikacji.
