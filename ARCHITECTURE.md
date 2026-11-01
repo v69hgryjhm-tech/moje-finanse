@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.8.0**.
+Aktualna gałąź produkcyjna: **5.8.1**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -28,7 +28,8 @@ Aktualna gałąź produkcyjna: **5.8.0**.
 17. `v57mission.js` + `v57mission.css` — Mission Control 5.6: briefing startowy, 3 priorytety, prywatne vs MOHE, następne 30 dni, rekomendacja Autopilota i zmiany m/m. Dotychczasowy Start pozostaje dostępny jako rozwijane szczegóły.
 18. `v58performance.js` — optymalizacja 5.7: szybka nawigacja bez pełnego renderu, lekkie renderery per widok i diagnostyka czasu pełnego renderu.
 19. `v59kernel.js` — centralny kernel 5.8: jeden router `show()`, jeden aktywny `render()`, renderowanie wyłącznie bieżącego widoku i fallback starego pełnego renderu tylko na żądanie.
-20. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
+20. `v60salaryperiod.js` — rozdzielenie miesiąca pracy od miesiąca wypłaty dla Etatu; cashflow/PIT liczą miesiąc wypłaty, analiza zarobków i forecast okresu pracy korzystają z miesiąca pracy.
+21. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
 
 ## Dane
 Główny klucz localStorage pozostaje bez zmian: `moje-finanse-v14`.
@@ -79,3 +80,6 @@ Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje
 - usunięto wczesny `render()` z końca `v14b2.js`, dzięki czemu aplikacja nie buduje całego DOM przed ukończeniem ładowania modułów,
 - zapis danych wywołujący globalne `render()` odświeża teraz aktywny widok zamiast całej aplikacji,
 - stare szczegóły Startu używają pełnego legacy renderu wyłącznie po świadomym rozwinięciu przez użytkownika.
+
+- poprawka 5.8.1: rekord Etatu pozostaje zapisany w miesiącu faktycznej wypłaty, a pole `workMonth` wskazuje miesiąc pracy, którego wypłata dotyczy; dla istniejących wpisów domyślnie przyjmowany jest miesiąc wcześniejszy,
+- forecast finansowy pozostaje cashflow według daty wypłaty, natomiast panel Etatu pokazuje także forecast za rok pracy, dzięki czemu wypłata ze stycznia 2027 może zasilić grudzień 2026 w analizie wynagrodzenia.
