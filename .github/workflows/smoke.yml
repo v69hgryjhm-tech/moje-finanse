@@ -60,3 +60,6 @@ jobs:
 
       - name: Mission Control 5.6
         run: node tests/mission-57.mjs
+
+      - name: Performance 5.7
+        run: node tests/performance-58.mjs
