@@ -39,8 +39,10 @@ if(!html.includes('v53command.js')) failures.push('Brak Centrum dowodzenia 5.2')
 if(!html.includes('v54ops.js')) failures.push('Brak warstwy operacyjnej 5.3');
 if(!html.includes('v55lab.js')) failures.push('Brak Laboratorium i strategii 5.4');
 if(!html.includes('v56autopilot.js')) failures.push('Brak Autopilota 5.5');
+if(!html.includes('v57mission.js')) failures.push('Brak Mission Control 5.6');
+if(!html.includes('v57mission.css')) failures.push('Brak stylu Mission Control 5.6');
 if(!html.includes("show('control')")) failures.push('Brak wejścia do Centrum dowodzenia');
-if(!html.includes('Moje Finanse 5.5.1')) failures.push('Nieprawidłowa wersja aplikacji');
+if(!html.includes('Moje Finanse 5.6.0')) failures.push('Nieprawidłowa wersja aplikacji');
 if(!read('v14a.js').includes('moje-finanse-v14')) failures.push('Zmieniono główny klucz danych localStorage');
 
 console.log('Aktywne JS:',scripts.length);
