@@ -22,8 +22,38 @@ function balance(l){try{return N(loanPoint(l).balance)}catch{return N(l.balance)
 function flow(k){let {y,m}=parse(k),s=salary(y,m),c=company(y,m),e=expTotal(k),lo=loanSpend(k),income=(s.actual?s.net:0)+(c.actual?Math.max(0,c.profit):0);return{k,y,m,s,c,e,lo,income,free:income-e-lo}}
 function addMonth(k,d){let {y,m}=parse(k),x=new Date(y,m+d,1,12);return key(x.getFullYear(),x.getMonth())}
 function nav(k,fn){let {y,m}=parse(k);return `<div class="card miniNav"><button class="btn" onclick="${fn}(-1)">‹</button><b>${FULL[m]} ${y}</b><button class="btn" onclick="${fn}(1)">›</button></div>`}
-function expenseRow(e,i,suffix=''){return `<div class="budgetRow"><div><b>${esc(e.name)}</b><small>${esc(e.category||'Inne')} • dzień ${e.day||'—'}${suffix}</small></div><b>${PLN(e.amount)}</b><button class="btn danger" onclick="removeExpense34(${i})">Usuń</button></div>`}
-function renderBudget(){if(!ensure())return;let h=G('budgetBody');if(!h)return;let k=S.finance.analysisMonth||nowKey(),rec=recurringRows(),once=oneTimeRows(k),total=expTotal(k),recMonth=rec.filter(e=>isExpenseInMonth(e,k)).reduce((a,e)=>a+N(e.amount),0),onceTotal=once.reduce((a,e)=>a+N(e.amount),0);h.innerHTML=`${nav(k,'shiftFinanceAnalysis34')}<div class="grid"><div class="tile"><small>RAZEM W MIESIĄCU</small><b>${PLN(total)}</b></div><div class="tile"><small>STAŁE CO MIESIĄC</small><b>${PLN(recMonth)}</b></div><div class="tile"><small>JEDNORAZOWE</small><b>${PLN(onceTotal)}</b></div></div><div class="card"><div class="title">Stałe — powtarzane automatycznie <button class="btn primary" onclick="expenseModal34('recurring')">＋ Dodaj stały</button></div><p class="muted">Te pozycje pojawiają się automatycznie w każdym miesiącu. Nie trzeba ich ponownie zaznaczać.</p>${rec.length?rec.map(e=>expenseRow(e,S.finance.expenses.indexOf(e),e.from?' • od '+e.from:'')).join(''):'<p class="muted">Brak stałych wydatków.</p>'}</div><div class="card"><div class="title">Tylko ${FULL[parse(k).m]} — jednorazowe <button class="btn primary" onclick="expenseModal34('once')">＋ Dodaj na ten miesiąc</button></div><p class="muted">Np. naprawa, prezent, ubezpieczenie, większy zakup — obciąży tylko wybrany miesiąc.</p>${once.length?once.map(e=>expenseRow(e,S.finance.expenses.indexOf(e),' • tylko '+e.month)).join(''):'<p class="muted">Brak jednorazowych wydatków w tym miesiącu.</p>'}</div>`}
+function expenseRow(e,i,suffix=''){
+ const recurring=e.kind!=='once',type=recurring?'Stały':'Jednorazowy',day=e.day?'dzień '+e.day:'bez terminu';
+ return `<div class="expenseItem34">
+   <div class="expenseIcon34">${recurring?'↻':'1×'}</div>
+   <div class="expenseMain34">
+     <b>${esc(e.name)}</b>
+     <div class="expenseMeta34">
+       <span class="expenseBadge34 category">${esc(e.category||'Inne')}</span>
+       <span class="expenseBadge34 ${recurring?'recurring':'once'}">${type}</span>
+       <span>${day}${suffix}</span>
+     </div>
+   </div>
+   <div class="expenseAmount34"><b>${PLN(e.amount)}</b><small>/ mies.</small></div>
+   <button class="expenseDelete34" title="Usuń" onclick="removeExpense34(${i})">×</button>
+ </div>`
+}
+function renderBudget(){if(!ensure())return;let h=G('budgetBody');if(!h)return;let k=S.finance.analysisMonth||nowKey(),rec=recurringRows(),once=oneTimeRows(k),total=expTotal(k),recMonth=rec.filter(e=>isExpenseInMonth(e,k)).reduce((a,e)=>a+N(e.amount),0),onceTotal=once.reduce((a,e)=>a+N(e.amount),0),monthName=FULL[parse(k).m];
+ h.innerHTML=`${nav(k,'shiftFinanceAnalysis34')}
+ <div class="budgetSummary34">
+   <div class="primary"><small>PLANOWANE WYDATKI • ${monthName.toUpperCase()}</small><b>${PLN(total)}</b><span>${rec.length+once.length} pozycji</span></div>
+   <div><small>STAŁE</small><b>${PLN(recMonth)}</b></div>
+   <div><small>JEDNORAZOWE</small><b>${PLN(onceTotal)}</b></div>
+ </div>
+ <div class="card budgetSection34">
+   <div class="budgetSectionHead34"><div><small>POWTARZALNE</small><b>Wydatki stałe</b><span>Automatycznie uwzględniane co miesiąc.</span></div><button class="btn primary" onclick="expenseModal34('recurring')">＋ Dodaj</button></div>
+   <div class="expenseList34">${rec.length?rec.map(e=>expenseRow(e,S.finance.expenses.indexOf(e),e.from?' • od '+e.from:'')).join(''):'<div class="budgetEmpty34">Brak stałych wydatków.</div>'}</div>
+ </div>
+ <div class="card budgetSection34">
+   <div class="budgetSectionHead34"><div><small>TYLKO TEN MIESIĄC</small><b>Jednorazowe • ${monthName}</b><span>Zakupy i koszty, które nie powtarzają się automatycznie.</span></div><button class="btn" onclick="expenseModal34('once')">＋ Dodaj</button></div>
+   <div class="expenseList34">${once.length?once.map(e=>expenseRow(e,S.finance.expenses.indexOf(e),'')).join(''):'<div class="budgetEmpty34">Brak jednorazowych wydatków w tym miesiącu.</div>'}</div>
+ </div>`
+}
 window.expenseTypeChange34=function(){let t=G('exKind34')?.value,once=G('exMonthWrap34'),from=G('exFromWrap34');if(once)once.style.display=t==='once'?'block':'none';if(from)from.style.display=t==='recurring'?'block':'none'};
 window.expenseModal34=function(kind='recurring'){if(!ensure())return;let k=S.finance.analysisMonth||nowKey();open(`<h2>Dodaj wydatek</h2><div class="form"><label>Typ<select id="exKind34" onchange="expenseTypeChange34()"><option value="recurring" ${kind==='recurring'?'selected':''}>Stały — co miesiąc</option><option value="once" ${kind==='once'?'selected':''}>Jednorazowy — tylko jeden miesiąc</option></select></label><label>Nazwa<input id="exName34" placeholder="np. Telefon, paliwo, OC"></label><label>Kwota<input id="exAmount34" type="number" step="0.01"></label><label>Kategoria<input id="exCategory34" placeholder="np. Dom, Auto, Subskrypcje"></label><label>Dzień miesiąca<input id="exDay34" type="number" min="1" max="31" value="1"></label><label id="exMonthWrap34">Miesiąc<input id="exMonth34" type="month" value="${k}"></label><label id="exFromWrap34">Powtarzaj od miesiąca<input id="exFrom34" type="month" value="${k}"></label></div><div class="actions"><button class="btn" onclick="closeModal()">Anuluj</button><button class="btn primary" onclick="saveExpense34()">Zapisz</button></div>`);setTimeout(expenseTypeChange34,0)};
 window.saveExpense34=function(){if(!ensure())return;let kind=G('exKind34')?.value||'recurring',name=G('exName34')?.value?.trim(),amount=N(G('exAmount34')?.value),day=Math.max(1,Math.min(31,N(G('exDay34')?.value)||1));if(!name)return alert('Podaj nazwę wydatku.');if(amount<=0)return alert('Podaj kwotę większą od zera.');let e={kind,name,amount,category:G('exCategory34')?.value?.trim()||'Inne',day,active:true};if(kind==='once')e.month=G('exMonth34')?.value||S.finance.analysisMonth||nowKey();else e.from=G('exFrom34')?.value||nowKey();S.finance.expenses.push(e);save();closeModal();renderBudget();window.renderMonthly42?.();window.renderCalendar42?.()};
@@ -47,6 +77,37 @@ function renderAll(){renderBudget();renderScenario();renderDebt();wireLoanHome()
 window.renderBudget34=renderBudget;window.renderCalendar34=renderCalendar;window.renderScenario34=renderScenario;window.renderDebt34=renderDebt;
 const oldShow=window.show;if(typeof oldShow==='function')window.show=function(v){oldShow(v);setVersion();if(v==='budget')renderBudget();if(v==='calendar')window.renderCalendar42?.();if(v==='scenario')renderScenario();if(v==='debt')renderDebt();if(v==='home')wireLoanHome()};
 const oldRender=window.render;if(typeof oldRender==='function')window.render=function(){oldRender();setVersion();renderAll()};
+let budgetStyle34=document.createElement('style');budgetStyle34.textContent=`
+#budgetBody{display:grid;gap:12px}
+.budgetSummary34{display:grid;grid-template-columns:1.4fr .8fr .8fr;gap:10px}
+.budgetSummary34>div{background:#fff;border:1px solid #e5eaf1;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:3px}
+.budgetSummary34 .primary{background:linear-gradient(135deg,#f6f9fd,#eef4fb)}
+.budgetSummary34 small{font-size:8px;letter-spacing:.06em;color:#8793a4;font-weight:800}
+.budgetSummary34 b{font-size:20px;color:#29496b}
+.budgetSummary34 span{font-size:9px;color:#8793a4}
+.budgetSection34{padding:0;overflow:hidden}
+.budgetSectionHead34{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 16px;border-bottom:1px solid #edf1f5}
+.budgetSectionHead34 small{display:block;font-size:8px;color:#8b97a6;font-weight:800;letter-spacing:.06em}
+.budgetSectionHead34 b{display:block;margin:2px 0;color:#304c6d;font-size:14px}
+.budgetSectionHead34 span{font-size:9px;color:#8995a5}
+.expenseList34{padding:2px 16px 8px}
+.expenseItem34{display:grid;grid-template-columns:36px minmax(0,1fr) 120px 28px;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #edf1f5}
+.expenseItem34:last-child{border-bottom:0}
+.expenseIcon34{width:32px;height:32px;border-radius:10px;background:#eef4fa;color:#42658c;display:grid;place-items:center;font-size:11px;font-weight:900}
+.expenseMain34>b{display:block;color:#304c6d;font-size:11px}
+.expenseMeta34{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;color:#8a96a5;font-size:8px}
+.expenseBadge34{padding:3px 6px;border-radius:999px;background:#f1f4f8;color:#617188;font-weight:700}
+.expenseBadge34.recurring{background:#eef8f2;color:#347253}
+.expenseBadge34.once{background:#fff3e5;color:#986317}
+.expenseBadge34.category{background:#eef3fa;color:#466786}
+.expenseAmount34{text-align:right}
+.expenseAmount34 b{display:block;color:#2f4e70;font-size:12px}
+.expenseAmount34 small{font-size:8px;color:#909baa}
+.expenseDelete34{border:0;background:transparent;color:#b8c1cc;width:28px;height:28px;border-radius:8px;font-size:17px;cursor:pointer}
+.expenseDelete34:hover{background:#fff0f1;color:#c54752}
+.budgetEmpty34{padding:18px 0;color:#8b97a6;font-size:10px}
+@media(max-width:700px){.budgetSummary34{grid-template-columns:1fr 1fr}.budgetSummary34 .primary{grid-column:1/-1}.expenseItem34{grid-template-columns:34px minmax(0,1fr) auto}.expenseDelete34{grid-column:3;grid-row:1}.expenseAmount34{grid-column:2/4;text-align:left}.budgetSectionHead34{align-items:flex-start}.budgetSectionHead34 .btn{white-space:nowrap}}
+`;document.head.appendChild(budgetStyle34);
 window.renderStable34=renderAll;
 window.prepareStable34=function(){ensure();setVersion();};
 })();
