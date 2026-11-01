@@ -192,6 +192,7 @@ function runSmoke47(){
  add('Zapis lokalny',(()=>{try{let k='mf47_smoke',v=String(Date.now());localStorage.setItem(k,v);let ok=localStorage.getItem(k)===v;localStorage.removeItem(k);return ok}catch{return false}})());
  return tests;
 }
+window.mfUx47={setVersion,enhanceLoans:enhanceLoans47,addFirmaShortcut,improveLabels,renderSmoke:()=>renderSmoke47()};
 function renderSmoke47(){
  let settings=G('settings');if(!settings)return;
  let box=G('smoke47');if(!box){box=document.createElement('div');box.id='smoke47';box.className='card';settings.appendChild(box)}
