@@ -97,5 +97,5 @@ function install57(){
  let r=window.render;if(typeof r==='function'&&!r.__mission57){let fn=function(){let out;try{out=r()}catch(e){try{console.error('[Mission 5.6] render',e)}catch{}}finally{setVersion57();renderMission57()}return out};fn.__mission57=true;window.render=fn}
 }
 window.mfMission57={render:renderMission57,upcoming30:upcoming30_57,privateStatus:privateStatus57,companyStatus:companyStatus57};
-window.addEventListener('finance-modules-ready',()=>{install57();renderMission57()},{once:true});
+window.addEventListener('finance-modules-ready',()=>{install57()},{once:true});
 })();
