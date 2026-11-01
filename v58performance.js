@@ -15,6 +15,7 @@ function safe58(name,fn){
 function renderTarget58(v){
  switch(v){
   case 'home': return safe58('home',()=>window.mfMission57?.render?.());
+  case 'salary': return safe58('Etat',()=>window.renderSalaryLocal37?.());
   case 'businessplus':
    safe58('Firma+',()=>window.renderBusinessPlus44?.());
    safe58('Portfolio MOHE',()=>window.renderBusiness55?.());
