@@ -97,8 +97,8 @@ function ensurePayrollProfile35(){
   }
 }
 window.fg=fg35;window.fn=fn35;window.sal=sal35;window.months=months35;
-window.saveS=function(i){let r=Y().salary[i];r.net=G('n'+i).value===''?null:+G('n'+i).value;r.bonus=G('b'+i).value===''?null:+G('b'+i).value;r.ppkEmployeePct=nullable(G('ppe'+i).value);r.ppkEmployerPct=nullable(G('ppr'+i).value);delete r.ppkEmployee;delete r.ppkEmployer;r.locked=true;save();render()};
-function apply35(){try{ensurePayrollProfile35();let p=window.sal();renderSummary35(p);months35(p);renderPpk35(p);cleanSettings35()}catch(e){console.error('Etat 3.5',e)}}
-const prev=window.render;if(typeof prev==='function')window.render=function(){prev();apply35()};
+window.saveS=function(i){let r=Y().salary[i];r.net=G('n'+i).value===''?null:+G('n'+i).value;r.bonus=G('b'+i).value===''?null:+G('b'+i).value;r.ppkEmployeePct=nullable(G('ppe'+i).value);r.ppkEmployerPct=nullable(G('ppr'+i).value);delete r.ppkEmployee;delete r.ppkEmployer;r.locked=true;save();window.renderSalaryLocal37?.()||render()};
+function apply35(preset){try{ensurePayrollProfile35();let p=preset||window.sal();renderSummary35(p);months35(p);renderPpk35(p);cleanSettings35()}catch(e){console.error('Etat 3.5',e)}}
+window.renderSalary27=apply35;window.toggleS=function(i){Y().salary.forEach((m,j)=>m.locked=j===i?!m.locked:true);save();window.renderSalaryLocal37?.()||render()};window.lockAll=function(){Y().salary.forEach(x=>x.locked=true);save();window.renderSalaryLocal37?.()||render()};const prev=window.render;if(typeof prev==='function')window.render=function(){prev();apply35()};
 
 })();
