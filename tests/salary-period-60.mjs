@@ -19,9 +19,9 @@ const ctx={
   console,Intl,Date,
   S:{selectedYear:2026,years,finance:{}},
   save(){saves++},
-  Y(){return this.S.years[String(this.S.selectedYear)]},
+  Y(){return ctx.S.years[String(ctx.S.selectedYear)]},
   sal(){
-    const rows=this.S.years[String(this.S.selectedYear)].salary.map((r,i)=>({
+    const rows=ctx.S.years[String(ctx.S.selectedYear)].salary.map((r,i)=>({
       total:(+r.net||0)+(+r.bonus||0),
       actual:((+r.net||0)+(+r.bonus||0))>0,
       i
