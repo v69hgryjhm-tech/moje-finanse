@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.8.2**.
+Aktualna gałąź produkcyjna: **5.8.3**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -81,7 +81,9 @@ Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje
 - zapis danych wywołujący globalne `render()` odświeża teraz aktywny widok zamiast całej aplikacji,
 - stare szczegóły Startu używają pełnego legacy renderu wyłącznie po świadomym rozwinięciu przez użytkownika.
 
-- poprawka 5.8.2: rekord Etatu pozostaje zapisany w miesiącu faktycznej wypłaty, a pole `workMonth` wskazuje miesiąc pracy, którego wypłata dotyczy; dla istniejących wpisów domyślnie przyjmowany jest miesiąc wcześniejszy,
+- poprawka 5.8.3: rekord Etatu pozostaje zapisany w miesiącu faktycznej wypłaty, a pole `workMonth` wskazuje miesiąc pracy, którego wypłata dotyczy; dla istniejących wpisów domyślnie przyjmowany jest miesiąc wcześniejszy,
 - forecast finansowy pozostaje cashflow według daty wypłaty, natomiast panel Etatu pokazuje także forecast za rok pracy, dzięki czemu wypłata ze stycznia 2027 może zasilić grudzień 2026 w analizie wynagrodzenia.
 
-- poprawka 5.8.2: po renderze legacy Startu kernel jawnie uruchamia współczesne renderery forecastu i podatków, dzięki czemu stare markupy wykresów nie trafiają pod nowy CSS i nie rozciągają się na pełną szerokość.
+- poprawka 5.8.3: po renderze legacy Startu kernel jawnie uruchamia współczesne renderery forecastu i podatków, dzięki czemu stare markupy wykresów nie trafiają pod nowy CSS i nie rozciągają się na pełną szerokość.
+
+- poprawka 5.8.3: przebudowano widok Budżet i wydatki na kompaktową listę pozycji z czytelną hierarchią nazwa/kategoria/typ/termin/kwota; usunięto wygląd przypominający surowy formularz administracyjny.
