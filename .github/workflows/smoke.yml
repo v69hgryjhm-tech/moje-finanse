@@ -57,3 +57,6 @@ jobs:
 
       - name: Autopilot 5.5
         run: node tests/autopilot-56.mjs
+
+      - name: Mission Control 5.6
+        run: node tests/mission-57.mjs
