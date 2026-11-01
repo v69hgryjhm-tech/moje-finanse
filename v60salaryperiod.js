@@ -37,14 +37,14 @@ function salaryForWork(workKey){
 function actualWorkYear(y){
  let rows=[];
  for(let m=0;m<12;m++){
-  let wk=key(y,m),x=salaryForWork(wk);
-  rows.push({workKey:wk,paymentKey:x?.paymentKey||key(y,m+1),row:x?.row||null,result:x?.result||null,actual:!!x?.result?.actual,total:N(x?.result?.total)})
+  let wk=key(y,m),x=salaryForWork(wk),paymentKey=x?.paymentKey||key(y,m+1),result=x?.result||salaryResultForPayment(paymentKey);
+  rows.push({workKey:wk,paymentKey,row:x?.row||null,result,actual:!!result?.actual,total:N(result?.total)})
  }
  return rows
 }
 function workSummary(y){
- const rows=actualWorkYear(y),actual=rows.filter(x=>x.actual);
- return{rows,actual,total:actual.reduce((a,x)=>a+N(x.total),0),count:actual.length,avg:actual.length?actual.reduce((a,x)=>a+N(x.total),0)/actual.length:0}
+ const rows=actualWorkYear(y),actual=rows.filter(x=>x.actual),forecast=rows.filter(x=>!x.actual);
+ return{rows,actual,forecast,total:actual.reduce((a,x)=>a+N(x.total),0),forecastTotal:forecast.reduce((a,x)=>a+N(x.total),0),yearTotal:rows.reduce((a,x)=>a+N(x.total),0),count:actual.length,avg:actual.length?actual.reduce((a,x)=>a+N(x.total),0)/actual.length:0}
 }
 function label(k){let {y,m}=parse(k);return ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'][m]+' '+y}
 function decorateSalaryCards(){
@@ -77,7 +77,7 @@ function renderWorkSummary61(){
  let box=document.getElementById('workSummary61');if(!box){box=document.createElement('div');box.id='workSummary61';let anchor=document.getElementById('salarySummary28');anchor?.insertAdjacentElement('afterend',box)}
  if(!box)return;
  let x=workSummary(S.selectedYear),last=x.actual.at(-1);
- box.innerHTML='<div class="card"><div class="title">Etat — miesiące pracy <span class="pill">oddzielone od daty wypłaty</span></div><div class="grid"><div class="tile"><small>ZAROBIONE ZA '+S.selectedYear+'</small><b>'+new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(x.total)+'</b></div><div class="tile"><small>MIESIĄCE Z DANYMI</small><b>'+x.count+'/12</b></div><div class="tile"><small>ŚREDNIA ZA MIESIĄC PRACY</small><b>'+new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(x.avg)+'</b></div><div class="tile"><small>OSTATNI ROZLICZONY OKRES PRACY</small><b>'+(last?label(last.workKey):'—')+'</b><span>'+(last?'wypłata '+label(last.paymentKey):'')+'</span></div></div><p class="muted">Cashflow i PIT liczą miesiąc faktycznej wypłaty. Ten panel pokazuje, za jaki miesiąc pracy wynagrodzenie zostało wypracowane.</p></div>'
+ box.innerHTML='<div class="card"><div class="title">Etat — miesiące pracy <span class="pill">oddzielone od daty wypłaty</span></div><div class="grid"><div class="tile"><small>FAKTYCZNIE ZAROBIONE ZA '+S.selectedYear+'</small><b>'+new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(x.total)+'</b></div><div class="tile"><small>PROGNOZA ZA CAŁY ROK PRACY</small><b>'+new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(x.yearTotal)+'</b><span>w tym prognoza '+new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(x.forecastTotal)+'</span></div><div class="tile"><small>MIESIĄCE Z DANYMI</small><b>'+x.count+'/12</b></div><div class="tile"><small>OSTATNI ROZLICZONY OKRES PRACY</small><b>'+(last?label(last.workKey):'—')+'</b><span>'+(last?'wypłata '+label(last.paymentKey):'')+'</span></div></div><p class="muted">Cashflow i PIT liczą miesiąc faktycznej wypłaty. Forecast „za rok pracy” przesuwa wynagrodzenie o miesiąc wstecz, więc np. wypłata ze stycznia 2027 zasila grudzień 2026.</p></div>'
 }
 function refresh(){ensureAll();attachSave();decorateSalaryCards();renderWorkSummary61()}
 window.mfSalaryPeriod61={payKey,defaultWorkKey,workKeyForRow,salaryForWork,actualWorkYear,workSummary,label,refresh};
