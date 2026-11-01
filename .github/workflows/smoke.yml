@@ -61,5 +61,5 @@ jobs:
       - name: Mission Control 5.6
         run: node tests/mission-57.mjs
 
-      - name: Performance 5.7
-        run: node tests/performance-58.mjs
+      - name: Central kernel 5.8
+        run: node tests/kernel-59.mjs
