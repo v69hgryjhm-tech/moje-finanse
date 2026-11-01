@@ -1,7 +1,7 @@
 /* Moje Finanse 5.8 — centralny kernel renderowania */
 (function(){
 'use strict';
-const VERSION='5.8.1',G=id=>document.getElementById(id);
+const VERSION='5.8.2',G=id=>document.getElementById(id);
 const legacyRender=window.render,legacyShow=window.show;
 const perf=window.__mfKernel59||(window.__mfKernel59={renders:0,navigations:0,fallbacks:0,lastView:'home',lastMs:0});
 function setVersion59(){document.title='Moje Finanse '+VERSION;let h=document.querySelector('.top small');if(h)h.innerHTML='<span id="headerYear">'+(typeof S!=='undefined'?S.selectedYear:'')+'</span> • wersja '+VERSION;document.documentElement.dataset.appVersion=VERSION}
