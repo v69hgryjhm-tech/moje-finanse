@@ -24,7 +24,7 @@ for(const [lines,expected] of [
  [[],0]
 ]){
  year=makeYear(lines);
- ctx.render();
+ ctx.renderForecast26();
  assert.equal(nodes.get('companyTile').textContent,fmt(expected));
  const chart=nodes.get('earningsChart').innerHTML;
  assert.ok(chart.includes('earningsScroll26'));
@@ -50,7 +50,7 @@ for(const [lines,expected] of [
 }
 year=makeYear([{gross:123,vatRate:23}]);
 ctx.sal=()=>({rows:Array.from({length:12},(_,i)=>({total:i===0?1000:800,g:i===0?1500:1200,actual:i===0}))});
-ctx.render();
+ctx.renderForecast26();
 const totalHtml=nodes.get('earningsChart').innerHTML;
 const actualCash=1000+100;
 const annualCash=1000+800*11+100*12;
