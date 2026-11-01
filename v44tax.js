@@ -174,7 +174,7 @@ function renderCompanySummary44(){
    '<div class="actions"><button class="btn primary" onclick="show(\'businessplus\')">Edytuj w Firma+</button></div></div>';
  }).join('');
 }
-function apply44(){renderTax44();renderCompanySummary44()}
+function apply44(){renderTax44();renderCompanySummary44()}window.renderTaxSuite44=apply44;window.renderTaxOnly44=renderTax44;window.renderCompanySummary44=renderCompanySummary44;
 const oldRender=window.render;
 if(typeof oldRender==='function'&&!oldRender.__tax44){
  const fn=function(){const out=oldRender();apply44();return out};fn.__tax44=true;window.render=fn;
