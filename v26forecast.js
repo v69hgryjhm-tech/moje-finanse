@@ -77,6 +77,6 @@ function renderEarnings26(d){
  h.innerHTML=summary+'<div class="earningsMeta26"><span>Porównanie miesięczne — wartości nie są sumowane na wykresie</span><span class="earningsAverage26">Etat netto vs sprzedaż firmy netto bez VAT</span></div><div class="earningsScroll26" tabindex="0" role="region" aria-label="Wykres miesięczny. Na małym ekranie przewiń w poziomie."><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Etat netto i sprzedaż firmy netto bez VAT, miesiąc po miesiącu">'+svg+'</svg></div>';
  let lg=h.parentElement.querySelector('.legend');if(lg){lg.classList.add('earningsLegend26');lg.innerHTML='<span><i class="earningsDot26 salary26"></i>Etat netto</span><span><i class="earningsDot26 company26"></i>Firma netto bez VAT</span><span><i class="earningsForecast26"></i>Prognoza — jasne słupki</span>'}
 }
-const oldRender=window.render;if(typeof oldRender==='function'){window.render=function(){oldRender();apply()}}
+window.renderForecast26=apply;
 
 })();
