@@ -6,7 +6,7 @@ const src=fs.readFileSync('v59kernel.js','utf8');
 const html=fs.readFileSync('index.html','utf8');
 new Function(src);
 
-let ready=null, salary=0, accounting=0, business=0, loans=0, legacy=0;
+let ready=null, salary=0, accounting=0, business=0, loans=0, legacy=0, forecast=0;
 const mk=()=>({classList:{toggle(){},contains(){return false}},dataset:{}});
 const ctx={
  console,performance:{now:()=>0},scrollTo(){},
@@ -20,6 +20,7 @@ const ctx={
  S:{selectedYear:2026},
  render(){legacy++},show(){},
  renderSalaryLocal37(){salary++},
+ renderForecast26(){forecast++},
  renderAccounting50(){accounting++},
  renderBusinessPlus44(){business++},
  loans(){loans++},
@@ -33,10 +34,11 @@ ctx.show('salary');assert.equal(salary,1);assert.equal(legacy,0);
 ctx.show('accounting');assert.equal(accounting,1);assert.equal(legacy,0);
 ctx.show('businessplus');assert.equal(business,1);assert.equal(legacy,0);
 ctx.show('loans');assert.equal(loans,1);assert.equal(legacy,0);
+ctx.mfKernel59.renderLegacyHome();assert.equal(legacy,1);assert.equal(forecast,1,'Legacy Start musi odtworzyć nowy wykres forecastu');
 
-assert.match(html,/v59kernel\.js\?v=5810/);
+assert.match(html,/v59kernel\.js\?v=5820/);
 assert.doesNotMatch(html,/v58performance\.js/);
-assert.match(html,/Moje Finanse 5\.8\.1/);
+assert.match(html,/Moje Finanse 5\.8\.2/);
 assert.ok(!fs.readFileSync('v14b2.js','utf8').trimEnd().endsWith('render();'),'v14b2 nadal robi wczesny render');
 
 console.log('PASS — 5.8: centralny kernel renderuje tylko aktywny widok, v58 jest odpięty, a wczesny render usunięty.');
