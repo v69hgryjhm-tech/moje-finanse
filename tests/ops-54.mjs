@@ -21,8 +21,8 @@ for(const token of [
   assert.ok(src.includes(token),'Brak funkcji/modułu: '+token);
 }
 
-assert.match(html,/v54ops\.js\?v=5800/);
-assert.match(html,/Moje Finanse 5\.8\.0/);
+assert.match(html,/v54ops\.js\?v=5810/);
+assert.match(html,/Moje Finanse 5\.8\.1/);
 assert.match(html,/Plan działania/);
 assert.ok(!src.includes('accountBalance'),'Operacje nie powinny wymagać stanu konta');
 assert.ok(!src.includes('cashBalance'),'Operacje nie powinny wymagać stanu gotówki');
