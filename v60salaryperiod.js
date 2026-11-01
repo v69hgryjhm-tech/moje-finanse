@@ -8,11 +8,12 @@ function payKey(y,i){return key(y,i)}
 function defaultWorkKey(y,i){return key(y,i-1)}
 function workKeyForRow(y,i,row){return row?.workMonth||defaultWorkKey(y,i)}
 function ensureAll(){
- if(typeof S==='undefined')return;
+ if(typeof S==='undefined')return;let changed=false;
  Object.keys(S.years||{}).forEach(yy=>{
   const y=+yy,rows=S.years[yy]?.salary||[];
-  rows.forEach((r,i)=>{if(r&&r.workMonth==null)r.workMonth=defaultWorkKey(y,i)})
- })
+  rows.forEach((r,i)=>{if(r&&r.workMonth==null){r.workMonth=defaultWorkKey(y,i);changed=true}})
+ });
+ if(changed)try{save()}catch{}
 }
 function findPaymentForWork(workKey){
  const out=[];
