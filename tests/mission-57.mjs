@@ -20,9 +20,9 @@ for(const token of [
   assert.ok(src.includes(token),'Brak elementu Mission Control: '+token);
 }
 
-assert.match(html,/v57mission\.css\?v=5700/);
-assert.match(html,/v57mission\.js\?v=5700/);
-assert.match(html,/Moje Finanse 5\.7\.0/);
+assert.match(html,/v57mission\.css\?v=5710/);
+assert.match(html,/v57mission\.js\?v=5710/);
+assert.match(html,/Moje Finanse 5\.7\.1/);
 assert.ok(css.includes('#home.missionMode57:not(.showLegacy57)>:not(#missionHome57)'),'Stary Start nie jest domyślnie ukrywany');
 assert.ok(src.includes('Pokaż szczegóły finansowe'),'Brak rozwijania starego Startu');
 assert.ok(src.includes('3 rzeczy do zrobienia'),'Brak priorytetów na Start');
