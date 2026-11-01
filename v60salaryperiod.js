@@ -1,4 +1,4 @@
-/* Moje Finanse 5.8.1 — okres pracy vs miesiąc wypłaty */
+/* Moje Finanse 5.8.2 — okres pracy vs miesiąc wypłaty */
 (function(){
 'use strict';
 const N=v=>+v||0;
