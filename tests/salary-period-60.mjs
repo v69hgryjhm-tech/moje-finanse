@@ -64,8 +64,8 @@ assert.equal(sum2026.total,7000);
 assert.equal(years[2026].salary[11].net,null);
 assert.equal(years[2027].salary[0].net,7000);
 
-assert.match(html,/v60salaryperiod\.js\?v=5820/);
-assert.match(html,/Moje Finanse 5\.8\.2/);
+assert.match(html,/v60salaryperiod\.js\?v=5830/);
+assert.match(html,/Moje Finanse 5\.8\.3/);
 assert.ok(src.includes('Cashflow i PIT liczą miesiąc faktycznej wypłaty'));
 
-console.log('PASS — 5.8.2: styczeń 2027 może być wypłatą za grudzień 2026 bez przesuwania cashflow i PIT.');
+console.log('PASS — 5.8.3: styczeń 2027 może być wypłatą za grudzień 2026 bez przesuwania cashflow i PIT.');
