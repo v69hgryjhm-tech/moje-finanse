@@ -8,7 +8,8 @@ function setVersion59(){document.title='Moje Finanse '+VERSION;let h=document.qu
 function safe59(name,fn){try{return fn?.()}catch(e){try{console.error('[MF 5.8] '+name,e)}catch{}return null}}
 function active59(){return document.querySelector('.view.active')?.id||perf.lastView||'home'}
 function activate59(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));document.querySelectorAll('.nav button[data-v]').forEach(x=>x.classList.toggle('active',x.dataset.v===v));perf.lastView=v;try{scrollTo(0,0)}catch{}}
-function renderHome59(){safe59('Mission Control',()=>window.mfMission57?.render?.());if(G('home')?.classList.contains('showLegacy57')){perf.fallbacks++;safe59('legacy home details',legacyRender)}}
+function renderLegacyHome59(){perf.fallbacks++;safe59('legacy home details',legacyRender);safe59('home forecast charts',()=>window.renderForecast26?.());safe59('home tax/company',()=>window.renderTaxSuite44?.())}
+function renderHome59(){safe59('Mission Control',()=>window.mfMission57?.render?.());if(G('home')?.classList.contains('showLegacy57'))renderLegacyHome59()}
 function renderSalary59(){safe59('Etat',()=>window.renderSalaryLocal37?.())}
 function renderCompany59(){safe59('Firma',()=>window.company?.(window.comp?.()));safe59('Firma tax summary',()=>window.renderCompanySummary44?.())}
 function renderBusiness59(){
@@ -83,6 +84,6 @@ function install59(){
  window.show=function(v){perf.navigations++;activate59(v);renderView59(v);return v};
  window.render.__mfKernel59=true;window.show.__mfKernel59=true;setVersion59()
 }
-window.mfKernel59={renderView:renderView59,stats:perf,legacyRender,legacyShow,install:install59};
+window.mfKernel59={renderView:renderView59,renderLegacyHome:renderLegacyHome59,stats:perf,legacyRender,legacyShow,install:install59};
 window.addEventListener('finance-modules-ready',install59,{once:true});
 })();
