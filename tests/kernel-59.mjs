@@ -34,9 +34,9 @@ ctx.show('accounting');assert.equal(accounting,1);assert.equal(legacy,0);
 ctx.show('businessplus');assert.equal(business,1);assert.equal(legacy,0);
 ctx.show('loans');assert.equal(loans,1);assert.equal(legacy,0);
 
-assert.match(html,/v59kernel\.js\?v=5800/);
+assert.match(html,/v59kernel\.js\?v=5810/);
 assert.doesNotMatch(html,/v58performance\.js/);
-assert.match(html,/Moje Finanse 5\.8\.0/);
+assert.match(html,/Moje Finanse 5\.8\.1/);
 assert.ok(!fs.readFileSync('v14b2.js','utf8').trimEnd().endsWith('render();'),'v14b2 nadal robi wczesny render');
 
 console.log('PASS — 5.8: centralny kernel renderuje tylko aktywny widok, v58 jest odpięty, a wczesny render usunięty.');
