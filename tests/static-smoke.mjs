@@ -42,10 +42,10 @@ if(!html.includes('v56autopilot.js')) failures.push('Brak Autopilota 5.5');
 if(!html.includes('v57mission.js')) failures.push('Brak Mission Control 5.6');
 if(html.includes('v58performance.js')) failures.push('Stara warstwa v58 nadal ładowana');
 if(!html.includes('v59kernel.js')) failures.push('Brak centralnego kernela 5.8');
-if(!html.includes('v60salaryperiod.js')) failures.push('Brak warstwy miesiąca pracy Etatu 5.8.1');
+if(!html.includes('v60salaryperiod.js')) failures.push('Brak warstwy miesiąca pracy Etatu 5.8.2');
 if(!html.includes('v57mission.css')) failures.push('Brak stylu Mission Control 5.6');
 if(!html.includes("show('control')")) failures.push('Brak wejścia do Centrum dowodzenia');
-if(!html.includes('Moje Finanse 5.8.1')) failures.push('Nieprawidłowa wersja aplikacji');
+if(!html.includes('Moje Finanse 5.8.2')) failures.push('Nieprawidłowa wersja aplikacji');
 if(!read('v14a.js').includes('moje-finanse-v14')) failures.push('Zmieniono główny klucz danych localStorage');
 
 console.log('Aktywne JS:',scripts.length);
