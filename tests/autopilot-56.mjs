@@ -28,8 +28,8 @@ for(const id of ['autopilot','capacity','watch','autopilotBody56','capacityBody5
   assert.ok(html.includes('id="'+id+'"'),'Brak widoku/kontenera #'+id);
 }
 
-assert.match(html,/v56autopilot\.js\?v=5600/);
-assert.match(html,/Moje Finanse 5\.6\.0/);
+assert.match(html,/v56autopilot\.js\?v=5700/);
+assert.match(html,/Moje Finanse 5\.7\.0/);
 assert.match(html,/Autopilot finansowy/);
 assert.match(html,/MOHE Capacity Planner/);
 assert.match(html,/Watchlista decyzji/);
