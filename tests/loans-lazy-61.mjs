@@ -17,10 +17,9 @@ assert.ok(lazy.includes('renderLoanCardLazy61'),'Brak lokalnego renderera pojedy
 assert.ok(lazy.includes('requestAnimationFrame(()=>renderLoanCardLazy61(i))'),'Rozwinięcie nie jest odroczone/lokalne');
 assert.ok(lazy.includes('actualStats61'),'Lekka lista nie ma własnych lekkich statystyk historii');
 
-const summaryStart=lazy.indexOf('function summary61');
-const summaryEnd=lazy.indexOf('function renderLoanCardLazy61');
-const summary=lazy.slice(summaryStart,summaryEnd);
-assert.ok(!summary.includes('timeline('),'Zwinięta karta nadal liczy pełny timeline');
+const summaryMatch=lazy.match(/function summary61\([^]*?\n\}/);
+assert.ok(summaryMatch,'Nie znaleziono summary61');
+assert.ok(!summaryMatch[0].includes('timeline('),'Zwinięta karta nadal liczy pełny timeline');
 
 assert.ok(loan17.includes('uiScheduleOpen?cards'),'Harmonogram nie jest lazy');
 assert.ok(loan17.includes('toggleLoanSchedule17'),'Brak osobnego otwierania harmonogramu');
