@@ -36,9 +36,9 @@ ctx.show('businessplus');assert.equal(business,1);assert.equal(legacy,0);
 ctx.show('loans');assert.equal(loans,1);assert.equal(legacy,0);
 ctx.mfKernel59.renderLegacyHome();assert.equal(legacy,1);assert.equal(forecast,1,'Legacy Start musi odtworzyć nowy wykres forecastu');
 
-assert.match(html,/v59kernel\.js\?v=5830/);
+assert.match(html,/v59kernel\.js\?v=5840/);
 assert.doesNotMatch(html,/v58performance\.js/);
-assert.match(html,/Moje Finanse 5\.8\.3/);
+assert.match(html,/Moje Finanse 5\.8\.4/);
 assert.ok(!fs.readFileSync('v14b2.js','utf8').trimEnd().endsWith('render();'),'v14b2 nadal robi wczesny render');
 
 console.log('PASS — 5.8: centralny kernel renderuje tylko aktywny widok, v58 jest odpięty, a wczesny render usunięty.');
