@@ -30,10 +30,7 @@ function renderControl59(){
  safe59('Control autopilot',()=>window.mfAutopilot56?.renderControl?.())
 }
 function renderLoans59(){
- safe59('Kredyty base',()=>window.loans?.());
- safe59('Kredyty UX',()=>window.mfUx47?.enhanceLoans?.());
- safe59('Kredyty control',()=>window.mfControl51?.renderLoans?.());
- safe59('Kredyty planner',()=>window.mfPlanner52?.renderLoans?.())
+ safe59('Kredyty lazy',()=>window.renderLoansLazy61?.()||window.loans?.())
 }
 function renderSettings59(){
  safe59('Ustawienia diag',()=>window.renderDiagnostics42?.());
