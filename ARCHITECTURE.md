@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.8.5**.
+Aktualna gałąź produkcyjna: **5.9.0**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -31,7 +31,8 @@ Aktualna gałąź produkcyjna: **5.8.5**.
 20. `v60salaryperiod.js` — rozdzielenie miesiąca pracy od miesiąca wypłaty dla Etatu; cashflow/PIT liczą miesiąc wypłaty, analiza zarobków i forecast okresu pracy korzystają z miesiąca pracy.
 21. `v61loanslazy.js` — lekki moduł Kredytów: szybkie podsumowania, lazy rendering szczegółów pojedynczego kredytu i osobne lazy ładowanie harmonogramu miesięcznego.
 22. `v62loanengine.js` — poprawiony silnik kredytów: osobne zdarzenia raty i nadpłaty, osobne daty, chronologiczne naliczanie odsetek i kapitału.
-23. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
+23. `v63privatemonitor.js` — prywatne finanse w trybie monitoringu: Etat, kredyty, cele i majątek bez pełnego budżetu domowego, bez prywatnej nadwyżki i bez obowiązkowej poduszki.
+24. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
 
 ## Dane
 Główny klucz localStorage pozostaje bez zmian: `moje-finanse-v14`.
@@ -95,3 +96,8 @@ Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje
 - poprawka 5.8.5: rata regularna i nadpłata mają osobne daty (`regularPaymentDate`, `extraPaymentDate`); nadpłata obniża kapitał w dniu wpłaty, ale nie oznacza raty jako zapłaconej przed terminem,
 - miesięczne forecasty sumują wszystkie zdarzenia kredytowe z miesiąca, więc nadpłata przed terminem nie usuwa oczekiwanej raty,
 - przycisk Edytuj jest dostępny na każdej karcie kredytu, a zapis edycji odświeża tylko moduł Kredytów.
+
+- 5.9.0 rozdziela filozofię danych: MOHE pozostaje pełnym przepływem finansowym, natomiast część prywatna nie zakłada kompletności codziennych wydatków,
+- prywatne ekrany nie pokazują kwoty „ile zostało”, nie generują alertów deficytu na podstawie niepełnych kosztów i nie rozdzielają pensji na poduszkę/cele/inwestycje,
+- ekran Poduszki jest ukryty, a zapisane historyczne dane pozostają w magazynie wyłącznie dla kompatybilności,
+- Wydatki zostały uproszczone do opcjonalnych stałych zobowiązań i większych kosztów, które użytkownik chce świadomie śledzić.
