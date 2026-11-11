@@ -42,11 +42,12 @@ if(!html.includes('v56autopilot.js')) failures.push('Brak Autopilota 5.5');
 if(!html.includes('v57mission.js')) failures.push('Brak Mission Control 5.6');
 if(html.includes('v58performance.js')) failures.push('Stara warstwa v58 nadal ładowana');
 if(!html.includes('v59kernel.js')) failures.push('Brak centralnego kernela 5.8');
-if(!html.includes('v60salaryperiod.js')) failures.push('Brak warstwy miesiąca pracy Etatu 5.8.4');
-if(!html.includes('v61loanslazy.js')) failures.push('Brak lazy Kredytów 5.8.4');
+if(!html.includes('v60salaryperiod.js')) failures.push('Brak warstwy miesiąca pracy Etatu 5.8.5');
+if(!html.includes('v61loanslazy.js')) failures.push('Brak lazy Kredytów 5.8.5');
+if(!html.includes('v62loanengine.js')) failures.push('Brak poprawionego silnika Kredytów 5.8.5');
 if(!html.includes('v57mission.css')) failures.push('Brak stylu Mission Control 5.6');
 if(!html.includes("show('control')")) failures.push('Brak wejścia do Centrum dowodzenia');
-if(!html.includes('Moje Finanse 5.8.4')) failures.push('Nieprawidłowa wersja aplikacji');
+if(!html.includes('Moje Finanse 5.8.5')) failures.push('Nieprawidłowa wersja aplikacji');
 if(!read('v14a.js').includes('moje-finanse-v14')) failures.push('Zmieniono główny klucz danych localStorage');
 
 console.log('Aktywne JS:',scripts.length);
@@ -59,4 +60,4 @@ if(failures.length){
 console.log('\nPASS — składnia, pliki, kontenery, podstawowe handlery i storage są spójne.');
 
 const ux=fs.readFileSync('v33uxfix.js','utf8');
-if(!ux.includes('expenseItem34')||!ux.includes('budgetSummary34')) failures.push('Brak nowego widoku wydatków 5.8.4');
+if(!ux.includes('expenseItem34')||!ux.includes('budgetSummary34')) failures.push('Brak nowego widoku wydatków 5.8.5');
