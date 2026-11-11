@@ -69,3 +69,6 @@ jobs:
 
       - name: Lazy loans 5.8.4
         run: node tests/loans-lazy-61.mjs
+
+      - name: Loan events 5.8.5
+        run: node tests/loan-events-62.mjs
