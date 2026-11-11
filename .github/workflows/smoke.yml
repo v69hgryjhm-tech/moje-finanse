@@ -66,3 +66,6 @@ jobs:
 
       - name: Salary work/payment period 5.8.1
         run: node tests/salary-period-60.mjs
+
+      - name: Lazy loans 5.8.4
+        run: node tests/loans-lazy-61.mjs
