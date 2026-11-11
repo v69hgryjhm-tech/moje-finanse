@@ -57,7 +57,7 @@ function renderView59(v){
   case 'emergency':safe59('Monitoring prywatny',()=>{activate59('control');window.renderPrivateMonitor63?.()});break;
   case 'actions':safe59('Plan działania',()=>window.mfOps54?.renderActions?.());break;
   case 'calendar':safe59('Kalendarz',()=>{window.renderCalendar42?.();window.mfOps54?.renderCalendar?.()});break;
-  case 'budget':safe59('Wydatki',()=>{window.renderBudget34?.();window.renderSuite41?.();window.mfOps54?.renderBudget?.()});break;
+  case 'budget':safe59('Stałe zobowiązania',()=>window.renderCommitments63?.()||window.renderBudget34?.());break;
   case 'debt':safe59('Zadłużenie',()=>{window.renderDebt34?.();window.renderSuite41?.()});break;
   case 'scenario':safe59('Scenariusz legacy',()=>window.renderScenario34?.());break;
   case 'lab':safe59('Laboratorium',()=>window.mfLab55?.renderLab?.());break;
