@@ -59,6 +59,46 @@ function renderMissionPrivate63(){
  host.innerHTML='<div class="missionHero57"><div class="missionHeroCopy57"><small>Centrum dowodzenia • monitoring</small><h2>Etat, firma i zobowiązania — bez liczenia każdej złotówki.</h2><p>Prywatnie śledzę wpływy, kredyty i majątek. Firma nadal jest liczona dokładnie, bo tam prowadzisz sprzedaż i koszty.</p><div class="missionHeroActions57"><button class="btn primary" onclick="show(\\'control\\')">🧭 Finanse prywatne</button><button class="btn" onclick="show(\\'businessplus\\')">🏢 MOHE</button></div></div></div><div class="missionDomains57"><section class="missionCard57 domain57"><div class="missionTitle57"><div><small>JA / FINANSE PRYWATNE</small><b>monitoring uproszczony</b></div></div><div class="domainKpis57"><div><span>Etat — miesiąc</span><b>'+PLN(x.salary.amount)+'</b></div><div><span>Saldo kredytów</span><b>'+PLN(x.debt)+'</b></div><div><span>Raty / nadpłaty</span><b>'+PLN(x.loanMonthly)+'</b></div></div><p class="muted">Nie pokazuję „ile zostało”, bo nie wpisujesz wszystkich codziennych wydatków.</p><button class="missionLink57" onclick="show(\\'control\\')">Otwórz monitoring prywatny ›</button></section><section class="missionCard57 domain57"><div class="missionTitle57"><div><small>MOHE / FIRMA</small><b>'+(companyOk?'pełny przepływ':'uzupełnij dane')+'</b></div></div><div class="domainKpis57"><div><span>Sprzedaż netto</span><b>'+PLN(company?.sales)+'</b></div><div><span>Bezpieczny próg</span><b>'+PLN(company?.safe)+'</b></div><div><span>Margines</span><b class="'+(N(company?.margin)>=0?'green':'red')+'">'+PLN(company?.margin)+'</b></div></div><p class="muted">Firma pozostaje liczona dokładnie: sprzedaż, koszty, podatki i wynik.</p><button class="missionLink57" onclick="show(\\'businessplus\\')">Otwórz MOHE ›</button></section></div><section class="missionCard57"><div class="missionTitle57"><div><small>CO WARTO SPRAWDZIĆ</small><b>Zapisane zobowiązania i terminy</b></div><button class="btn" onclick="show(\\'calendar\\')">Kalendarz ›</button></div><p class="muted">Aplikacja przypomina o kredytach, podatkach firmy i zapisanych większych płatnościach — nie o codziennych zakupach.</p></section>';
  return true
 }
+
+function monitoringScore63(k=nowKey()){
+ let x=privateSnapshot(k),salaryScore=x.salary.amount>0?(x.salary.actual?30:22):0;
+ let debtShare=x.salary.amount>0?x.loanMonthly/x.salary.amount:0,debtScore=Math.round(Math.max(0,Math.min(1,(.55-debtShare)/.40))*30);
+ let loans=S.loans||[],loanQuality=!loans.length?20:Math.round(loans.filter(l=>N(l.payment)>=0&&N(l.balance)>=0&&N(l.dueDay)>0).length/loans.length*20);
+ let goals=(S.finance.goals||[]),goalScore=goals.length?10:6;
+ let company=window.mfCommand53?.companyBreakEven?.(),companyScore=company?.ok?10:5;
+ let total=Math.max(0,Math.min(100,salaryScore+debtScore+loanQuality+goalScore+companyScore));
+ return{total,state:total>=80?'dane wyglądają dobrze':total>=60?'monitoring kompletny':total>=40?'część danych do uzupełnienia':'mało danych',parts:[
+  {name:'Etat',score:salaryScore,max:30,detail:x.salary.actual?'wpisana wypłata':'prognoza / brak wpisu'},
+  {name:'Obciążenie ratami',score:debtScore,max:30,detail:x.salary.amount?Math.round(debtShare*100)+'% etatu':'brak odniesienia'},
+  {name:'Dane kredytów',score:loanQuality,max:20,detail:loans.length?loans.length+' kredyt(y)':'brak kredytów'},
+  {name:'Cele',score:goalScore,max:10,detail:goals.length?goals.length+' aktywne':'opcjonalne'},
+  {name:'Firma',score:companyScore,max:10,detail:company?.ok?'dane dostępne':'brak pełnych danych'}
+ ],quality:{issues:[]},monitoring:true}
+}
+function periodMonitoring63(y,q=0){
+ let months=q?[3*(q-1),3*(q-1)+1,3*(q-1)+2]:[0,1,2,3,4,5,6,7,8,9,10,11],salary=0,company=0,actualSalary=0,loanPaid=0;
+ months.forEach(m=>{
+  let k=key(y,m),s=salaryFor(k);salary+=N(s.amount);if(s.actual)actualSalary++;
+  try{let r=S.years?.[String(y)]?.company?.[m],cs=window.mfCompanySummary44?.(r||{});company+=N(cs?.profit)}catch{}
+  (S.loans||[]).forEach(l=>{try{let rows=(window.loanTimeline15?.(l,false)?.actual||[]).filter(r=>key(r.date.getFullYear(),r.date.getMonth())===k);loanPaid+=rows.reduce((a,r)=>a+N(r.regularPaid)+N(r.extra),0)}catch{}})
+ });
+ return{salary,company,actualSalary,loanPaid,months:months.length,debt:(S.loans||[]).reduce((a,l)=>a+loanBalance(l),0)}
+}
+function renderReview63(){
+ let h=G('reviewBody55');if(!h||!ensure63())return;
+ let y=N(S.finance.lab55?.reviewYear)||S.selectedYear||new Date().getFullYear(),q=N(S.finance.lab55?.reviewQuarter)||1,cur=periodMonitoring63(y,q),prev=periodMonitoring63(q===1?y-1:y,q===1?4:q-1);
+ let pct=(a,b)=>b?((a-b)/Math.abs(b))*100:0;
+ h.innerHTML='<section class="card"><div class="title">Review — Q'+q+' '+y+' <span class="pill">monitoring</span></div><div class="privateGrid63"><div><small>ETAT</small><b>'+PLN(cur.salary)+'</b><span>'+cur.actualSalary+'/'+cur.months+' mies. z wpisaną wypłatą</span></div><div><small>MOHE — WYNIK</small><b>'+PLN(cur.company)+'</b><span>'+(pct(cur.company,prev.company)>=0?'+':'')+pct(cur.company,prev.company).toFixed(1)+'% vs poprzedni kwartał</span></div><div><small>WPŁATY DO KREDYTÓW</small><b>'+PLN(cur.loanPaid)+'</b><span>raty + nadpłaty wykonane</span></div><div><small>AKTUALNE SALDO KREDYTÓW</small><b>'+PLN(cur.debt)+'</b></div></div><p class="muted">Review nie ocenia prywatnych wydatków ani „miesięcy na plusie”, bo aplikacja nie prowadzi pełnego budżetu domowego.</p><div class="actions"><button class="btn" onclick="reviewShiftYear55(-1)">‹ Rok</button><button class="btn" onclick="reviewQuarter55('+(q===1?4:q-1)+')">‹ Kwartał</button><button class="btn" onclick="reviewQuarter55('+(q===4?1:q+1)+')">Kwartał ›</button><button class="btn" onclick="reviewShiftYear55(1)">Rok ›</button></div></section>'
+}
+function watchMetric63(type){
+ let x=privateSnapshot(nowKey()),company=window.mfCommand53?.companyBreakEven?.(),inv=0;try{inv=N(window.mfLab55?.investmentSummary?.().value)}catch{}
+ return({debt:x.debt,company:N(company?.sales),invest:inv,refi:N(S.finance.auto56?.bestRefiOffer),salary:x.salary.amount})[type]||0
+}
+function renderWatch63(){
+ let h=G('watchBody56');if(!h||!ensure63())return,rows=(S.finance.auto56?.watchlist||[]).filter(w=>['debt','company','invest','refi','salary'].includes(w.type));
+ h.innerHTML='<section class="card"><div class="title">Watchlista decyzji <span class="pill">realne mierniki</span></div><p class="muted">Warunki oparte tylko na danych, które rzeczywiście prowadzisz. Stare warunki „poduszka” i „nadwyżka” nie sterują już decyzjami.</p>'+(rows.length?'<div class="watchRows56">'+rows.map(w=>{let cur=watchMetric63(w.type),hit=w.dir==='lte'?cur<=N(w.threshold):cur>=N(w.threshold);return'<div class="'+(hit?'hit56':'')+'"><div><small>'+esc(({debt:'Saldo kredytów',company:'Sprzedaż MOHE',invest:'Portfel inwestycyjny',refi:'Oferta refinansowania %',salary:'Etat — wpływ'})[w.type])+'</small><b>'+esc(w.name)+'</b><span>aktualnie '+(w.type==='refi'?cur.toFixed(2):PLN(cur))+'</span></div><strong>'+(hit?'✓ SPEŁNIONY':'oczekuje')+'</strong><em>'+esc(w.action||'')+'</em></div>').join('')+'</div>':'<div class="privateNote63"><b>Brak aktywnych warunków opartych na realnych miernikach.</b><span>Możemy później dodać np. próg salda kredytu, wartość inwestycji albo wynik MOHE.</span></div>')+'</section>'
+}
+
 function hideEmergency63(){
  let s=G('emergency');if(s)s.hidden=true;
  document.querySelectorAll('[onclick*="show(\\'emergency\\')"]').forEach(b=>b.style.display='none');
@@ -71,6 +111,7 @@ function install63(){
   window.mfPlanner52.renderControl=()=>{};
  }
  if(window.mfCommand53){
+  window.mfCommand53.financialScore=monitoringScore63;
   window.mfCommand53.renderHome=()=>{};
   window.mfCommand53.renderControl=()=>{};
  }
@@ -80,13 +121,15 @@ function install63(){
  }
  if(window.mfAutopilot56){
   window.mfAutopilot56.renderAutopilot=renderAutopilot63;
+  window.mfAutopilot56.renderWatch=renderWatch63;
   window.mfAutopilot56.renderHome=()=>{};
   window.mfAutopilot56.renderControl=()=>{};
  }
+ if(window.mfLab55)window.mfLab55.renderReview=renderReview63;
  window.renderPrivateMonitor63=renderPrivateMonitor63;
  window.renderMonthlyMonitor63=renderMonthlyMonitor63;
 }
-window.mfPrivate63={snapshot:privateSnapshot,renderControl:renderPrivateMonitor63,renderMonthly:renderMonthlyMonitor63,renderActions:renderActions63,renderAutopilot:renderAutopilot63,renderMission:renderMissionPrivate63,install:install63};
+window.mfPrivate63={snapshot:privateSnapshot,monitoringScore:monitoringScore63,renderControl:renderPrivateMonitor63,renderMonthly:renderMonthlyMonitor63,renderActions:renderActions63,renderAutopilot:renderAutopilot63,renderMission:renderMissionPrivate63,renderReview:renderReview63,renderWatch:renderWatch63,install:install63};
 window.addEventListener('finance-modules-ready',install63,{once:true});
 let st=document.createElement('style');st.textContent='.privateGrid63{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.privateGrid63>div{padding:12px;border:1px solid #e4eaf2;border-radius:12px;background:#f7f9fc}.privateGrid63 small,.privateGrid63 span{display:block;color:#7c899c;font-size:9px}.privateGrid63 b{display:block;margin:5px 0;color:#315275}.privateNote63{margin-top:12px;padding:12px;border-radius:11px;background:#f4f7fb}.privateNote63 b,.privateNote63 span{display:block}.privateNote63 span{margin-top:4px;color:#77869a;font-size:10px}.monitorActions63{display:grid;gap:8px;margin-top:10px}.monitorActions63 button{display:grid;grid-template-columns:28px 1fr;gap:9px;align-items:center;text-align:left;border:1px solid #e4eaf2;background:#fff;border-radius:11px;padding:10px;cursor:pointer}.monitorActions63 button>span{width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:#edf3fa;color:#315f9f;font-weight:800}.monitorActions63 b,.monitorActions63 small{display:block}.monitorActions63 small{margin-top:3px;color:#7d899b}@media(max-width:760px){.privateGrid63{grid-template-columns:1fr 1fr}}@media(max-width:520px){.privateGrid63{grid-template-columns:1fr}}';document.head.appendChild(st);
 })();
