@@ -17,13 +17,13 @@ function actualStats61(l){
  }
  return{balance,date:last,paid,extra:extraPaid,interest:interestPaid,principal:principalPaid}
 }
-function point(l){let s=actualStats61(l);return{balance:s.balance,date:s.date}}
-function totals(l){let s=actualStats61(l);return{paid:s.paid,extra:s.extra,interest:s.interest,principal:s.principal}}
+function point(l){try{return window.loanCurrentPoint15?.(l)||{balance:N(l.balance),date:parseDate61(l.asOfDate)}}catch{return{balance:N(l.balance),date:parseDate61(l.asOfDate)}}}
+function totals(l){try{return window.loanTotals15?.(l)||actualStats61(l)}catch{return actualStats61(l)}}
 function timeline(l,plan=true){try{return window.loanTimeline15?.(l,plan)}catch{return null}}
 function isOpen(i){return !!S.loans?.[i]?.uiOpen61}
 function summary61(l,i){
  const q=point(l),tot=totals(l),bal=N(q?.balance??l.balance),orig=Math.max(N(l.originalBalance),bal,1),pc=Math.max(0,Math.min(100,(orig-bal)/orig*100));
- return '<div class="card loan loanSummary61" id="loanLazy61_'+i+'"><div class="loanTitle"><div><small>'+(l.loanType==='zero'?'RATY 0%':'KREDYT OPROCENTOWANY')+'</small><h3>'+esc(l.name||'Kredyt')+'</h3></div><div class="loanTitleActions"><button class="btn collapseBtn" onclick="toggleLoanLazy61('+i+')">Rozwiń ▾</button><button class="btn danger" onclick="delLoan('+i+')">Usuń</button></div></div><div class="loanKpis loanKpisCompact61"><div class="loanKpi"><small>AKTUALNE SALDO</small><b>'+PLN(bal)+'</b></div><div class="loanKpi"><small>RATA UMOWNA</small><b>'+PLN(l.payment)+'</b></div><div class="loanKpi"><small>WPŁACONO</small><b>'+PLN(tot?.paid)+'</b></div><div class="loanKpi"><small>OPROCENTOWANIE</small><b>'+N(l.rate).toFixed(2)+'%</b></div></div><div class="loanProgress"><div><span>Postęp spłaty</span><b>'+pc.toFixed(1)+'%</b></div><div class="progress"><i style="width:'+pc+'%"></i></div></div></div>'
+ return '<div class="card loan loanSummary61" id="loanLazy61_'+i+'"><div class="loanTitle"><div><small>'+(l.loanType==='zero'?'RATY 0%':'KREDYT OPROCENTOWANY')+'</small><h3>'+esc(l.name||'Kredyt')+'</h3></div><div class="loanTitleActions"><button class="btn editLoan47" onclick="editLoanModal47('+i+')">✎ Edytuj</button><button class="btn collapseBtn" onclick="toggleLoanLazy61('+i+')">Rozwiń ▾</button><button class="btn danger" onclick="delLoan('+i+')">Usuń</button></div></div><div class="loanKpis loanKpisCompact61"><div class="loanKpi"><small>AKTUALNE SALDO</small><b>'+PLN(bal)+'</b></div><div class="loanKpi"><small>RATA UMOWNA</small><b>'+PLN(l.payment)+'</b></div><div class="loanKpi"><small>WPŁACONO</small><b>'+PLN(tot?.paid)+'</b></div><div class="loanKpi"><small>OPROCENTOWANIE</small><b>'+N(l.rate).toFixed(2)+'%</b></div></div><div class="loanProgress"><div><span>Postęp spłaty</span><b>'+pc.toFixed(1)+'%</b></div><div class="progress"><i style="width:'+pc+'%"></i></div></div></div>'
 }
 function renderLoanCardLazy61(i){
  const host=G('loanLazy61_'+i);if(!host||!S.loans?.[i])return;
@@ -41,6 +41,8 @@ function renderLoanCardLazy61(i){
      if(actions){btn=document.createElement('button');btn.className='btn collapseBtn';actions.prepend(btn)}
    }
    if(btn){btn.textContent='Zwiń ▴';btn.onclick=()=>toggleLoanLazy61(i)}
+   if(actions&&!actions.querySelector('.editLoan47')){let eb=document.createElement('button');eb.className='btn editLoan47';eb.type='button';eb.textContent='✎ Edytuj';eb.onclick=()=>window.editLoanModal47?.(i);actions.insertBefore(eb,actions.querySelector('.danger')||null)}
+   let inline=card.querySelector('.loanEdit');if(inline)inline.style.display='none'
  }
 }
 window.renderLoanCardLazy61=renderLoanCardLazy61;
@@ -64,5 +66,5 @@ function renderLoansLazy61(){
 }
 window.renderLoansLazy61=renderLoansLazy61;
 window.loans=renderLoansLazy61;
-let st=document.createElement('style');st.textContent='.loanSummary61{padding:14px}.loanKpisCompact61{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:10px}.loanLoading61{padding:18px}.loanLoading61 small{display:block;margin-top:4px;color:var(--muted)}.loanOverviewLite61{margin-bottom:12px}.loanScheduleClosed17{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:12px;background:#f7f9fc}.loanScheduleClosed17 b,.loanScheduleClosed17 small{display:block}.loanScheduleClosed17 small{margin-top:3px;color:var(--muted);font-size:9px}@media(max-width:760px){.loanKpisCompact61{grid-template-columns:1fr 1fr}.loanScheduleClosed17{align-items:flex-start;flex-direction:column}}';document.head.appendChild(st);
+let st=document.createElement('style');st.textContent='.loanSummary61{padding:14px}.loanKpisCompact61{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:10px}.loanLoading61{padding:18px}.loanLoading61 small{display:block;margin-top:4px;color:var(--muted)}.loanOverviewLite61{margin-bottom:12px}.loanScheduleClosed17{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:12px;background:#f7f9fc}.loanScheduleClosed17 b,.loanScheduleClosed17 small{display:block}.loanDatesSplit62{grid-template-columns:1fr 1fr 1fr 1fr}.loanScheduleClosed17 small{margin-top:3px;color:var(--muted);font-size:9px}@media(max-width:760px){.loanKpisCompact61{grid-template-columns:1fr 1fr}.loanDatesSplit62{grid-template-columns:1fr 1fr}.loanScheduleClosed17{align-items:flex-start;flex-direction:column}}';document.head.appendChild(st);
 })();
