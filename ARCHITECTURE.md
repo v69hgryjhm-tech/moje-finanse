@@ -1,6 +1,6 @@
 # Moje Finanse — aktywna architektura
 
-Aktualna gałąź produkcyjna: **5.8.3**.
+Aktualna gałąź produkcyjna: **5.8.4**.
 
 ## Punkt wejścia
 - `fresh-260.html` — bezpieczny redirect z cache-busterem
@@ -29,7 +29,8 @@ Aktualna gałąź produkcyjna: **5.8.3**.
 18. `v58performance.js` — optymalizacja 5.7: szybka nawigacja bez pełnego renderu, lekkie renderery per widok i diagnostyka czasu pełnego renderu.
 19. `v59kernel.js` — centralny kernel 5.8: jeden router `show()`, jeden aktywny `render()`, renderowanie wyłącznie bieżącego widoku i fallback starego pełnego renderu tylko na żądanie.
 20. `v60salaryperiod.js` — rozdzielenie miesiąca pracy od miesiąca wypłaty dla Etatu; cashflow/PIT liczą miesiąc wypłaty, analiza zarobków i forecast okresu pracy korzystają z miesiąca pracy.
-21. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
+21. `v61loanslazy.js` — lekki moduł Kredytów: szybkie podsumowania, lazy rendering szczegółów pojedynczego kredytu i osobne lazy ładowanie harmonogramu miesięcznego.
+22. `v43boot.js` — pojedynczy start i odsłonięcie gotowego interfejsu.
 
 ## Dane
 Główny klucz localStorage pozostaje bez zmian: `moje-finanse-v14`.
@@ -87,3 +88,5 @@ Nie zmieniać tego klucza bez jawnej migracji danych. Centrum finansowe zapisuje
 - poprawka 5.8.3: po renderze legacy Startu kernel jawnie uruchamia współczesne renderery forecastu i podatków, dzięki czemu stare markupy wykresów nie trafiają pod nowy CSS i nie rozciągają się na pełną szerokość.
 
 - poprawka 5.8.3: przebudowano widok Budżet i wydatki na kompaktową listę pozycji z czytelną hierarchią nazwa/kategoria/typ/termin/kwota; usunięto wygląd przypominający surowy formularz administracyjny.
+
+- poprawka 5.8.4: wejście w Kredyty nie buduje już wykresów i harmonogramów wszystkich kredytów; lista używa lekkich statystyk z historii, szczegóły renderują się tylko dla rozwiniętej pozycji, a harmonogram do 120 miesięcy dopiero po osobnym kliknięciu.
