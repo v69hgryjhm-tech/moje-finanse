@@ -22,12 +22,7 @@ function renderBusiness59(){
  safe59('Capacity MOHE',()=>window.mfAutopilot56?.renderBusiness?.())
 }
 function renderControl59(){
- safe59('Control base',()=>window.renderControl51?.());
- safe59('Control planner',()=>window.mfPlanner52?.renderControl?.());
- safe59('Control command',()=>window.mfCommand53?.renderControl?.());
- safe59('Control ops',()=>window.mfOps54?.renderControl?.());
- safe59('Control lab',()=>window.mfLab55?.renderControl?.());
- safe59('Control autopilot',()=>window.mfAutopilot56?.renderControl?.())
+ safe59('Prywatny monitoring',()=>window.renderPrivateMonitor63?.());
 }
 function renderLoans59(){
  safe59('Kredyty lazy',()=>window.renderLoansLazy61?.()||window.loans?.())
@@ -54,12 +49,12 @@ function renderView59(v){
   case 'businessplus':renderBusiness59();break;
   case 'accounting':safe59('Dla księgowej',()=>window.renderAccounting50?.());break;
   case 'control':renderControl59();break;
-  case 'monthly':safe59('Pulpit miesiąca',()=>window.renderMonthly42?.());break;
+  case 'monthly':safe59('Pulpit miesiąca',()=>window.renderMonthlyMonitor63?.()||window.renderMonthly42?.());break;
   case 'loans':renderLoans59();break;
   case 'tax':safe59('Podatki',()=>{window.taxChart?.(window.sal?.());window.renderTaxOnly44?.()});break;
   case 'wealth':safe59('Majątek',()=>{window.renderWealth42?.();window.renderSuite41?.();window.mfControl51?.renderWealth?.();window.mfLab55?.renderWealth?.()});break;
   case 'goals':safe59('Cele',()=>{window.renderGoals42?.();window.mfControl51?.renderGoals?.()});break;
-  case 'emergency':safe59('Poduszka',()=>window.renderEmergency42?.());break;
+  case 'emergency':safe59('Monitoring prywatny',()=>{activate59('control');window.renderPrivateMonitor63?.()});break;
   case 'actions':safe59('Plan działania',()=>window.mfOps54?.renderActions?.());break;
   case 'calendar':safe59('Kalendarz',()=>{window.renderCalendar42?.();window.mfOps54?.renderCalendar?.()});break;
   case 'budget':safe59('Wydatki',()=>{window.renderBudget34?.();window.renderSuite41?.();window.mfOps54?.renderBudget?.()});break;
