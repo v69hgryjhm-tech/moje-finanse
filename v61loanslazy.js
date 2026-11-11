@@ -4,9 +4,22 @@
 const G=id=>document.getElementById(id),N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(N(v));
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function point(l){try{return window.loanCurrentPoint15?.(l)}catch{return null}}
+function parseDate61(s){let d=new Date(String(s||'').length===7?String(s)+'-01':s);return isNaN(d)?new Date():d}
+function actualStats61(l){
+ let balance=N(l.balance),last=parseDate61(l.asOfDate),paid=0,extraPaid=0,interestPaid=0,principalPaid=0;
+ let hist=[...(l.history||[])].sort((a,b)=>(a.paymentDate||a.month||'').localeCompare(b.paymentDate||b.month||''));
+ for(const h of hist){
+  let d=parseDate61(h.paymentDate||((h.month||'')+'-'+String(l.dueDay||1).padStart(2,'0')));if(d<last)continue;
+  let days=Math.max(0,Math.round((d-last)/86400000)),interest=l.loanType==='zero'?0:balance*(N(l.rate)/100)/365*days,reg=h.paid?N(h.regularPaid):0,ex=h.isOverpayment?N(h.extra):0;
+  let toInterest=Math.min(reg,interest),principal=Math.max(0,reg-toInterest),unpaid=Math.max(0,interest-toInterest);
+  balance=Math.max(0,balance-principal-ex+unpaid);if(h.balanceAfter!=null)balance=Math.max(0,N(h.balanceAfter));
+  paid+=reg+ex;extraPaid+=ex;interestPaid+=toInterest;principalPaid+=principal+ex;last=d
+ }
+ return{balance,date:last,paid,extra:extraPaid,interest:interestPaid,principal:principalPaid}
+}
+function point(l){let s=actualStats61(l);return{balance:s.balance,date:s.date}}
+function totals(l){let s=actualStats61(l);return{paid:s.paid,extra:s.extra,interest:s.interest,principal:s.principal}}
 function timeline(l,plan=true){try{return window.loanTimeline15?.(l,plan)}catch{return null}}
-function totals(l){try{return window.loanTotals15?.(l)}catch{return null}}
 function isOpen(i){return !!S.loans?.[i]?.uiOpen61}
 function summary61(l,i){
  const q=point(l),tot=totals(l),bal=N(q?.balance??l.balance),orig=Math.max(N(l.originalBalance),bal,1),pc=Math.max(0,Math.min(100,(orig-bal)/orig*100));
