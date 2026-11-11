@@ -9,8 +9,8 @@ const html=fs.readFileSync('index.html','utf8');
 new Function(lazy);
 new Function(loan17);
 
-assert.match(html,/v61loanslazy\.js\?v=5850/);
-assert.match(html,/Moje Finanse 5\.8\.5/);
+assert.match(html,/v61loanslazy\.js\?v=5900/);
+assert.match(html,/Moje Finanse 5\.9\.0/);
 
 assert.ok(lazy.includes('uiOpen61'),'Brak stanu rozwinięcia konkretnego kredytu');
 assert.ok(lazy.includes('renderLoanCardLazy61'),'Brak lokalnego renderera pojedynczej karty');
@@ -29,4 +29,4 @@ assert.ok(kernel.includes("safe59('Kredyty lazy'"),'Kernel nie korzysta z lekkie
 assert.ok(!kernel.includes("safe59('Kredyty planner'"),'Kernel nadal odpala ciężką analizę planera przy wejściu w Kredyty');
 assert.ok(!kernel.includes("safe59('Kredyty control'"),'Kernel nadal odpala ciężką analizę control przy wejściu w Kredyty');
 
-console.log('PASS — 5.8.5: Kredyty używają lekkiej listy, lokalnego rozwijania i lazy harmonogramu.');
+console.log('PASS — 5.9.0: Kredyty używają lekkiej listy, lokalnego rozwijania i lazy harmonogramu.');
