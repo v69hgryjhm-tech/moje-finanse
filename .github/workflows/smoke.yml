@@ -72,3 +72,6 @@ jobs:
 
       - name: Loan events 5.8.5
         run: node tests/loan-events-62.mjs
+
+      - name: Private monitoring 5.9
+        run: node tests/private-monitor-63.mjs
