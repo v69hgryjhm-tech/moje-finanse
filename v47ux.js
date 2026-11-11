@@ -154,7 +154,7 @@ window.editLoanModal47=function(i){
 window.saveLoanEdit47=function(i){
  let l=S?.loans?.[i];if(!l)return;
  let bal=Math.max(0,N(G('e47_bal')?.value)),orig=Math.max(0,N(G('e47_orig')?.value));
- l.name=(G('e47_name')?.value||l.name||'Kredyt').trim();l.loanType=G('e47_type')?.value==='zero'?'zero':'interest';l.originalBalance=Math.max(orig,bal);l.balance=bal;l.asOfDate=G('e47_date')?.value||TODAY;l.payment=Math.max(0,N(G('e47_pay')?.value));l.rate=l.loanType==='zero'?0:Math.max(0,N(G('e47_rate')?.value));l.months=Math.max(0,Math.round(N(G('e47_months')?.value)));l.dueDay=Math.max(1,Math.min(31,Math.round(N(G('e47_due')?.value)||1)));l.overpayMode=G('e47_mode')?.value==='reduce_payment'?'reduce_payment':'shorten';l.extraMonthly=Math.max(0,N(G('e47_extra')?.value));l.oneOff=Math.max(0,N(G('e47_one')?.value));l.uiEditOpen=false;save();closeModal();window.render?.();window.show?.('loans')
+ l.name=(G('e47_name')?.value||l.name||'Kredyt').trim();l.loanType=G('e47_type')?.value==='zero'?'zero':'interest';l.originalBalance=Math.max(orig,bal);l.balance=bal;l.asOfDate=G('e47_date')?.value||TODAY;l.payment=Math.max(0,N(G('e47_pay')?.value));l.rate=l.loanType==='zero'?0:Math.max(0,N(G('e47_rate')?.value));l.months=Math.max(0,Math.round(N(G('e47_months')?.value)));l.dueDay=Math.max(1,Math.min(31,Math.round(N(G('e47_due')?.value)||1)));l.overpayMode=G('e47_mode')?.value==='reduce_payment'?'reduce_payment':'shorten';l.extraMonthly=Math.max(0,N(G('e47_extra')?.value));l.oneOff=Math.max(0,N(G('e47_one')?.value));l.uiEditOpen=false;save();closeModal();window.renderLoansLazy61?.()
 };
 function enhanceLoans47(){styleLoanOverview();styleLoanCards();enhanceLoanEditing()}
 
