@@ -48,7 +48,7 @@ if(!html.includes('v62loanengine.js')) failures.push('Brak poprawionego silnika 
 if(!html.includes('v63privatemonitor.js')) failures.push('Brak prywatnego monitoringu 5.9');
 if(!html.includes('v57mission.css')) failures.push('Brak stylu Mission Control 5.6');
 if(!html.includes("show('control')")) failures.push('Brak wejścia do Centrum dowodzenia');
-if(!html.includes('Moje Finanse 5.9.0')) failures.push('Nieprawidłowa wersja aplikacji');
+if(!html.includes('Moje Finanse 5.9.2')) failures.push('Nieprawidłowa wersja aplikacji');
 if(!read('v14a.js').includes('moje-finanse-v14')) failures.push('Zmieniono główny klucz danych localStorage');
 
 console.log('Aktywne JS:',scripts.length);
