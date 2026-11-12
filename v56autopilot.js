@@ -1,7 +1,7 @@
 /* Moje Finanse 5.5 — Autopilot finansowy */
 (function(){
 'use strict';
-const VERSION='5.9.0',G=id=>document.getElementById(id),N=v=>+v||0,CL=(v,a,b)=>Math.max(a,Math.min(b,v));
+const VERSION='5.9.2',G=id=>document.getElementById(id),N=v=>+v||0,CL=(v,a,b)=>Math.max(a,Math.min(b,v));
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:2,maximumFractionDigits:2}).format(N(v));
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const MN=['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
@@ -244,9 +244,8 @@ function renderControl56(){
  h.appendChild(box)
 }
 function renderHome56(){
- let h=G('home');if(!h||!ensure56())return;G('autoHome56')?.remove();let k=nowKey(),x=allocation56(k),debt=debtSim56(500),hit=(S.finance.auto56.watchlist||[]).filter(w=>watchReached56(w)).length,box=document.createElement('div');box.id='autoHome56';box.className='card';
- box.innerHTML='<div class="title">Autopilot finansowy <span class="pill green">5.5 AKTYWNY</span><button class="btn primary" onclick="show(\'autopilot\')">Centrum Autopilota ›</button></div><div class="autoKpis56"><div><small>DO PODZIAŁU</small><b>'+PLN(x?.available)+'</b></div><div><small>STRATEGIA</small><b>'+esc(x?.strategy?.label||'—')+'</b></div><div><small>+500 ZŁ DO DŁUGU</small><b>'+(debt.months?debt.months+' mies. do zera':'brak długu')+'</b></div><div><small>WATCHLISTA</small><b>'+hit+' spełnione</b></div></div>';
- let lab=G('labHome55')||G('opsHome54');if(lab)lab.insertAdjacentElement('afterend',box);else h.prepend(box)
+ let h=G('home'); if(!h)return;
+ G('autoHome56')?.remove();
 }
 function renderBusiness56(){
  let h=G('businessPlusBody');if(!h||!ensure56())return;G('capacityBusiness56')?.remove();let x=capacityPlan56(),box=document.createElement('div');box.id='capacityBusiness56';box.className='card';
@@ -271,7 +270,7 @@ function renderAll56(){
  if(!safe56('ensure56',ensure56))return;
  safe56('version',setVersion56);
  safe56('score snapshot',snapshotScore56);
- safe56('Start 5.5',renderHome56);
+ 
  safe56('Centrum 5.5',renderControl56);
  safe56('Autopilot',renderAutopilot56,'autopilotBody56','Autopilot finansowy');filled56('autopilotBody56','Autopilot finansowy');
  safe56('Capacity',renderCapacity56,'capacityBody56','MOHE Capacity Planner');filled56('capacityBody56','MOHE Capacity Planner');
