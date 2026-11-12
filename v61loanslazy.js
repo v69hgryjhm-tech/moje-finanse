@@ -51,11 +51,41 @@ window.toggleLoanLazy61=function(i){
  l.uiOpen61=!l.uiOpen61;save();
  requestAnimationFrame(()=>renderLoanCardLazy61(i))
 };
+function loanDate61(v){let d=v instanceof Date?new Date(v):parseDate61(v);return isNaN(d)?new Date():d}
+function monthEnd61(base,add){let d=new Date(base.getFullYear(),base.getMonth()+add+1,0);d.setHours(23,59,59,999);return d}
+function overviewSeries61(){
+ const now=new Date(),months=Array.from({length:12},(_,i)=>monthEnd61(now,i));
+ return months.map(d=>({d,balance:S.loans.reduce((sum,l)=>{
+   let rows=timeline(l,true)?.rows||timeline(l,true)||[];
+   rows=Array.isArray(rows)?rows:[];
+   let prev=rows.filter(r=>loanDate61(r.date||r.paymentDate||r.month)<=d).at(-1);
+   return sum+N(prev?.balance??point(l)?.balance??l.balance)
+ },0)}))
+}
+function chart61(data){
+ const w=720,h=190,left=48,right=700,top=24,bottom=145,max=Math.max(1,...data.map(x=>x.balance)),min=Math.min(...data.map(x=>x.balance)),span=Math.max(1,max-min),x=i=>left+i*((right-left)/(data.length-1||1)),y=v=>top+(1-(v-min)/span)*(bottom-top);
+ const pts=data.map((r,i)=>x(i)+','+y(r.balance)).join(' ');
+ const area=left+','+bottom+' '+pts+' '+right+','+bottom;
+ const labels=data.map((r,i)=>i%2===0||i===data.length-1?'<text x="'+x(i)+'" y="171" text-anchor="middle" fill="#73819a" font-size="9">'+r.d.toLocaleDateString('pl-PL',{month:'short',year:'2-digit'})+'</text>':'').join('');
+ const end=data.at(-1);
+ return '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><line x1="'+left+'" y1="'+bottom+'" x2="'+right+'" y2="'+bottom+'" stroke="#dfe5ec"/><polygon points="'+area+'" fill="#38b96a" opacity=".08"/><polyline points="'+pts+'" fill="none" stroke="#38b96a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="'+x(data.length-1)+'" cy="'+y(end.balance)+'" r="5" fill="#38b96a" stroke="#fff" stroke-width="2"/>'+labels+'</svg>'
+}
+function nearestPayments61(){
+ const now=new Date();now.setHours(0,0,0,0);let rows=[];
+ S.loans.forEach(l=>{
+   let t=timeline(l,true),arr=t?.rows||t||[];if(!Array.isArray(arr))return;
+   arr.filter(r=>loanDate61(r.date||r.paymentDate||r.month)>=now).slice(0,3).forEach(r=>rows.push({name:l.name||'Kredyt',date:loanDate61(r.date||r.paymentDate||r.month),amount:N(r.planned??r.payment??r.regular??l.payment)}))
+ });
+ return rows.sort((a,b)=>a.date-b.date).slice(0,5)
+}
 function renderOverviewLite61(){
  let host=G('loanList'),old=G('loanOverview');if(old)old.remove();if(!host||!S.loans?.length)return;
- const totalBal=S.loans.reduce((a,l)=>a+N(point(l)?.balance??l.balance),0),payments=S.loans.reduce((a,l)=>a+N(l.payment),0),paid=S.loans.reduce((a,l)=>a+N(totals(l)?.paid),0);
+ const totalBal=S.loans.reduce((a,l)=>a+N(point(l)?.balance??l.balance),0),payments=S.loans.reduce((a,l)=>a+N(l.payment),0),paid=S.loans.reduce((a,l)=>a+N(totals(l)?.paid),0),series=overviewSeries61(),nearest=nearestPayments61();
  let box=document.createElement('div');box.id='loanOverview';box.className='card loanOverviewLite61';
- box.innerHTML='<div class="title">Kredyty — szybki podgląd <span class="pill">lekki widok</span></div><div class="loanOverviewKpis"><div><small>ŁĄCZNE SALDO</small><b>'+PLN(totalBal)+'</b></div><div><small>RATY / MIES.</small><b>'+PLN(payments)+'</b></div><div><small>WPŁACONO</small><b>'+PLN(paid)+'</b></div><div><small>LICZBA KREDYTÓW</small><b>'+S.loans.length+'</b></div></div>';
+ box.innerHTML='<div class="title">Kredyty — szybki podgląd <span class="pill">lekki widok</span></div>'+
+ '<div class="loanOverviewKpis"><div><small>ŁĄCZNE SALDO</small><b>'+PLN(totalBal)+'</b></div><div><small>RATY / MIES.</small><b>'+PLN(payments)+'</b></div><div><small>WPŁACONO</small><b>'+PLN(paid)+'</b></div><div><small>LICZBA KREDYTÓW</small><b>'+S.loans.length+'</b></div></div>'+
+ '<div class="loanOverviewSplit61"><section class="loanOverviewPanel61"><div class="loanOverviewHead61"><div><b>Saldo kredytów w czasie</b><small>prognoza najbliższych 12 miesięcy</small></div></div><div class="loanOverviewChart61">'+chart61(series)+'</div></section>'+
+ '<section class="loanOverviewPanel61"><div class="loanOverviewHead61"><div><b>Najbliższe raty</b><small>co, gdzie i kiedy</small></div></div><div class="loanNext61">'+(nearest.length?nearest.map(r=>'<div><span><b>'+esc(r.name)+'</b><small>'+r.date.toLocaleDateString('pl-PL',{day:'2-digit',month:'short',year:'numeric'})+'</small></span><strong>'+PLN(r.amount)+'</strong></div>').join(''):'<p class="muted">Brak przyszłych rat w harmonogramie.</p>')+'</div></section></div>';
  host.parentNode.insertBefore(box,host)
 }
 function renderLoansLazy61(){
@@ -66,5 +96,5 @@ function renderLoansLazy61(){
 }
 window.renderLoansLazy61=renderLoansLazy61;
 window.loans=renderLoansLazy61;
-let st=document.createElement('style');st.textContent='.loanSummary61{padding:14px}.loanKpisCompact61{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:10px}.loanLoading61{padding:18px}.loanLoading61 small{display:block;margin-top:4px;color:var(--muted)}.loanOverviewLite61{margin-bottom:12px}.loanScheduleClosed17{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:12px;background:#f7f9fc}.loanScheduleClosed17 b,.loanScheduleClosed17 small{display:block}.loanDatesSplit62{grid-template-columns:1fr 1fr 1fr 1fr}.loanScheduleClosed17 small{margin-top:3px;color:var(--muted);font-size:9px}@media(max-width:760px){.loanKpisCompact61{grid-template-columns:1fr 1fr}.loanDatesSplit62{grid-template-columns:1fr 1fr}.loanScheduleClosed17{align-items:flex-start;flex-direction:column}}';document.head.appendChild(st);
+let st=document.createElement('style');st.textContent='.loanSummary61{padding:14px}.loanKpisCompact61{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:10px}.loanLoading61{padding:18px}.loanLoading61 small{display:block;margin-top:4px;color:var(--muted)}.loanOverviewLite61{margin-bottom:12px}.loanOverviewSplit61{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);gap:12px;margin-top:12px}.loanOverviewPanel61{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}.loanOverviewHead61 b,.loanOverviewHead61 small{display:block}.loanOverviewHead61 small{margin-top:3px;color:var(--muted);font-size:9px}.loanOverviewChart61{margin-top:6px;overflow:hidden}.loanOverviewChart61 svg{display:block;width:100%;height:185px}.loanNext61{margin-top:6px}.loanNext61>div{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.loanNext61>div:last-child{border-bottom:0}.loanNext61 span b,.loanNext61 span small{display:block}.loanNext61 span small{margin-top:2px;color:var(--muted);font-size:9px}.loanNext61 strong{white-space:nowrap}.loanNext61 .muted{margin:10px 0 0}.loanScheduleClosed17{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:12px;background:#f7f9fc}.loanScheduleClosed17 b,.loanScheduleClosed17 small{display:block}.loanDatesSplit62{grid-template-columns:1fr 1fr 1fr 1fr}.loanScheduleClosed17 small{margin-top:3px;color:var(--muted);font-size:9px}@media(max-width:760px){.loanOverviewSplit61{grid-template-columns:1fr}.loanOverviewChart61 svg{height:165px}.loanKpisCompact61{grid-template-columns:1fr 1fr}.loanDatesSplit62{grid-template-columns:1fr 1fr}.loanScheduleClosed17{align-items:flex-start;flex-direction:column}}';document.head.appendChild(st);
 })();
