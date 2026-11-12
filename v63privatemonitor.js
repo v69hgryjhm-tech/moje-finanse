@@ -1,7 +1,7 @@
 /* Moje Finanse 5.9 — prywatne finanse jako monitoring, nie budżet domowy */
 (function(){
 'use strict';
-const VERSION='5.9.0';
+const VERSION='5.9.2';
 const G=id=>document.getElementById(id);
 const N=v=>+v||0;
 const PLN=v=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN',minimumFractionDigits:0,maximumFractionDigits:0}).format(N(v));
@@ -87,7 +87,7 @@ function companySnapshot63(){
 }
 function renderMissionPrivate63(){
  let home=G('home');if(!home||!ensure63())return;
- home.classList.add('missionMode57');
+ home.classList.add('missionMode57','showLegacy57');
  let host=G('missionHome57');if(!host){host=document.createElement('div');host.id='missionHome57';home.prepend(host)}
  let x=privateSnapshot(nowKey()),c=companySnapshot63();
  host.innerHTML='<div class="missionHero57"><div class="missionHeroCopy57"><small>Centrum dowodzenia • monitoring</small><h2>Etat, firma i zobowiązania — bez liczenia każdej złotówki.</h2>'
